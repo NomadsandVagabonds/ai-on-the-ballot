@@ -45,7 +45,7 @@ export function ZipCodeInput({ onSubmit, variant = "hero" }: ZipCodeInputProps) 
   if (variant === "hero") {
     return (
       <div className="w-full max-w-md">
-        <form onSubmit={handleSubmit} className="flex gap-3">
+        <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-3">
           <div className="flex-1">
             <input
               type="text"

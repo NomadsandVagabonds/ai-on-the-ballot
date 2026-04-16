@@ -11,6 +11,7 @@ const NAV_LINKS = [
 ] as const;
 
 export function Header() {
+  const isMobileNavOpen = useAppStore((s) => s.isMobileNavOpen);
   const toggleMobileNav = useAppStore((s) => s.toggleMobileNav);
 
   return (
@@ -56,6 +57,7 @@ export function Header() {
             className="md:hidden inline-flex items-center justify-center rounded-md p-2 text-text-secondary hover:text-text-primary hover:bg-bg-elevated transition-colors"
             onClick={toggleMobileNav}
             aria-label="Open navigation menu"
+            aria-expanded={isMobileNavOpen}
           >
             <svg
               className="h-6 w-6"

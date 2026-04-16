@@ -60,11 +60,11 @@ function DesktopGrid({
       <table className="w-full border-collapse">
         <thead>
           <tr>
-            <th className="text-left text-xs font-semibold text-text-muted uppercase tracking-wider px-4 py-3 border-b border-border w-48">
+            <th scope="col" className="text-left text-xs font-semibold text-text-muted uppercase tracking-wider px-4 py-3 border-b border-border w-48">
               Issue
             </th>
             {candidates.map((c) => (
-              <th key={c.id} className="border-b border-border min-w-[140px]">
+              <th scope="col" key={c.id} className="border-b border-border min-w-[140px]">
                 <CandidateColumnHeader candidate={c} />
               </th>
             ))}
@@ -96,6 +96,7 @@ function DesktopGrid({
                       viewBox="0 0 24 24"
                       strokeWidth={2}
                       stroke="currentColor"
+                      aria-hidden="true"
                     >
                       <path
                         strokeLinecap="round"
@@ -169,7 +170,9 @@ function MobileView({
             key={c.id}
             type="button"
             role="tab"
+            id={`candidate-tab-${c.id}`}
             aria-selected={i === activeIndex}
+            aria-controls="candidate-tabpanel"
             onClick={() => {
               setActiveIndex(i);
               setExpandedIssue(null);
@@ -185,6 +188,12 @@ function MobileView({
         ))}
       </div>
 
+      {/* Tab panel content */}
+      <div
+        id="candidate-tabpanel"
+        role="tabpanel"
+        aria-labelledby={`candidate-tab-${activeCandidate.id}`}
+      >
       {/* Candidate info */}
       <div className="flex items-center gap-3 px-4 py-3 border-b border-border">
         {activeCandidate.photo_url ? (
@@ -246,6 +255,7 @@ function MobileView({
                     viewBox="0 0 24 24"
                     strokeWidth={2}
                     stroke="currentColor"
+                    aria-hidden="true"
                   >
                     <path
                       strokeLinecap="round"
@@ -277,6 +287,7 @@ function MobileView({
                         viewBox="0 0 24 24"
                         strokeWidth={2}
                         stroke="currentColor"
+                        aria-hidden="true"
                       >
                         <path
                           strokeLinecap="round"
@@ -291,6 +302,7 @@ function MobileView({
             </div>
           );
         })}
+      </div>
       </div>
     </div>
   );

@@ -80,6 +80,7 @@ export function USMap({ states }: USMapProps) {
           width={800}
           height={500}
           className="w-full h-auto"
+          aria-label="Interactive map of the United States showing tracked congressional races by state"
         >
           <Geographies geography={GEO_URL}>
             {({ geographies }) =>
@@ -92,6 +93,8 @@ export function USMap({ states }: USMapProps) {
                 const hasData = stateEntry?.has_data ?? false;
                 const isHovered = hoveredState === abbr;
 
+                const stateName = stateEntry?.name ?? abbr;
+
                 return (
                   <Geography
                     key={geo.rsmKey}
@@ -103,6 +106,19 @@ export function USMap({ states }: USMapProps) {
                         router.push(`/state/${stateEntry.slug}`);
                       }
                     }}
+                    onKeyDown={(e: React.KeyboardEvent) => {
+                      if ((e.key === "Enter" || e.key === " ") && stateEntry) {
+                        e.preventDefault();
+                        router.push(`/state/${stateEntry.slug}`);
+                      }
+                    }}
+                    tabIndex={hasData ? 0 : -1}
+                    role={hasData ? "button" : undefined}
+                    aria-label={
+                      hasData
+                        ? `${stateName} — ${stateEntry!.race_count} tracked race${stateEntry!.race_count === 1 ? "" : "s"}`
+                        : `${stateName} — coming soon`
+                    }
                     style={{
                       default: {
                         fill: hasData ? "#0D9488" : "#E5E0D8",

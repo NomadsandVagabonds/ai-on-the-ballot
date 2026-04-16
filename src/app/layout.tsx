@@ -23,13 +23,15 @@ const jetbrainsMono = JetBrains_Mono({
   display: "swap",
 });
 
+const siteDescription =
+  "A nonpartisan transparency resource documenting the public AI governance positions of U.S. congressional candidates.";
+
 export const metadata: Metadata = {
   title: {
     default: "AI on the Ballot",
     template: "%s | AI on the Ballot",
   },
-  description:
-    "A nonpartisan transparency resource documenting the public AI governance positions of U.S. congressional candidates.",
+  description: siteDescription,
   keywords: [
     "AI policy",
     "congressional candidates",
@@ -37,6 +39,18 @@ export const metadata: Metadata = {
     "voter guide",
     "election 2026",
   ],
+  openGraph: {
+    title: "AI on the Ballot",
+    description: siteDescription,
+    type: "website",
+    locale: "en_US",
+    siteName: "AI on the Ballot",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "AI on the Ballot",
+    description: siteDescription,
+  },
 };
 
 export default function RootLayout({
