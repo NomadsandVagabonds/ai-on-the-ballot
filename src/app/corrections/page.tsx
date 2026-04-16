@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { createServerSupabaseClient } from "@/lib/supabase/server";
+import { createServerSupabaseClient, isSupabaseConfigured } from "@/lib/supabase/server";
 import type { PublicCorrection } from "@/types/domain";
 import { CorrectionForm } from "./CorrectionForm";
 
@@ -12,16 +12,20 @@ export const metadata: Metadata = {
 };
 
 export default async function CorrectionsPage() {
-  const supabase = await createServerSupabaseClient();
-  const { data: rawCorrections } = await supabase
-    .from("corrections_log")
-    .select(
-      "id, candidate_name, issue, nature_of_change, previous_value, new_value, created_at"
-    )
-    .eq("is_public", true)
-    .order("created_at", { ascending: false });
+  let corrections: PublicCorrection[] = [];
 
-  const corrections = (rawCorrections ?? []) as unknown as PublicCorrection[];
+  if (isSupabaseConfigured()) {
+    const supabase = await createServerSupabaseClient();
+    const { data: rawCorrections } = await supabase
+      .from("corrections_log")
+      .select(
+        "id, candidate_name, issue, nature_of_change, previous_value, new_value, created_at"
+      )
+      .eq("is_public", true)
+      .order("created_at", { ascending: false });
+
+    corrections = (rawCorrections ?? []) as unknown as PublicCorrection[];
+  }
 
   return (
     <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 py-16 sm:py-24">

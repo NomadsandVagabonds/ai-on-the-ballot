@@ -1,4 +1,4 @@
-import { createServerSupabaseClient } from "@/lib/supabase/server";
+import { createServerSupabaseClient, isSupabaseConfigured } from "@/lib/supabase/server";
 import { getCandidateSummaries } from "./candidates";
 import type { RaceWithCandidates } from "@/types/domain";
 import type { RaceRow, RaceCandidateRow } from "@/types/database";
@@ -14,6 +14,8 @@ const CHAMBER_ORDER: Record<string, number> = {
 export async function getRacesByState(
   stateAbbr: string
 ): Promise<RaceWithCandidates[]> {
+  if (!isSupabaseConfigured()) return [];
+
   const supabase = await createServerSupabaseClient();
 
   const { data: rawRaces } = await supabase
@@ -33,6 +35,8 @@ export async function getRacesByState(
 export async function getRaceBySlug(
   slug: string
 ): Promise<RaceWithCandidates | null> {
+  if (!isSupabaseConfigured()) return null;
+
   const supabase = await createServerSupabaseClient();
 
   const { data, error } = await supabase

@@ -1,4 +1,4 @@
-import { createServerSupabaseClient } from "@/lib/supabase/server";
+import { createServerSupabaseClient, isSupabaseConfigured } from "@/lib/supabase/server";
 import type { Candidate, CandidateSummary } from "@/types/domain";
 import type {
   CandidateRow,
@@ -11,6 +11,8 @@ import type {
 export async function getCandidateBySlug(
   slug: string
 ): Promise<Candidate | null> {
+  if (!isSupabaseConfigured()) return null;
+
   const supabase = await createServerSupabaseClient();
 
   const { data, error } = await supabase

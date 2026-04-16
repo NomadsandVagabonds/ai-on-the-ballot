@@ -1,4 +1,4 @@
-import { createServerSupabaseClient } from "@/lib/supabase/server";
+import { createServerSupabaseClient, isSupabaseConfigured } from "@/lib/supabase/server";
 import { STATE_MAP, stateAbbrToSlug } from "@/lib/utils/states";
 import type { SearchResult } from "@/types/domain";
 import type { RaceRow } from "@/types/database";
@@ -27,6 +27,11 @@ export async function search(query: string): Promise<SearchResult[]> {
         url: `/state/${stateAbbrToSlug(abbr)}`,
       });
     }
+  }
+
+  // If Supabase isn't configured, return state-only results
+  if (!isSupabaseConfigured()) {
+    return results.slice(0, MAX_RESULTS);
   }
 
   // 2. Search candidates by name
