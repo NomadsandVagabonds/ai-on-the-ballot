@@ -28,6 +28,17 @@ const FIPS_TO_ABBR: Record<string, string> = {
   "51": "VA", "53": "WA", "54": "WV", "55": "WI", "56": "WY",
 };
 
+/* Academic palette for map states */
+const MAP_COLORS = {
+  activeFill: "#2E4057",       // Deep slate navy — tracked states
+  activeHover: "#5B7B6A",      // Sage green on hover
+  inactiveFill: "#DDD8D0",     // Warm beige-gray — coming soon
+  inactiveHover: "#C9C2B6",    // Slightly darker on hover
+  stroke: "#F0EDE7",           // Cream border between states
+  tooltipBg: "#2E4057",        // Navy tooltip
+  tooltipBorder: "#3D5A6E",
+};
+
 interface StateFeature {
   abbr: string;
   name: string;
@@ -71,7 +82,6 @@ export function USMap({ states }: USMapProps) {
 
         const geojson = feature(topology, topology.objects.states);
 
-        // Set up projection — geoAlbersUsa includes Alaska/Hawaii repositioning
         const projection = geoAlbersUsa()
           .scale(1280)
           .translate([480, 300]);
@@ -120,7 +130,6 @@ export function USMap({ states }: USMapProps) {
     ? stateDataMap.get(hoveredState)
     : null;
 
-  // Hovering over a state with no data entry — show name + "Coming soon"
   const hoveredStateName = hoveredState
     ? STATE_MAP[hoveredState] ?? hoveredState
     : null;
@@ -149,7 +158,6 @@ export function USMap({ states }: USMapProps) {
     [handleStateClick]
   );
 
-  // Stats
   const totalStatesWithData = states.filter((s) => s.has_data).length;
   const totalRaces = states.reduce((sum, s) => sum + s.race_count, 0);
   const sortedStates = useMemo(
@@ -169,10 +177,8 @@ export function USMap({ states }: USMapProps) {
           {loading && (
             <div className="flex items-center justify-center py-32">
               <div className="flex flex-col items-center gap-3">
-                <div
-                  className="h-8 w-8 rounded-full border-2 border-teal-400/30 border-t-teal-400 animate-spin"
-                />
-                <p className="text-sm text-gray-400">Loading map...</p>
+                <div className="h-8 w-8 rounded-full border-2 border-accent-primary/30 border-t-accent-primary animate-spin" />
+                <p className="text-sm text-text-muted">Loading map...</p>
               </div>
             </div>
           )}
@@ -180,7 +186,7 @@ export function USMap({ states }: USMapProps) {
           {/* Error state */}
           {error && (
             <div className="flex items-center justify-center py-32">
-              <p className="text-sm text-red-400">{error}</p>
+              <p className="text-sm text-red-600">{error}</p>
             </div>
           )}
 
@@ -193,24 +199,6 @@ export function USMap({ states }: USMapProps) {
               role="img"
               aria-label="Interactive map of the United States showing tracked congressional races by state"
             >
-              {/* Subtle background glow behind active states */}
-              <defs>
-                <filter id="state-glow" x="-20%" y="-20%" width="140%" height="140%">
-                  <feGaussianBlur stdDeviation="3" result="blur" />
-                  <feMerge>
-                    <feMergeNode in="blur" />
-                    <feMergeNode in="SourceGraphic" />
-                  </feMerge>
-                </filter>
-                <filter id="hover-glow" x="-20%" y="-20%" width="140%" height="140%">
-                  <feGaussianBlur stdDeviation="6" result="blur" />
-                  <feMerge>
-                    <feMergeNode in="blur" />
-                    <feMergeNode in="SourceGraphic" />
-                  </feMerge>
-                </filter>
-              </defs>
-
               {stateFeatures.map((feat) => {
                 const entry = stateDataMap.get(feat.abbr);
                 const hasData = entry?.has_data ?? false;
@@ -218,13 +206,13 @@ export function USMap({ states }: USMapProps) {
 
                 let fill: string;
                 if (hasData && isHovered) {
-                  fill = "#2DD4BF"; // bright teal on hover
+                  fill = MAP_COLORS.activeHover;
                 } else if (hasData) {
-                  fill = "#0D9488"; // teal
+                  fill = MAP_COLORS.activeFill;
                 } else if (isHovered) {
-                  fill = "#3A3D45"; // lighter gray on hover
+                  fill = MAP_COLORS.inactiveHover;
                 } else {
-                  fill = "#22252D"; // dark gray inactive
+                  fill = MAP_COLORS.inactiveFill;
                 }
 
                 return (
@@ -232,17 +220,11 @@ export function USMap({ states }: USMapProps) {
                     key={feat.abbr}
                     d={feat.pathD}
                     fill={fill}
-                    stroke="#0F1419"
-                    strokeWidth={0.75}
+                    stroke={MAP_COLORS.stroke}
+                    strokeWidth={1}
                     style={{
                       cursor: hasData ? "pointer" : "default",
-                      transition: "fill 0.15s ease",
-                      filter:
-                        hasData && isHovered
-                          ? "url(#hover-glow)"
-                          : hasData
-                          ? "url(#state-glow)"
-                          : undefined,
+                      transition: "fill 0.2s ease",
                     }}
                     onMouseEnter={() => setHoveredState(feat.abbr)}
                     onMouseLeave={() => setHoveredState(null)}
@@ -268,14 +250,14 @@ export function USMap({ states }: USMapProps) {
               style={{
                 left: tooltipPos.x + 14,
                 top: tooltipPos.y - 48,
-                backgroundColor: "#1E2028",
-                border: "1px solid #2A2D35",
+                backgroundColor: MAP_COLORS.tooltipBg,
+                border: `1px solid ${MAP_COLORS.tooltipBorder}`,
               }}
             >
               <p className="text-sm font-semibold text-white">
                 {hoveredStateName}
               </p>
-              <p className="text-xs text-gray-400">
+              <p className="text-xs text-gray-300">
                 {hoveredStateData
                   ? hoveredStateData.race_count > 0
                     ? `${hoveredStateData.race_count} tracked race${hoveredStateData.race_count === 1 ? "" : "s"}`
@@ -287,32 +269,28 @@ export function USMap({ states }: USMapProps) {
         </div>
 
         {/* Legend */}
-        <div className="flex items-center justify-center gap-8 py-4">
+        <div className="flex items-center justify-center gap-8 py-3">
           <div className="flex items-center gap-2">
             <span
               className="inline-block h-3 w-3 rounded-sm"
-              style={{ backgroundColor: "#0D9488" }}
+              style={{ backgroundColor: MAP_COLORS.activeFill }}
             />
-            <span className="text-xs text-gray-400">Tracked races</span>
+            <span className="text-xs text-text-muted">Tracked races</span>
           </div>
           <div className="flex items-center gap-2">
             <span
               className="inline-block h-3 w-3 rounded-sm"
-              style={{ backgroundColor: "#22252D" }}
+              style={{ backgroundColor: MAP_COLORS.inactiveFill }}
             />
-            <span className="text-xs text-gray-400">Coming soon</span>
+            <span className="text-xs text-text-muted">Coming soon</span>
           </div>
         </div>
 
         {/* Stats bar */}
-        <div className="grid grid-cols-3 gap-px bg-[#1A1D24]">
+        <div className="grid grid-cols-3 gap-px border-t border-border-strong">
           <StatBox label="States Tracked" value={totalStatesWithData} />
           <StatBox label="Races" value={totalRaces} />
-          <StatBox
-            label="Candidates"
-            value={"\u2014"}
-            sublabel="Across all races"
-          />
+          <StatBox label="AI Issues" value={5} />
         </div>
       </div>
 
@@ -327,24 +305,18 @@ export function USMap({ states }: USMapProps) {
 function StatBox({
   label,
   value,
-  sublabel,
 }: {
   label: string;
   value: number | string;
-  sublabel?: string;
 }) {
   return (
-    <div
-      className="flex flex-col items-center justify-center py-6 px-4"
-      style={{ backgroundColor: "#131720" }}
-    >
-      <span className="text-3xl font-bold text-teal-400 font-mono tabular-nums">
+    <div className="flex flex-col items-center justify-center py-5 px-4 bg-bg-surface/60">
+      <span className="text-2xl font-bold text-accent-primary font-mono tabular-nums">
         {value}
       </span>
-      <span className="text-sm text-gray-300 mt-1">{label}</span>
-      {sublabel && (
-        <span className="text-xs text-gray-500 mt-0.5">{sublabel}</span>
-      )}
+      <span className="text-[10px] text-text-muted mt-1 uppercase tracking-[0.1em] font-mono">
+        {label}
+      </span>
     </div>
   );
 }

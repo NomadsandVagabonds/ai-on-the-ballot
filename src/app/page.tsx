@@ -13,21 +13,18 @@ export default async function Home() {
 
   return (
     <div>
-      {/* Hero: title + zip code + map as one integrated dark section */}
-      <section
-        className="relative"
-        style={{ backgroundColor: "#0F1419" }}
-      >
+      {/* Hero: title + zip code + map — unified beige section */}
+      <section className="relative bg-bg-elevated">
         {/* Title + zip code */}
         <div className="relative z-10 pt-12 md:pt-16 pb-6 md:pb-8 px-4">
           <div className="mx-auto max-w-4xl text-center">
-            <p className="text-[10px] font-mono uppercase tracking-[0.25em] text-teal-400/80 mb-4">
+            <p className="text-[10px] font-mono uppercase tracking-[0.25em] text-accent-secondary mb-4">
               Nonpartisan Research &middot; 2026 Elections
             </p>
-            <h1 className="font-display text-display-xl font-bold text-white mb-4">
+            <h1 className="font-display text-display-xl font-bold text-text-primary mb-4">
               AI on the Ballot
             </h1>
-            <p className="text-gray-400 text-lg md:text-xl max-w-2xl mx-auto mb-8 leading-relaxed">
+            <p className="text-text-secondary text-lg md:text-xl max-w-2xl mx-auto mb-8 leading-relaxed">
               Where do your representatives stand on the most consequential
               technology of our time?
             </p>
@@ -36,22 +33,25 @@ export default async function Home() {
             <div className="flex justify-center mb-2">
               <HeroZipInput />
             </div>
-            <p className="text-xs text-gray-500">
+            <p className="text-xs text-text-muted mt-3">
               Enter your zip code to find your candidates &mdash; or click a
               state below
             </p>
           </div>
         </div>
 
-        {/* Map integrated directly below */}
-        <div className="relative z-10">
+        {/* Map integrated directly */}
+        <div className="relative z-10 max-w-6xl mx-auto px-4 pb-6">
           <USMap states={states} />
         </div>
+
+        {/* Subtle bottom border */}
+        <div className="h-px bg-gradient-to-r from-transparent via-border-strong to-transparent" />
       </section>
 
-      {/* Featured states — below the dark map section */}
+      {/* Featured states — below on white */}
       {statesWithData > 0 && (
-        <section className="px-4 py-16 md:py-20">
+        <section className="px-4 py-16 md:py-20 bg-bg-primary">
           <div className="mx-auto max-w-5xl">
             <div className="flex items-center gap-4 mb-8">
               <div className="h-px flex-1 bg-border" />

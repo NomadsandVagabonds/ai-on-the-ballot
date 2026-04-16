@@ -11,7 +11,7 @@ export function HeroZipInput() {
       onSubmit={(zip) => {
         router.push(`/lookup?zip=${zip}`);
       }}
-      variant="hero-dark"
+      variant="hero"
     />
   );
 }

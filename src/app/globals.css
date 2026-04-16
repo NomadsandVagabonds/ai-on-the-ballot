@@ -11,11 +11,11 @@
   --text-secondary: #4A4A4A;
   --text-muted: #9B9183;
 
-  /* Brand Accents (bespoke — no red/white/blue for chrome) */
-  --accent-primary: #0D9488;
-  --accent-primary-hover: #0F766E;
-  --accent-secondary: #4F46E5;
-  --accent-gold: #D97706;
+  /* Brand Accents — academic, authoritative (no red/white/blue for chrome) */
+  --accent-primary: #2E4057;
+  --accent-primary-hover: #1D2D3F;
+  --accent-secondary: #5B7B6A;
+  --accent-gold: #A67C37;
 
   /* Borders & Dividers */
   --border: #E5E0D8;
@@ -29,8 +29,8 @@
   --stance-no-mention: #D1D5DB;
 
   /* Confidence */
-  --confidence-high: #0D9488;
-  --confidence-medium: #D97706;
+  --confidence-high: #2E4057;
+  --confidence-medium: #A67C37;
   --confidence-low: #9CA3AF;
 
   /* Party Colors (ONLY used on PartyBadge — never in site chrome) */
