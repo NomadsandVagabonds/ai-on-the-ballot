@@ -39,3 +39,10 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# pipeline data (research output, staged positions, reports)
+/data/research-output/
+/data/staged-positions/
+/data/source-verification-report.json
+/data/candidate-manifest.csv
+/data/fec-to-bioguide.json

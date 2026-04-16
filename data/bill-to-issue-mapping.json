@@ -1,0 +1,167 @@
+{
+  "_comment": "Maps known AI-relevant bill keywords/titles to issue categories and expected stances. Used by derive-positions.ts to auto-code positions from legislative records.",
+  "rules": [
+    {
+      "pattern": "CHIPS",
+      "issue": "export-control",
+      "stance_if_sponsored": "support",
+      "stance_if_voted_for": "support",
+      "stance_if_voted_against": "oppose"
+    },
+    {
+      "pattern": "semiconductor export",
+      "issue": "export-control",
+      "stance_if_sponsored": "support",
+      "stance_if_voted_for": "support",
+      "stance_if_voted_against": "oppose"
+    },
+    {
+      "pattern": "compute governance",
+      "issue": "export-control",
+      "stance_if_sponsored": "support",
+      "stance_if_voted_for": "support",
+      "stance_if_voted_against": "oppose"
+    },
+    {
+      "pattern": "export control",
+      "issue": "export-control",
+      "stance_if_sponsored": "support",
+      "stance_if_voted_for": "support",
+      "stance_if_voted_against": "oppose"
+    },
+    {
+      "pattern": "autonomous weapons",
+      "issue": "military-ai",
+      "stance_if_sponsored": "mixed",
+      "stance_if_voted_for": "support",
+      "stance_if_voted_against": "oppose"
+    },
+    {
+      "pattern": "defense artificial intelligence",
+      "issue": "military-ai",
+      "stance_if_sponsored": "support",
+      "stance_if_voted_for": "support",
+      "stance_if_voted_against": "oppose"
+    },
+    {
+      "pattern": "military AI",
+      "issue": "military-ai",
+      "stance_if_sponsored": "support",
+      "stance_if_voted_for": "support",
+      "stance_if_voted_against": "oppose"
+    },
+    {
+      "pattern": "National Defense Authorization",
+      "issue": "military-ai",
+      "stance_if_sponsored": "support",
+      "stance_if_voted_for": "support",
+      "stance_if_voted_against": "oppose",
+      "_note": "Only match if bill also contains AI-related language"
+    },
+    {
+      "pattern": "AI regulation",
+      "issue": "regulation",
+      "stance_if_sponsored": "support",
+      "stance_if_voted_for": "support",
+      "stance_if_voted_against": "oppose"
+    },
+    {
+      "pattern": "artificial intelligence accountability",
+      "issue": "regulation",
+      "stance_if_sponsored": "support",
+      "stance_if_voted_for": "support",
+      "stance_if_voted_against": "oppose"
+    },
+    {
+      "pattern": "AI safety",
+      "issue": "regulation",
+      "stance_if_sponsored": "support",
+      "stance_if_voted_for": "support",
+      "stance_if_voted_against": "oppose"
+    },
+    {
+      "pattern": "algorithmic accountability",
+      "issue": "regulation",
+      "stance_if_sponsored": "support",
+      "stance_if_voted_for": "support",
+      "stance_if_voted_against": "oppose"
+    },
+    {
+      "pattern": "AI oversight",
+      "issue": "regulation",
+      "stance_if_sponsored": "support",
+      "stance_if_voted_for": "support",
+      "stance_if_voted_against": "oppose"
+    },
+    {
+      "pattern": "AI licensing",
+      "issue": "regulation",
+      "stance_if_sponsored": "support",
+      "stance_if_voted_for": "support",
+      "stance_if_voted_against": "oppose"
+    },
+    {
+      "pattern": "data center",
+      "issue": "data-centers",
+      "stance_if_sponsored": "support",
+      "stance_if_voted_for": "support",
+      "stance_if_voted_against": "oppose"
+    },
+    {
+      "pattern": "AI energy",
+      "issue": "data-centers",
+      "stance_if_sponsored": "support",
+      "stance_if_voted_for": "support",
+      "stance_if_voted_against": "oppose"
+    },
+    {
+      "pattern": "compute infrastructure",
+      "issue": "data-centers",
+      "stance_if_sponsored": "support",
+      "stance_if_voted_for": "support",
+      "stance_if_voted_against": "oppose"
+    },
+    {
+      "pattern": "Kids Online Safety",
+      "issue": "children-safety",
+      "stance_if_sponsored": "support",
+      "stance_if_voted_for": "support",
+      "stance_if_voted_against": "oppose"
+    },
+    {
+      "pattern": "KOSA",
+      "issue": "children-safety",
+      "stance_if_sponsored": "support",
+      "stance_if_voted_for": "support",
+      "stance_if_voted_against": "oppose"
+    },
+    {
+      "pattern": "COPPA",
+      "issue": "children-safety",
+      "stance_if_sponsored": "support",
+      "stance_if_voted_for": "support",
+      "stance_if_voted_against": "oppose"
+    },
+    {
+      "pattern": "children online",
+      "issue": "children-safety",
+      "stance_if_sponsored": "support",
+      "stance_if_voted_for": "support",
+      "stance_if_voted_against": "oppose"
+    },
+    {
+      "pattern": "age verification",
+      "issue": "children-safety",
+      "stance_if_sponsored": "support",
+      "stance_if_voted_for": "support",
+      "stance_if_voted_against": "oppose"
+    },
+    {
+      "pattern": "deepfake",
+      "issue": "children-safety",
+      "stance_if_sponsored": "support",
+      "stance_if_voted_for": "support",
+      "stance_if_voted_against": "oppose"
+    }
+  ]
+}
