@@ -7,7 +7,7 @@ Nonpartisan candidate tracker — documents U.S. congressional candidates' publi
 - Supabase (PostgreSQL) for data
 - Tailwind 4 + CSS custom properties for styling
 - Zustand for client state
-- react-simple-maps for interactive US map
+- topojson-client + d3-geo for interactive US map (inline SVG)
 - Vercel for deployment
 
 ## Project Structure
