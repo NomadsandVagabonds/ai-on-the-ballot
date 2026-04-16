@@ -40,8 +40,11 @@ export default function AboutPage() {
     <article className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
       {/* Hero */}
       <header className="mb-16">
-        <h1 className="font-display text-4xl sm:text-5xl font-bold tracking-tight mb-6">
-          About This Project
+        <p className="text-[10px] font-mono uppercase tracking-[0.2em] text-accent-primary mb-4">
+          About & Methodology
+        </p>
+        <h1 className="font-display text-display-lg font-bold tracking-tight mb-6">
+          How We Track AI Policy Positions
         </h1>
         <p className="text-lg sm:text-xl text-text-secondary leading-relaxed">
           AI on the Ballot is a nonpartisan transparency resource that documents
@@ -52,11 +55,11 @@ export default function AboutPage() {
       </header>
 
       {/* Section 1 — What This Is */}
-      <section className="mb-14">
+      <section className="mb-16">
         <h2 className="font-display text-2xl sm:text-3xl font-semibold mb-4">
           What This Is
         </h2>
-        <div className="h-px bg-border mb-6" />
+        <div className="h-px bg-gradient-to-r from-accent-primary/40 to-transparent mb-6" />
         <div className="space-y-4 text-text-secondary text-lg leading-relaxed">
           <p>
             AI on the Ballot documents the publicly available AI governance
@@ -64,20 +67,20 @@ export default function AboutPage() {
             have said, how they have voted, and what legislation they have
             sponsored or cosponsored on key AI policy issues.
           </p>
-          <p>
+          <div className="pull-quote">
             This is a nonpartisan transparency resource. We do not evaluate,
             endorse, score, or make recommendations about candidates or electoral
             outcomes.
-          </p>
+          </div>
         </div>
       </section>
 
       {/* Section 2 — Methodology */}
-      <section className="mb-14" id="methodology">
+      <section className="mb-16" id="methodology">
         <h2 className="font-display text-2xl sm:text-3xl font-semibold mb-4">
           Methodology
         </h2>
-        <div className="h-px bg-border mb-6" />
+        <div className="h-px bg-gradient-to-r from-accent-primary/40 to-transparent mb-6" />
 
         {/* Source Categories */}
         <h3 className="font-display text-xl font-semibold mb-3">
@@ -86,25 +89,38 @@ export default function AboutPage() {
         <p className="text-text-secondary text-lg leading-relaxed mb-4">
           We collect public statements and records from four source categories:
         </p>
-        <ul className="list-disc pl-6 space-y-2 text-text-secondary text-lg leading-relaxed mb-8">
-          <li>
-            <strong className="text-text-primary">Campaign websites</strong> —
-            official policy pages, press releases, and issue statements
-          </li>
-          <li>
-            <strong className="text-text-primary">Social media</strong> —
-            public posts on major platforms where candidates discuss AI policy
-          </li>
-          <li>
-            <strong className="text-text-primary">Web search</strong> — news
-            interviews, op-eds, debate transcripts, and public remarks
-          </li>
-          <li>
-            <strong className="text-text-primary">Congressional record</strong>{" "}
-            — sponsored/cosponsored bills, committee hearing statements, floor
-            votes, and official letters
-          </li>
-        </ul>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-10">
+          {[
+            {
+              title: "Campaign websites",
+              desc: "Official policy pages, press releases, and issue statements",
+            },
+            {
+              title: "Social media",
+              desc: "Public posts on major platforms where candidates discuss AI policy",
+            },
+            {
+              title: "Web search",
+              desc: "News interviews, op-eds, debate transcripts, and public remarks",
+            },
+            {
+              title: "Congressional record",
+              desc: "Sponsored/cosponsored bills, committee hearing statements, floor votes",
+            },
+          ].map((source) => (
+            <div
+              key={source.title}
+              className="callout-box"
+            >
+              <p className="text-sm font-semibold text-text-primary mb-1">
+                {source.title}
+              </p>
+              <p className="text-sm text-text-secondary leading-relaxed !text-sm">
+                {source.desc}
+              </p>
+            </div>
+          ))}
+        </div>
 
         {/* Stance Coding */}
         <h3 className="font-display text-xl font-semibold mb-3">
@@ -114,7 +130,7 @@ export default function AboutPage() {
           Each candidate&rsquo;s position on each tracked issue is coded into
           one of five categories:
         </p>
-        <dl className="space-y-3 mb-8">
+        <dl className="space-y-3 mb-10">
           {[
             {
               term: "Support",
@@ -142,11 +158,11 @@ export default function AboutPage() {
                 "No public record of the candidate addressing this topic was found in our research.",
             },
           ].map((item) => (
-            <div key={item.term} className="flex gap-3">
-              <dt className="font-semibold text-text-primary min-w-[7rem] shrink-0">
+            <div key={item.term} className="flex gap-4 py-2 border-b border-border/60 last:border-0">
+              <dt className="font-mono text-sm font-semibold text-text-primary min-w-[7rem] shrink-0">
                 {item.term}
               </dt>
-              <dd className="text-text-secondary text-lg leading-relaxed">
+              <dd className="text-text-secondary leading-relaxed">
                 {item.definition}
               </dd>
             </div>
@@ -161,7 +177,7 @@ export default function AboutPage() {
           Each coded stance includes a confidence level reflecting the strength
           of the underlying evidence:
         </p>
-        <dl className="space-y-3 mb-8">
+        <dl className="space-y-3 mb-10">
           {[
             {
               term: "High",
@@ -179,11 +195,11 @@ export default function AboutPage() {
                 "Based on inferred or tangential evidence — e.g., a brief remark in a broader context, or a position extrapolated from related statements.",
             },
           ].map((item) => (
-            <div key={item.term} className="flex gap-3">
-              <dt className="font-semibold text-text-primary min-w-[7rem] shrink-0">
+            <div key={item.term} className="flex gap-4 py-2 border-b border-border/60 last:border-0">
+              <dt className="font-mono text-sm font-semibold text-text-primary min-w-[7rem] shrink-0">
                 {item.term}
               </dt>
-              <dd className="text-text-secondary text-lg leading-relaxed">
+              <dd className="text-text-secondary leading-relaxed">
                 {item.definition}
               </dd>
             </div>
@@ -191,47 +207,58 @@ export default function AboutPage() {
         </dl>
 
         {/* Issue Categories */}
-        <h3 className="font-display text-xl font-semibold mb-3">
+        <h3 className="font-display text-xl font-semibold mb-4">
           Tracked Issue Categories
         </h3>
-        <p className="text-text-secondary text-lg leading-relaxed mb-4">
+        <p className="text-text-secondary text-lg leading-relaxed mb-5">
           We track candidate positions across five AI governance issue areas:
         </p>
-        <ol className="list-decimal pl-6 space-y-3 mb-4">
-          {ISSUE_CATEGORIES.map((issue) => (
-            <li key={issue.name} className="text-lg leading-relaxed">
-              <strong className="text-text-primary">{issue.name}</strong>
-              <span className="text-text-secondary">
-                {" "}
-                — {issue.description}
-              </span>
-            </li>
+        <div className="grid grid-cols-1 gap-4 mb-4">
+          {ISSUE_CATEGORIES.map((issue, i) => (
+            <div key={issue.name} className="card-elevated p-5">
+              <div className="flex items-start gap-4">
+                <span className="font-mono text-2xl font-bold text-accent-primary/30 tabular-nums leading-none mt-0.5">
+                  {String(i + 1).padStart(2, "0")}
+                </span>
+                <div>
+                  <p className="font-semibold text-text-primary mb-1">
+                    {issue.name}
+                  </p>
+                  <p className="text-sm text-text-secondary leading-relaxed">
+                    {issue.description}
+                  </p>
+                </div>
+              </div>
+            </div>
           ))}
-        </ol>
+        </div>
       </section>
 
       {/* Section 3 — Candidate Inclusion Criteria */}
-      <section className="mb-14">
+      <section className="mb-16">
         <h2 className="font-display text-2xl sm:text-3xl font-semibold mb-4">
           Candidate Inclusion Criteria
         </h2>
-        <div className="h-px bg-border mb-6" />
+        <div className="h-px bg-gradient-to-r from-accent-primary/40 to-transparent mb-6" />
         <div className="space-y-4 text-text-secondary text-lg leading-relaxed">
           <p>
             Candidates must meet FEC filing and fundraising thresholds to be
             included:
           </p>
-          <ul className="list-disc pl-6 space-y-2">
-            <li>
-              <strong className="text-text-primary">Senate:</strong> FEC Form 1
-              (Statement of Candidacy) filed + $100,000 or more raised
-            </li>
-            <li>
-              <strong className="text-text-primary">House:</strong> FEC Form 1
-              filed + $15,000 raised (initial inclusion), $50,000 raised
-              (ongoing inclusion)
-            </li>
-          </ul>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="callout-box">
+              <p className="text-sm font-semibold text-text-primary mb-1">Senate</p>
+              <p className="text-sm text-text-secondary leading-relaxed !text-sm">
+                FEC Form 1 (Statement of Candidacy) filed + $100,000 or more raised
+              </p>
+            </div>
+            <div className="callout-box">
+              <p className="text-sm font-semibold text-text-primary mb-1">House</p>
+              <p className="text-sm text-text-secondary leading-relaxed !text-sm">
+                FEC Form 1 filed + $15,000 raised (initial), $50,000 raised (ongoing)
+              </p>
+            </div>
+          </div>
           <p>
             Thresholds are re-evaluated at each FEC quarterly filing deadline.
             Candidates who fall below the ongoing threshold may be removed from
@@ -241,28 +268,28 @@ export default function AboutPage() {
       </section>
 
       {/* Section 4 — Updates & Corrections */}
-      <section className="mb-14">
+      <section className="mb-16">
         <h2 className="font-display text-2xl sm:text-3xl font-semibold mb-4">
           Updates & Corrections
         </h2>
-        <div className="h-px bg-border mb-6" />
+        <div className="h-px bg-gradient-to-r from-accent-primary/40 to-transparent mb-6" />
         <div className="space-y-4 text-text-secondary text-lg leading-relaxed">
           <p>
             The candidate dataset is updated on the FEC quarterly schedule:
             April&nbsp;15, July&nbsp;15, and October&nbsp;15. Position coding is
             reviewed monthly between quarterly updates.
           </p>
-          <p>
+          <div className="pull-quote">
             We take corrections seriously. If you believe any information on this
             site is inaccurate, incomplete, or outdated, please let us know.
-          </p>
+          </div>
           <p>
             <Link
               href="/corrections"
-              className="inline-flex items-center gap-1 text-accent-primary hover:text-accent-primary-hover font-medium transition-colors"
+              className="group inline-flex items-center gap-1.5 text-accent-primary hover:text-accent-primary-hover font-medium transition-colors"
             >
               Submit a correction
-              <span aria-hidden="true">&rarr;</span>
+              <span className="transition-transform duration-200 group-hover:translate-x-0.5" aria-hidden="true">&rarr;</span>
             </Link>
           </p>
         </div>
@@ -273,7 +300,7 @@ export default function AboutPage() {
         <h2 className="font-display text-2xl sm:text-3xl font-semibold mb-4">
           Team
         </h2>
-        <div className="h-px bg-border mb-6" />
+        <div className="h-px bg-gradient-to-r from-accent-primary/40 to-transparent mb-6" />
         <div className="space-y-4 text-text-secondary text-lg leading-relaxed">
           <p>
             AI on the Ballot is an independent research project. Team credits
@@ -284,7 +311,7 @@ export default function AboutPage() {
             contact us at{" "}
             <a
               href="mailto:contact@aiontheballot.com"
-              className="text-accent-primary hover:text-accent-primary-hover font-medium transition-colors"
+              className="link-editorial font-medium"
             >
               contact@aiontheballot.com
             </a>

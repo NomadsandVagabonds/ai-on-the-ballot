@@ -14,15 +14,15 @@ interface ComparisonGridProps {
 
 function CandidateColumnHeader({ candidate }: { candidate: CandidateSummary }) {
   return (
-    <div className="flex flex-col items-center gap-2 px-2 py-3">
+    <div className="flex flex-col items-center gap-2.5 px-3 py-4">
       {candidate.photo_url ? (
         <img
           src={candidate.photo_url}
           alt={candidate.name}
-          className="h-12 w-12 rounded-full object-cover"
+          className="h-14 w-14 rounded-xl object-cover shadow-[var(--shadow-sm)]"
         />
       ) : (
-        <div className="h-12 w-12 rounded-full bg-bg-elevated flex items-center justify-center">
+        <div className="h-14 w-14 rounded-xl bg-bg-elevated flex items-center justify-center">
           <span className="font-display text-sm font-bold text-text-secondary">
             {candidate.name
               .split(" ")
@@ -34,10 +34,10 @@ function CandidateColumnHeader({ candidate }: { candidate: CandidateSummary }) {
         </div>
       )}
       <div className="text-center">
-        <p className="text-xs font-semibold text-text-primary leading-tight">
+        <p className="text-sm font-semibold text-text-primary leading-tight">
           {candidate.name}
         </p>
-        <div className="mt-1">
+        <div className="mt-1.5">
           <PartyBadge party={candidate.party} size="sm" />
         </div>
       </div>
@@ -59,37 +59,38 @@ function DesktopGrid({
     <div className="overflow-x-auto">
       <table className="w-full border-collapse">
         <thead>
-          <tr>
-            <th scope="col" className="text-left text-xs font-semibold text-text-muted uppercase tracking-wider px-4 py-3 border-b border-border w-48">
+          <tr className="bg-bg-elevated/40">
+            <th scope="col" className="text-left text-[10px] font-mono font-semibold text-text-muted uppercase tracking-[0.15em] px-5 py-4 border-b border-border w-52">
               Issue
             </th>
             {candidates.map((c) => (
-              <th scope="col" key={c.id} className="border-b border-border min-w-[140px]">
+              <th scope="col" key={c.id} className="border-b border-border min-w-[160px]">
                 <CandidateColumnHeader candidate={c} />
               </th>
             ))}
           </tr>
         </thead>
         <tbody>
-          {rows.map((row) => {
+          {rows.map((row, i) => {
             const isExpanded = expandedIssue === row.issue.id;
+            const isEvenRow = i % 2 === 0;
 
             return (
-              <tr key={row.issue.id} className="group">
+              <tr key={row.issue.id} className={`comparison-row ${isEvenRow ? "" : "bg-bg-elevated/20"}`}>
                 <td className="border-b border-border">
                   <button
                     type="button"
                     onClick={() =>
                       setExpandedIssue(isExpanded ? null : row.issue.id)
                     }
-                    className="w-full text-left px-4 py-3 flex items-center gap-2 hover:bg-bg-elevated/50 transition-colors"
+                    className="w-full text-left px-5 py-4 flex items-center gap-2 hover:bg-bg-elevated/50 transition-colors"
                     aria-expanded={isExpanded}
                   >
                     <span className="text-sm font-medium text-text-primary">
                       {row.issue.display_name}
                     </span>
                     <svg
-                      className={`h-3.5 w-3.5 text-text-muted shrink-0 transition-transform ${
+                      className={`h-3.5 w-3.5 text-text-muted shrink-0 transition-transform duration-200 ${
                         isExpanded ? "rotate-180" : ""
                       }`}
                       fill="none"
@@ -107,8 +108,8 @@ function DesktopGrid({
                   </button>
 
                   {isExpanded && (
-                    <div className="px-4 pb-3">
-                      <p className="text-xs text-text-muted">
+                    <div className="px-5 pb-4 row-reveal">
+                      <p className="text-xs text-text-muted leading-relaxed">
                         {row.issue.description}
                       </p>
                     </div>
@@ -117,25 +118,32 @@ function DesktopGrid({
                 {row.positions.map((pos) => (
                   <td
                     key={pos.candidate_id}
-                    className="border-b border-border px-4 py-3 text-center align-top"
+                    className="border-b border-border px-5 py-4 text-center align-top"
                   >
                     <div className="flex flex-col items-center gap-1">
                       <StanceIndicator stance={pos.stance} size="md" />
                     </div>
                     {isExpanded && pos.summary && (
-                      <p className="mt-2 text-xs text-text-secondary text-left leading-relaxed">
-                        {pos.summary}
-                      </p>
+                      <div className="row-reveal">
+                        <p className="mt-3 text-xs text-text-secondary text-left leading-relaxed">
+                          {pos.summary}
+                        </p>
+                      </div>
                     )}
                     {isExpanded && pos.source_url && (
-                      <a
-                        href={pos.source_url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-block mt-1 text-[10px] text-accent-primary hover:underline"
-                      >
-                        Source
-                      </a>
+                      <div className="row-reveal">
+                        <a
+                          href={pos.source_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1 mt-2 text-[10px] font-medium text-accent-primary hover:text-accent-primary-hover transition-colors"
+                        >
+                          View source
+                          <svg className="h-2.5 w-2.5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" aria-hidden="true">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 19.5l15-15m0 0H8.25m11.25 0v11.25" />
+                          </svg>
+                        </a>
+                      </div>
                     )}
                   </td>
                 ))}
@@ -177,9 +185,9 @@ function MobileView({
               setActiveIndex(i);
               setExpandedIssue(null);
             }}
-            className={`flex-1 min-w-0 px-3 py-2.5 text-center text-sm font-medium border-b-2 transition-colors ${
+            className={`flex-1 min-w-0 px-3 py-3 text-center text-sm font-medium border-b-2 transition-all duration-200 ${
               i === activeIndex
-                ? "border-accent-primary text-accent-primary"
+                ? "border-accent-primary text-accent-primary bg-accent-primary/5"
                 : "border-transparent text-text-muted hover:text-text-secondary"
             }`}
           >
@@ -195,15 +203,15 @@ function MobileView({
         aria-labelledby={`candidate-tab-${activeCandidate.id}`}
       >
       {/* Candidate info */}
-      <div className="flex items-center gap-3 px-4 py-3 border-b border-border">
+      <div className="flex items-center gap-3 px-4 py-4 bg-bg-elevated/30 border-b border-border">
         {activeCandidate.photo_url ? (
           <img
             src={activeCandidate.photo_url}
             alt={activeCandidate.name}
-            className="h-10 w-10 rounded-full object-cover"
+            className="h-12 w-12 rounded-xl object-cover shadow-[var(--shadow-sm)]"
           />
         ) : (
-          <div className="h-10 w-10 rounded-full bg-bg-elevated flex items-center justify-center">
+          <div className="h-12 w-12 rounded-xl bg-bg-elevated flex items-center justify-center">
             <span className="font-display text-xs font-bold text-text-secondary">
               {activeCandidate.name
                 .split(" ")
@@ -218,28 +226,31 @@ function MobileView({
           <p className="text-sm font-semibold text-text-primary">
             {activeCandidate.name}
           </p>
-          <PartyBadge party={activeCandidate.party} size="sm" />
+          <div className="mt-1">
+            <PartyBadge party={activeCandidate.party} size="sm" />
+          </div>
         </div>
       </div>
 
       {/* Issue list */}
       <div className="divide-y divide-border">
-        {rows.map((row) => {
+        {rows.map((row, i) => {
           const pos = row.positions.find(
             (p) => p.candidate_id === activeCandidate.id
           );
           if (!pos) return null;
 
           const isExpanded = expandedIssue === row.issue.id;
+          const isEvenRow = i % 2 === 0;
 
           return (
-            <div key={row.issue.id}>
+            <div key={row.issue.id} className={isEvenRow ? "" : "bg-bg-elevated/20"}>
               <button
                 type="button"
                 onClick={() =>
                   setExpandedIssue(isExpanded ? null : row.issue.id)
                 }
-                className="w-full flex items-center justify-between px-4 py-3 text-left hover:bg-bg-elevated/50 transition-colors"
+                className="w-full flex items-center justify-between px-4 py-3.5 text-left hover:bg-bg-elevated/50 transition-colors"
                 aria-expanded={isExpanded}
               >
                 <span className="text-sm font-medium text-text-primary">
@@ -248,7 +259,7 @@ function MobileView({
                 <div className="flex items-center gap-2 shrink-0">
                   <StanceIndicator stance={pos.stance} size="sm" />
                   <svg
-                    className={`h-3.5 w-3.5 text-text-muted transition-transform ${
+                    className={`h-3.5 w-3.5 text-text-muted transition-transform duration-200 ${
                       isExpanded ? "rotate-180" : ""
                     }`}
                     fill="none"
@@ -267,7 +278,7 @@ function MobileView({
               </button>
 
               {isExpanded && (
-                <div className="px-4 pb-3 space-y-2">
+                <div className="px-4 pb-4 space-y-2 row-reveal">
                   {pos.summary && (
                     <p className="text-sm text-text-secondary leading-relaxed">
                       {pos.summary}
@@ -278,7 +289,7 @@ function MobileView({
                       href={pos.source_url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1 text-xs text-accent-primary hover:underline"
+                      className="inline-flex items-center gap-1 text-xs font-medium text-accent-primary hover:text-accent-primary-hover transition-colors"
                     >
                       View source
                       <svg
@@ -323,7 +334,10 @@ export function ComparisonGrid({
 
   return (
     <div>
-      <div className="flex items-center justify-end mb-4">
+      <div className="flex items-center justify-between mb-5">
+        <p className="text-[10px] font-mono uppercase tracking-[0.15em] text-text-muted">
+          {filteredRows.length} issue{filteredRows.length === 1 ? "" : "s"}
+        </p>
         <ToggleSwitch
           checked={hideNoMention}
           onChange={toggleHideNoMention}
@@ -332,18 +346,23 @@ export function ComparisonGrid({
       </div>
 
       {filteredRows.length === 0 ? (
-        <p className="text-center py-8 text-text-muted">
-          No position data available for this race yet.
-        </p>
+        <div className="text-center py-12 bg-bg-surface border border-border rounded-lg">
+          <p className="text-text-muted font-display text-lg">
+            No position data available for this race yet.
+          </p>
+          <p className="text-text-muted text-sm mt-1">
+            Check back as we expand coverage.
+          </p>
+        </div>
       ) : (
         <>
           {/* Desktop / tablet */}
-          <div className="hidden md:block bg-bg-surface border border-border rounded-lg overflow-hidden">
+          <div className="hidden md:block card-elevated overflow-hidden">
             <DesktopGrid candidates={candidates} rows={filteredRows} />
           </div>
 
           {/* Mobile */}
-          <div className="md:hidden bg-bg-surface border border-border rounded-lg overflow-hidden">
+          <div className="md:hidden card-elevated overflow-hidden">
             <MobileView candidates={candidates} rows={filteredRows} />
           </div>
         </>

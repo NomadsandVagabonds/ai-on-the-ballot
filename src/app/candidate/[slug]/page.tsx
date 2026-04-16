@@ -39,7 +39,19 @@ function isAIRelevantCommittee(name: string): boolean {
   return AI_COMMITTEE_KEYWORDS.some((kw) => lower.includes(kw));
 }
 
-function InitialAvatar({ name }: { name: string }) {
+function getPartyColor(party: string): string {
+  switch (party.toLowerCase()) {
+    case "democrat":
+    case "democratic":
+      return "bg-party-dem";
+    case "republican":
+      return "bg-party-rep";
+    default:
+      return "bg-party-ind";
+  }
+}
+
+function InitialAvatar({ name, party }: { name: string; party: string }) {
   const initials = name
     .split(" ")
     .map((n) => n[0])
@@ -49,10 +61,10 @@ function InitialAvatar({ name }: { name: string }) {
 
   return (
     <div
-      className="h-24 w-24 md:h-32 md:w-32 rounded-full bg-bg-elevated flex items-center justify-center shrink-0"
+      className={`h-28 w-28 md:h-36 md:w-36 rounded-2xl ${getPartyColor(party)} flex items-center justify-center shrink-0`}
       aria-hidden="true"
     >
-      <span className="font-display text-3xl md:text-4xl font-bold text-text-secondary">
+      <span className="font-display text-3xl md:text-4xl font-bold text-white/90">
         {initials}
       </span>
     </div>
@@ -75,60 +87,61 @@ export default async function CandidatePage({ params }: CandidatePageProps) {
   );
 
   return (
-    <div className="mx-auto max-w-5xl px-4 py-8 md:py-12">
+    <div className="mx-auto max-w-5xl px-4 py-10 md:py-16">
       {/* Layer 1: Identity Card */}
-      <section className="bg-bg-surface border border-border rounded-lg p-6 md:p-8 mb-8">
+      <section className="card-elevated p-6 md:p-8 mb-10">
         <div className="flex flex-col sm:flex-row items-start gap-6">
           {/* Photo */}
           {candidate.photo_url ? (
             <img
               src={candidate.photo_url}
               alt={candidate.name}
-              className="h-24 w-24 md:h-32 md:w-32 rounded-full object-cover shrink-0"
+              className="h-28 w-28 md:h-36 md:w-36 rounded-2xl object-cover shrink-0 shadow-[var(--shadow-sm)]"
             />
           ) : (
-            <InitialAvatar name={candidate.name} />
+            <InitialAvatar name={candidate.name} party={candidate.party} />
           )}
 
           <div className="flex-1 min-w-0">
             {/* Name + party */}
             <div className="flex flex-wrap items-center gap-3 mb-2">
-              <h1 className="font-display text-2xl md:text-3xl font-bold text-text-primary">
+              <h1 className="font-display text-2xl md:text-3xl font-bold text-text-primary tracking-tight">
                 {candidate.name}
               </h1>
               <PartyBadge party={candidate.party} />
               {candidate.is_incumbent && (
-                <span className="inline-flex items-center rounded-full bg-accent-gold/10 px-2.5 py-0.5 text-xs font-semibold text-accent-gold">
+                <span className="inline-flex items-center rounded-full bg-accent-gold/10 px-2.5 py-0.5 text-xs font-semibold text-accent-gold border border-accent-gold/20">
                   Incumbent
                 </span>
               )}
             </div>
 
             {/* Office */}
-            <p className="text-text-secondary">
+            <p className="text-text-secondary text-lg">
               {candidate.office_sought}
             </p>
 
             {/* Committees */}
             {candidate.committee_assignments.length > 0 && (
-              <div className="mt-3">
-                <p className="text-xs text-text-muted uppercase tracking-wider mb-1.5">
+              <div className="mt-4">
+                <p className="text-[10px] font-mono text-text-muted uppercase tracking-[0.15em] mb-2">
                   Committee Assignments
                 </p>
                 <div className="flex flex-wrap gap-1.5">
                   {aiCommittees.map((c) => (
                     <span
                       key={c}
-                      className="inline-flex items-center rounded-full bg-accent-primary/10 px-2.5 py-1 text-xs font-medium text-accent-primary"
+                      className="inline-flex items-center rounded-full bg-accent-primary/10 border border-accent-primary/20 px-3 py-1 text-xs font-medium text-accent-primary"
                       title="AI-relevant committee"
                     >
+                      <span className="w-1.5 h-1.5 rounded-full bg-accent-primary mr-1.5" aria-hidden="true" />
                       {c}
                     </span>
                   ))}
                   {otherCommittees.map((c) => (
                     <span
                       key={c}
-                      className="inline-flex items-center rounded-full bg-bg-elevated px-2.5 py-1 text-xs text-text-secondary"
+                      className="inline-flex items-center rounded-full bg-bg-elevated px-3 py-1 text-xs text-text-secondary"
                     >
                       {c}
                     </span>
@@ -138,7 +151,7 @@ export default async function CandidatePage({ params }: CandidatePageProps) {
             )}
 
             {/* Last updated */}
-            <p className="mt-3 text-xs font-mono text-text-muted">
+            <p className="mt-4 text-[10px] font-mono text-text-muted uppercase tracking-wider">
               Last updated{" "}
               {new Date(candidate.updated_at).toLocaleDateString("en-US", {
                 year: "numeric",
@@ -151,15 +164,24 @@ export default async function CandidatePage({ params }: CandidatePageProps) {
       </section>
 
       {/* Layer 2: Position Grid */}
-      <section className="mb-8">
+      <section className="mb-10">
+        <div className="flex items-center gap-4 mb-6">
+          <h2 className="font-display text-xl md:text-2xl font-bold text-text-primary shrink-0">
+            AI Policy Positions
+          </h2>
+          <div className="h-px flex-1 bg-border" />
+        </div>
         <PositionGrid positions={candidate.positions} />
       </section>
 
       {/* Layer 3: Legislative Activity */}
       <section>
-        <h3 className="font-display text-lg font-semibold text-text-primary mb-4">
-          Legislative Activity
-        </h3>
+        <div className="flex items-center gap-4 mb-6">
+          <h2 className="font-display text-xl md:text-2xl font-bold text-text-primary shrink-0">
+            Legislative Activity
+          </h2>
+          <div className="h-px flex-1 bg-border" />
+        </div>
         <LegislativeActivity activities={candidate.legislative_activity} />
       </section>
     </div>
