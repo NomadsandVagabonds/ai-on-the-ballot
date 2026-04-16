@@ -40,7 +40,7 @@ export interface StagedPosition {
   sourceUrl: string | null;
   dateRecorded: string | null;
   researchMethod: "ai_assisted";
-  reviewed: false;
+  reviewed: boolean;
   aiReasoning: string; // Claude's reasoning for the coding
 }
 

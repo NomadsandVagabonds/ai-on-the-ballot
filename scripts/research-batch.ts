@@ -111,11 +111,7 @@ function loadResearchPacket(
 // Inline coding (uses same logic as code-positions.ts but inline)
 // ---------------------------------------------------------------------------
 
-async function codeFromPacket(packet: ResearchPacket): Promise<void> {
-  // Import code-positions dynamically to avoid circular deps
-  const { default: codePositions } = await import("./code-positions");
-  // The code-positions.ts main() won't work here — we'll shell out instead
-}
+// Coding is done by shelling out to code-positions.ts (see Step 2 below)
 
 // ---------------------------------------------------------------------------
 // Coverage report
