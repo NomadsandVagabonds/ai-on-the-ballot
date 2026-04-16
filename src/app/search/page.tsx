@@ -47,14 +47,17 @@ export default function SearchPage() {
 
   return (
     <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
-      <h1 className="font-display text-4xl sm:text-5xl font-bold tracking-tight mb-8">
+      <p className="text-[10px] font-mono uppercase tracking-[0.2em] text-accent-primary mb-3">
+        Find
+      </p>
+      <h1 className="font-display text-display-md font-bold tracking-tight mb-8">
         Search
       </h1>
 
       <SearchBar onSearch={handleSearch} variant="full" />
 
       {/* Results area */}
-      <div className="mt-8">
+      <div className="mt-10">
         {/* Loading state */}
         {isLoading && (
           <div className="flex items-center gap-3 text-text-muted py-8">
@@ -78,23 +81,32 @@ export default function SearchPage() {
                 d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
               />
             </svg>
-            <span>Searching...</span>
+            <span className="text-sm">Searching...</span>
           </div>
         )}
 
         {/* No query prompt */}
         {!hasSearched && !isLoading && (
-          <p className="text-text-muted text-lg py-8">
-            Search for candidates by name, states, or races to get started.
-          </p>
+          <div className="text-center py-12">
+            <p className="text-text-muted text-lg font-display">
+              Search for candidates, states, or races
+            </p>
+            <p className="text-text-muted text-sm mt-2">
+              Type at least 2 characters to get started
+            </p>
+          </div>
         )}
 
         {/* No results */}
         {showEmpty && (
-          <p className="text-text-muted text-lg py-8">
-            No results found for &ldquo;{query}&rdquo;. Try a different search
-            term.
-          </p>
+          <div className="text-center py-12">
+            <p className="text-text-muted text-lg font-display">
+              No results for &ldquo;{query}&rdquo;
+            </p>
+            <p className="text-text-muted text-sm mt-2">
+              Try a different search term or browse by state
+            </p>
+          </div>
         )}
 
         {/* Grouped results */}
@@ -102,7 +114,7 @@ export default function SearchPage() {
           <div className="space-y-8">
             {/* Candidates */}
             {candidateResults.length > 0 && (
-              <ResultGroup title="Candidates">
+              <ResultGroup title="Candidates" count={candidateResults.length}>
                 {candidateResults.map((result) => (
                   <ResultItem key={result.url} result={result} />
                 ))}
@@ -111,7 +123,7 @@ export default function SearchPage() {
 
             {/* Races */}
             {raceResults.length > 0 && (
-              <ResultGroup title="Races">
+              <ResultGroup title="Races" count={raceResults.length}>
                 {raceResults.map((result) => (
                   <ResultItem key={result.url} result={result} />
                 ))}
@@ -120,7 +132,7 @@ export default function SearchPage() {
 
             {/* States */}
             {stateResults.length > 0 && (
-              <ResultGroup title="States">
+              <ResultGroup title="States" count={stateResults.length}>
                 {stateResults.map((result) => (
                   <ResultItem key={result.url} result={result} />
                 ))}
@@ -135,17 +147,23 @@ export default function SearchPage() {
 
 function ResultGroup({
   title,
+  count,
   children,
 }: {
   title: string;
+  count: number;
   children: React.ReactNode;
 }) {
   return (
     <div>
-      <h2 className="text-sm font-semibold text-text-muted uppercase tracking-wider mb-3">
-        {title}
-      </h2>
-      <div className="bg-bg-surface border border-border rounded-lg divide-y divide-border overflow-hidden">
+      <div className="flex items-center gap-3 mb-3">
+        <h2 className="text-[10px] font-mono font-semibold text-text-muted uppercase tracking-[0.15em]">
+          {title}
+        </h2>
+        <span className="font-mono text-xs text-text-muted tabular-nums">{count}</span>
+        <div className="h-px flex-1 bg-border" />
+      </div>
+      <div className="card-elevated divide-y divide-border overflow-hidden">
         {children}
       </div>
     </div>
@@ -207,15 +225,17 @@ function ResultItem({ result }: { result: SearchResult }) {
   return (
     <Link
       href={result.url}
-      className="flex items-center gap-3 px-4 py-3 hover:bg-bg-elevated transition-colors"
+      className="group flex items-center gap-3 px-5 py-4 hover:bg-bg-elevated/60 transition-colors duration-200"
     >
       {typeIcon[result.type]}
       <div className="min-w-0 flex-1">
-        <p className="text-text-primary font-medium truncate">{result.label}</p>
+        <p className="text-text-primary font-medium truncate group-hover:text-accent-primary transition-colors duration-200">
+          {result.label}
+        </p>
         <p className="text-sm text-text-muted truncate">{result.sublabel}</p>
       </div>
       <svg
-        className="h-4 w-4 text-text-muted shrink-0"
+        className="h-4 w-4 text-text-muted shrink-0 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
         fill="none"
         viewBox="0 0 24 24"
         strokeWidth={2}
@@ -231,4 +251,3 @@ function ResultItem({ result }: { result: SearchResult }) {
     </Link>
   );
 }
-
