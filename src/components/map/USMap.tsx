@@ -163,7 +163,6 @@ export function USMap({ states }: USMapProps) {
       <div className="hidden md:block">
         <div
           className="relative w-full"
-          style={{ backgroundColor: "#0F1419" }}
           onMouseMove={handleMouseMove}
         >
           {/* Loading state */}
@@ -288,10 +287,7 @@ export function USMap({ states }: USMapProps) {
         </div>
 
         {/* Legend */}
-        <div
-          className="flex items-center justify-center gap-8 py-4"
-          style={{ backgroundColor: "#0F1419" }}
-        >
+        <div className="flex items-center justify-center gap-8 py-4">
           <div className="flex items-center gap-2">
             <span
               className="inline-block h-3 w-3 rounded-sm"
@@ -309,10 +305,7 @@ export function USMap({ states }: USMapProps) {
         </div>
 
         {/* Stats bar */}
-        <div
-          className="grid grid-cols-3 gap-px"
-          style={{ backgroundColor: "#1A1D24" }}
-        >
+        <div className="grid grid-cols-3 gap-px bg-[#1A1D24]">
           <StatBox label="States Tracked" value={totalStatesWithData} />
           <StatBox label="Races" value={totalRaces} />
           <StatBox

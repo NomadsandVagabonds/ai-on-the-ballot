@@ -5,7 +5,7 @@ import { isValidZipCode } from "@/lib/utils/states";
 
 interface ZipCodeInputProps {
   onSubmit: (zip: string) => void;
-  variant?: "hero" | "compact";
+  variant?: "hero" | "hero-dark" | "compact";
 }
 
 export function ZipCodeInput({ onSubmit, variant = "hero" }: ZipCodeInputProps) {
@@ -42,7 +42,8 @@ export function ZipCodeInput({ onSubmit, variant = "hero" }: ZipCodeInputProps) 
     }
   };
 
-  if (variant === "hero") {
+  if (variant === "hero" || variant === "hero-dark") {
+    const isDark = variant === "hero-dark";
     return (
       <div className="w-full max-w-md">
         <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-3">
@@ -55,9 +56,11 @@ export function ZipCodeInput({ onSubmit, variant = "hero" }: ZipCodeInputProps) 
               value={value}
               onChange={handleChange}
               onKeyDown={handleKeyDown}
-              placeholder="Enter zip code"
-              className={`w-full rounded-lg border px-4 py-3 text-base text-text-primary placeholder:text-text-muted bg-bg-surface focus:outline-none focus:ring-2 focus:ring-accent-primary focus:border-transparent transition-shadow ${
-                error ? "border-red-400" : "border-border"
+              placeholder="Enter your zip code"
+              className={`w-full rounded-lg border px-4 py-3.5 text-base font-mono tracking-widest transition-shadow focus:outline-none focus:ring-2 focus:ring-accent-primary focus:border-transparent ${
+                isDark
+                  ? `bg-white/10 text-white placeholder:text-gray-500 ${error ? "border-red-400" : "border-white/20"}`
+                  : `bg-bg-surface text-text-primary placeholder:text-text-muted ${error ? "border-red-400" : "border-border"}`
               }`}
               aria-label="Zip code"
               aria-invalid={!!error}
@@ -66,13 +69,13 @@ export function ZipCodeInput({ onSubmit, variant = "hero" }: ZipCodeInputProps) 
           </div>
           <button
             type="submit"
-            className="shrink-0 rounded-lg bg-accent-primary px-6 py-3 text-base font-semibold text-white hover:bg-accent-primary-hover focus:outline-none focus:ring-2 focus:ring-accent-primary focus:ring-offset-2 transition-colors"
+            className="shrink-0 rounded-lg bg-accent-primary px-6 py-3.5 text-base font-semibold text-white hover:bg-accent-primary-hover focus:outline-none focus:ring-2 focus:ring-accent-primary focus:ring-offset-2 transition-colors"
           >
             Find Your Reps
           </button>
         </form>
         {error && (
-          <p id="zip-error" className="mt-2 text-sm text-red-600" role="alert">
+          <p id="zip-error" className={`mt-2 text-sm ${isDark ? "text-red-400" : "text-red-600"}`} role="alert">
             {error}
           </p>
         )}
