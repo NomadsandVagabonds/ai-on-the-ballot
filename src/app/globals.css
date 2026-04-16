@@ -1,26 +1,100 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Background */
+  --bg-primary: #FAF6F0;
+  --bg-surface: #FFFFFF;
+  --bg-elevated: #F0EDE7;
+
+  /* Text */
+  --text-primary: #1A1D24;
+  --text-secondary: #4A4A4A;
+  --text-muted: #9B9183;
+
+  /* Brand Accents (bespoke — no red/white/blue for chrome) */
+  --accent-primary: #0D9488;
+  --accent-primary-hover: #0F766E;
+  --accent-secondary: #4F46E5;
+  --accent-gold: #D97706;
+
+  /* Borders & Dividers */
+  --border: #E5E0D8;
+  --border-strong: #C9C2B6;
+
+  /* Stance Indicators */
+  --stance-support: #16A34A;
+  --stance-oppose: #DC2626;
+  --stance-mixed: #D97706;
+  --stance-unclear: #9CA3AF;
+  --stance-no-mention: #D1D5DB;
+
+  /* Confidence */
+  --confidence-high: #0D9488;
+  --confidence-medium: #D97706;
+  --confidence-low: #9CA3AF;
+
+  /* Party Colors (ONLY used on PartyBadge — never in site chrome) */
+  --party-dem: #2563EB;
+  --party-rep: #DC2626;
+  --party-ind: #7C3AED;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px rgba(26, 29, 36, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(26, 29, 36, 0.07), 0 2px 4px -2px rgba(26, 29, 36, 0.05);
+  --shadow-lg: 0 10px 15px -3px rgba(26, 29, 36, 0.08), 0 4px 6px -4px rgba(26, 29, 36, 0.04);
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --color-bg-primary: var(--bg-primary);
+  --color-bg-surface: var(--bg-surface);
+  --color-bg-elevated: var(--bg-elevated);
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-muted: var(--text-muted);
+  --color-accent-primary: var(--accent-primary);
+  --color-accent-primary-hover: var(--accent-primary-hover);
+  --color-accent-secondary: var(--accent-secondary);
+  --color-accent-gold: var(--accent-gold);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-stance-support: var(--stance-support);
+  --color-stance-oppose: var(--stance-oppose);
+  --color-stance-mixed: var(--stance-mixed);
+  --color-stance-unclear: var(--stance-unclear);
+  --color-stance-no-mention: var(--stance-no-mention);
+  --color-party-dem: var(--party-dem);
+  --color-party-rep: var(--party-rep);
+  --color-party-ind: var(--party-ind);
+  --font-display: var(--font-crimson-text);
+  --font-body: var(--font-inter);
+  --font-mono: var(--font-jetbrains-mono);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: var(--font-body), system-ui, sans-serif;
+}
+
+/* Focus ring utility */
+:focus-visible {
+  outline: 2px solid var(--accent-primary);
+  outline-offset: 2px;
+}
+
+/* Skip to content link (accessibility) */
+.skip-to-content {
+  position: absolute;
+  top: -100%;
+  left: 0;
+  z-index: 100;
+  padding: 0.75rem 1.5rem;
+  background: var(--accent-primary);
+  color: white;
+  font-weight: 600;
+  transition: top 0.15s;
+}
+
+.skip-to-content:focus {
+  top: 0;
 }
