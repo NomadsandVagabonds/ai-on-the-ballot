@@ -379,13 +379,15 @@ body {
 .stagger-in > *:nth-child(5) { animation-delay: 0.25s; }
 .stagger-in > *:nth-child(6) { animation-delay: 0.3s; }
 
-/* Map state hover glow — warm, not techy */
-.map-state-active {
-  transition: fill 0.25s ease, filter 0.25s ease;
+/* Map state paths — suppress rectangular outline, use stroke for focus */
+.map-state-path {
+  outline: none !important;
 }
 
-.map-state-active:hover {
-  filter: brightness(1.15);
+.map-state-path:focus-visible {
+  outline: none !important;
+  stroke: #5B7B6A !important;
+  stroke-width: 2.5px !important;
 }
 
 /* Accordion reveal — smooth content expansion */

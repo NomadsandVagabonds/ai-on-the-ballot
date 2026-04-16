@@ -222,9 +222,10 @@ export function USMap({ states }: USMapProps) {
                     fill={fill}
                     stroke={MAP_COLORS.stroke}
                     strokeWidth={1}
+                    className="map-state-path"
                     style={{
                       cursor: hasData ? "pointer" : "default",
-                      transition: "fill 0.2s ease",
+                      transition: "fill 0.2s ease, stroke 0.2s ease, stroke-width 0.2s ease",
                     }}
                     onMouseEnter={() => setHoveredState(feat.abbr)}
                     onMouseLeave={() => setHoveredState(null)}
