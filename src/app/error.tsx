@@ -15,8 +15,8 @@ export default function Error({
         Something went wrong
       </h1>
       <p className="text-text-secondary text-lg mb-10 max-w-md mx-auto">
-        An unexpected error occurred. Please try again or return to the
-        homepage.
+        We hit an unexpected problem loading this page. This is on our
+        end &mdash; try refreshing, or head back to the homepage.
       </p>
 
       <div className="flex flex-col sm:flex-row items-center justify-center gap-4">

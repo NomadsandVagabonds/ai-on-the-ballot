@@ -79,7 +79,7 @@ export function CandidateCard({ candidate }: CandidateCardProps) {
 
         <div className="min-w-0 flex-1">
           {/* Name */}
-          <h3 className="text-sm font-semibold text-text-primary group-hover:text-accent-primary transition-colors duration-200 truncate">
+          <h3 className="text-sm font-semibold text-text-primary group-hover:text-accent-primary group-hover:underline group-hover:decoration-accent-primary/40 group-hover:underline-offset-2 transition-colors duration-200 truncate">
             {candidate.name}
           </h3>
 

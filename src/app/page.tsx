@@ -65,7 +65,7 @@ export default async function Home() {
               &middot; 5 AI policy issues
             </p>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 stagger-in">
               {states
                 .filter((s) => s.has_data)
                 .sort((a, b) => b.race_count - a.race_count)

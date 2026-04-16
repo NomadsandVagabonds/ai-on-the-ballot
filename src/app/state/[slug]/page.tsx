@@ -102,7 +102,7 @@ export default async function StatePage({ params }: StatePageProps) {
                   No candidates tracked for this race yet.
                 </p>
               ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 stagger-in">
                   {race.candidates.map((candidate) => (
                     <CandidateCard
                       key={candidate.id}

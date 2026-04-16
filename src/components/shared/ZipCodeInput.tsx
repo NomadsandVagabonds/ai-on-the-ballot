@@ -57,7 +57,7 @@ export function ZipCodeInput({ onSubmit, variant = "hero" }: ZipCodeInputProps) 
               onChange={handleChange}
               onKeyDown={handleKeyDown}
               placeholder="Enter your zip code"
-              className={`w-full rounded-lg border px-4 py-3.5 text-base font-mono tracking-widest transition-shadow focus:outline-none focus:ring-2 focus:ring-accent-primary focus:border-transparent ${
+              className={`w-full rounded-lg border px-4 py-3.5 text-base font-mono tracking-widest transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-accent-primary focus:border-transparent focus:shadow-[inset_0_1px_4px_rgba(46,64,87,0.08)] ${
                 isDark
                   ? `bg-white/10 text-white placeholder:text-gray-500 ${error ? "border-red-400" : "border-white/20"}`
                   : `bg-bg-surface text-text-primary placeholder:text-text-muted ${error ? "border-red-400" : "border-border"}`
@@ -69,7 +69,7 @@ export function ZipCodeInput({ onSubmit, variant = "hero" }: ZipCodeInputProps) 
           </div>
           <button
             type="submit"
-            className="shrink-0 rounded-lg bg-accent-primary px-6 py-3.5 text-base font-semibold text-white hover:bg-accent-primary-hover focus:outline-none focus:ring-2 focus:ring-accent-primary focus:ring-offset-2 transition-colors"
+            className="btn-press shrink-0 rounded-lg bg-accent-primary px-6 py-3.5 text-base font-semibold text-white hover:bg-accent-primary-hover focus:outline-none focus:ring-2 focus:ring-accent-primary focus:ring-offset-2 transition-colors"
           >
             Find Your Reps
           </button>
@@ -105,7 +105,7 @@ export function ZipCodeInput({ onSubmit, variant = "hero" }: ZipCodeInputProps) 
         />
         <button
           type="submit"
-          className="shrink-0 rounded-md bg-accent-primary px-3 py-1.5 text-sm font-medium text-white hover:bg-accent-primary-hover focus:outline-none focus:ring-2 focus:ring-accent-primary focus:ring-offset-1 transition-colors"
+          className="btn-press shrink-0 rounded-md bg-accent-primary px-3 py-1.5 text-sm font-medium text-white hover:bg-accent-primary-hover focus:outline-none focus:ring-2 focus:ring-accent-primary focus:ring-offset-1 transition-colors"
         >
           Go
         </button>
