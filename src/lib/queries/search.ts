@@ -1,4 +1,5 @@
 import { createServerSupabaseClient, isSupabaseConfigured } from "@/lib/supabase/server";
+import { searchMockData } from "@/lib/mock-data";
 import { STATE_MAP, stateAbbrToSlug } from "@/lib/utils/states";
 import type { SearchResult } from "@/types/domain";
 import type { RaceRow } from "@/types/database";
@@ -29,9 +30,33 @@ export async function search(query: string): Promise<SearchResult[]> {
     }
   }
 
-  // If Supabase isn't configured, return state-only results
+  // If Supabase isn't configured, search mock data for candidates and races
   if (!isSupabaseConfigured()) {
-    return results.slice(0, MAX_RESULTS);
+    const mockResults = searchMockData(trimmed);
+    results.push(...mockResults);
+
+    // Sort and deduplicate
+    const typePriority: Record<string, number> = { state: 0, candidate: 1, race: 2 };
+    results.sort((a, b) => {
+      const aExact = a.label.toLowerCase() === lowerQuery ? 0 : 1;
+      const bExact = b.label.toLowerCase() === lowerQuery ? 0 : 1;
+      if (aExact !== bExact) return aExact - bExact;
+      const aStarts = a.label.toLowerCase().startsWith(lowerQuery) ? 0 : 1;
+      const bStarts = b.label.toLowerCase().startsWith(lowerQuery) ? 0 : 1;
+      if (aStarts !== bStarts) return aStarts - bStarts;
+      return (typePriority[a.type] ?? 99) - (typePriority[b.type] ?? 99);
+    });
+
+    const seen = new Set<string>();
+    const unique: SearchResult[] = [];
+    for (const r of results) {
+      if (!seen.has(r.url)) {
+        seen.add(r.url);
+        unique.push(r);
+      }
+      if (unique.length >= MAX_RESULTS) break;
+    }
+    return unique;
   }
 
   // 2. Search candidates by name

@@ -1,5 +1,6 @@
 import { createServerSupabaseClient, isSupabaseConfigured } from "@/lib/supabase/server";
 import { getRacesByState } from "./races";
+import { getMockRacesByState } from "@/lib/mock-data";
 import {
   STATE_MAP,
   stateSlugToAbbr,
@@ -11,7 +12,7 @@ import type { StateData, StateMapEntry } from "@/types/domain";
 /** Launch states for demo/preview when Supabase isn't configured */
 const DEMO_STATES = new Set(["AR", "NC", "TX", "MS", "IL"]);
 const DEMO_RACE_COUNTS: Record<string, number> = {
-  TX: 4, NC: 3, IL: 4, AR: 3, MS: 3,
+  TX: 3, NC: 2, IL: 2, AR: 1, MS: 1,
 };
 
 /** Get state-level data including all races */
@@ -24,12 +25,17 @@ export async function getStateData(
   if (!abbr || !name) return null;
 
   if (!isSupabaseConfigured()) {
+    const races = getMockRacesByState(abbr);
+    const candidateCount = races.reduce(
+      (sum, race) => sum + race.candidates.length,
+      0
+    );
     return {
       name,
       abbreviation: abbr,
       slug: stateSlug,
-      races: [],
-      candidate_count: 0,
+      races,
+      candidate_count: candidateCount,
     };
   }
 

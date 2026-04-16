@@ -1,4 +1,5 @@
 import { createServerSupabaseClient, isSupabaseConfigured } from "@/lib/supabase/server";
+import { getMockPositionsForCandidate, getMockComparisonData } from "@/lib/mock-data";
 import type { ComparisonRow, PositionWithIssue } from "@/types/domain";
 import type { IssueRow, PositionRow } from "@/types/database";
 
@@ -6,7 +7,7 @@ import type { IssueRow, PositionRow } from "@/types/database";
 export async function getPositionsForCandidate(
   candidateId: string
 ): Promise<PositionWithIssue[]> {
-  if (!isSupabaseConfigured()) return [];
+  if (!isSupabaseConfigured()) return getMockPositionsForCandidate(candidateId);
 
   const supabase = await createServerSupabaseClient();
 
@@ -28,7 +29,7 @@ export async function getComparisonData(
   candidateIds: string[]
 ): Promise<ComparisonRow[]> {
   if (candidateIds.length === 0) return [];
-  if (!isSupabaseConfigured()) return [];
+  if (!isSupabaseConfigured()) return getMockComparisonData(candidateIds);
 
   const supabase = await createServerSupabaseClient();
 
