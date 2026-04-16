@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, Crimson_Text, JetBrains_Mono } from "next/font/google";
+import { Header } from "@/components/layout/Header";
+import { Footer } from "@/components/layout/Footer";
 import "./globals.css";
 
 const inter = Inter({
@@ -51,9 +53,11 @@ export default function RootLayout({
         <a href="#main-content" className="skip-to-content">
           Skip to content
         </a>
+        <Header />
         <main id="main-content" className="flex-1">
           {children}
         </main>
+        <Footer />
       </body>
     </html>
   );
