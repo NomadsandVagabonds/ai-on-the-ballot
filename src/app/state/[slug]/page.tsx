@@ -40,7 +40,7 @@ export default async function StatePage({ params }: StatePageProps) {
   }
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-10 md:py-16">
+    <div className="mx-auto max-w-5xl px-4 py-10 md:py-16">
       {/* State header — editorial style */}
       <header className="mb-12">
         <p className="text-[10px] font-mono uppercase tracking-[0.15em] text-accent-primary mb-3">
@@ -81,59 +81,54 @@ export default async function StatePage({ params }: StatePageProps) {
         <div className="space-y-14">
           {stateData.races.map((race) => (
             <section key={race.id}>
-              {/* Race heading */}
-              <div className="flex flex-wrap items-baseline gap-3 mb-5">
-                <h2 className="font-display text-xl md:text-2xl font-bold text-text-primary">
-                  {chamberLabel(race.chamber)}
-                  {race.district
-                    ? ` — District ${race.district}`
-                    : ""}
-                </h2>
-                {race.race_type === "special" && (
-                  <span className="inline-flex items-center rounded-full bg-accent-gold/10 px-2.5 py-0.5 text-xs font-semibold text-accent-gold border border-accent-gold/20">
-                    Special Election
-                  </span>
+              {/* Race heading row: title left, compare link right */}
+              <div className="flex flex-wrap items-baseline justify-between gap-3 mb-5">
+                <div className="flex items-baseline gap-3">
+                  <h2 className="font-display text-xl md:text-2xl font-bold text-text-primary">
+                    {chamberLabel(race.chamber)}
+                    {race.district
+                      ? ` — District ${race.district}`
+                      : ""}
+                  </h2>
+                  {race.race_type === "special" && (
+                    <span className="text-xs font-mono uppercase tracking-wider text-accent-gold">
+                      Special Election
+                    </span>
+                  )}
+                </div>
+
+                {race.candidates.length >= 2 && (
+                  <Link
+                    href={`/race/${race.slug}`}
+                    className="group inline-flex items-center gap-1 text-sm font-medium text-accent-primary hover:underline hover:underline-offset-2 transition-colors"
+                  >
+                    Compare
+                    <span
+                      className="transition-transform duration-200 group-hover:translate-x-0.5"
+                      aria-hidden="true"
+                    >
+                      &rarr;
+                    </span>
+                  </Link>
                 )}
               </div>
 
-              {/* Candidate cards */}
+              {/* Subtle rule under heading */}
+              <div className="h-px bg-border mb-5" />
+
+              {/* Candidate cards — 2-column grid on desktop */}
               {race.candidates.length === 0 ? (
                 <p className="text-text-muted text-sm italic">
                   No candidates tracked for this race yet.
                 </p>
               ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 stagger-in">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {race.candidates.map((candidate) => (
                     <CandidateCard
                       key={candidate.id}
                       candidate={candidate}
                     />
                   ))}
-                </div>
-              )}
-
-              {/* Compare link */}
-              {race.candidates.length >= 2 && (
-                <div className="mt-5">
-                  <Link
-                    href={`/race/${race.slug}`}
-                    className="group inline-flex items-center gap-1.5 text-sm font-medium text-accent-primary hover:text-accent-primary-hover transition-colors"
-                  >
-                    Compare Candidates
-                    <svg
-                      className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-0.5"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      strokeWidth={2}
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"
-                      />
-                    </svg>
-                  </Link>
                 </div>
               )}
             </section>

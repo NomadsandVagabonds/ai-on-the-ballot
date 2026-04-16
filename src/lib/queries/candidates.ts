@@ -81,12 +81,12 @@ export async function getCandidateSummaries(
   // Get position counts per candidate (excluding no_mention)
   const { data: rawPositions } = await supabase
     .from("positions")
-    .select("candidate_id, stance")
+    .select("candidate_id, stance, issue_id")
     .in("candidate_id", candidateIds);
 
   const positions = (rawPositions ?? []) as unknown as Pick<
     PositionRow,
-    "candidate_id" | "stance"
+    "candidate_id" | "stance" | "issue_id"
   >[];
 
   const positionCounts = new Map<string, number>();
@@ -99,8 +99,25 @@ export async function getCandidateSummaries(
     }
   }
 
+  // Get all issues sorted by sort_order for stance minibar
+  const { data: rawIssues } = await supabase
+    .from("issues")
+    .select("id, sort_order")
+    .order("sort_order", { ascending: true });
+
+  const sortedIssues = (rawIssues ?? []) as unknown as Pick<
+    import("@/types/database").IssueRow,
+    "id" | "sort_order"
+  >[];
+
   return candidates.map((c) => {
     const count = positionCounts.get(c.id) ?? 0;
+    const candidatePositions = positions.filter((p) => p.candidate_id === c.id);
+    const stances = sortedIssues.map((issue) => {
+      const pos = candidatePositions.find((p) => p.issue_id === issue.id);
+      return pos?.stance ?? ("no_mention" as const);
+    });
+
     return {
       id: c.id,
       name: c.name,
@@ -114,6 +131,7 @@ export async function getCandidateSummaries(
       position_count: count,
       coverage_percentage:
         issueCount > 0 ? Math.round((count / issueCount) * 100) : 0,
+      stances,
     };
   });
 }

@@ -1,107 +1,102 @@
 import Link from "next/link";
 import type { CandidateSummary } from "@/types/domain";
-import { PartyBadge } from "@/components/shared/PartyBadge";
+import type { Stance } from "@/types/database";
+import { partyLabel } from "@/lib/utils/stance";
+import { STANCE_DISPLAY } from "@/lib/utils/stance";
 
 interface CandidateCardProps {
   candidate: CandidateSummary;
 }
 
-function getPartyColor(party: string): string {
+function getPartyBorderColor(party: string): string {
   switch (party.toLowerCase()) {
-    case "democrat":
-    case "democratic":
-      return "bg-party-dem";
-    case "republican":
-      return "bg-party-rep";
+    case "d":
+      return "border-l-party-dem";
+    case "r":
+      return "border-l-party-rep";
     default:
-      return "bg-party-ind";
+      return "border-l-party-ind";
   }
 }
 
-function InitialAvatar({ name, party }: { name: string; party: string }) {
-  const initials = name
-    .split(" ")
-    .map((n) => n[0])
-    .join("")
-    .slice(0, 2)
-    .toUpperCase();
-
-  return (
-    <div
-      className={`h-14 w-14 rounded-xl ${getPartyColor(party)} flex items-center justify-center shrink-0`}
-      aria-hidden="true"
-    >
-      <span className="font-display text-base font-bold text-white/90">
-        {initials}
-      </span>
-    </div>
-  );
+function getPartyHoverBorderColor(party: string): string {
+  switch (party.toLowerCase()) {
+    case "d":
+      return "group-hover:border-l-party-dem";
+    case "r":
+      return "group-hover:border-l-party-rep";
+    default:
+      return "group-hover:border-l-party-ind";
+  }
 }
 
-function CoverageBar({ percentage }: { percentage: number }) {
+/** Tiny heatmap row: 5 colored blocks showing stance at a glance */
+function StanceMinibar({ stances }: { stances: Stance[] }) {
   return (
-    <div className="w-full mt-1">
-      <div className="flex items-center justify-between mb-1.5">
-        <span className="text-[10px] uppercase tracking-[0.1em] text-text-muted font-medium">
-          Issue coverage
-        </span>
-        <span className="text-xs font-mono font-semibold text-text-primary tabular-nums">
-          {percentage}%
-        </span>
-      </div>
-      <div className="coverage-bar-track">
-        <div
-          className="coverage-bar-fill"
-          style={{ width: `${percentage}%` }}
-        />
-      </div>
+    <div className="flex gap-0.5" aria-label="Stance overview across all issues">
+      {stances.map((stance, i) => {
+        const display = STANCE_DISPLAY[stance];
+        return (
+          <div
+            key={i}
+            className="h-2 w-6 first:rounded-l-sm last:rounded-r-sm"
+            style={{ backgroundColor: display.color }}
+            title={`${display.label}`}
+            aria-hidden="true"
+          />
+        );
+      })}
     </div>
   );
 }
 
 export function CandidateCard({ candidate }: CandidateCardProps) {
+  const partyName = partyLabel(candidate.party);
+
   return (
     <Link
       href={`/candidate/${candidate.slug}`}
-      className="group card-elevated p-5 block"
+      className={`group block bg-bg-surface border border-border border-l-[4px] ${getPartyBorderColor(candidate.party)} transition-all duration-200 hover:shadow-[var(--shadow-md)] hover:translate-y-[-1px] hover:border-l-[5px] ${getPartyHoverBorderColor(candidate.party)} focus-visible:outline-2 focus-visible:outline-accent-primary focus-visible:outline-offset-2`}
     >
-      <div className="flex items-start gap-3 mb-4">
-        {/* Photo or avatar */}
-        {candidate.photo_url ? (
-          <img
-            src={candidate.photo_url}
-            alt={`${candidate.name}`}
-            className="h-14 w-14 rounded-xl object-cover shrink-0 shadow-[var(--shadow-sm)]"
-          />
-        ) : (
-          <InitialAvatar name={candidate.name} party={candidate.party} />
-        )}
+      <div className="px-5 py-4">
+        {/* Name as hero */}
+        <div className="flex items-start gap-3">
+          {/* Optional headshot */}
+          {candidate.photo_url && (
+            <img
+              src={candidate.photo_url}
+              alt=""
+              className="h-10 w-10 rounded-full object-cover shrink-0 mt-0.5"
+            />
+          )}
 
-        <div className="min-w-0 flex-1">
-          {/* Name */}
-          <h3 className="text-sm font-semibold text-text-primary group-hover:text-accent-primary group-hover:underline group-hover:decoration-accent-primary/40 group-hover:underline-offset-2 transition-colors duration-200 truncate">
-            {candidate.name}
-          </h3>
+          <div className="min-w-0 flex-1">
+            <h3 className="font-display text-lg font-bold text-text-primary leading-tight tracking-tight group-hover:text-accent-primary transition-colors duration-200">
+              {candidate.name}
+            </h3>
 
-          {/* Party + incumbent */}
-          <div className="flex items-center gap-1.5 mt-1.5">
-            <PartyBadge party={candidate.party} size="sm" />
-            {candidate.is_incumbent && (
-              <span className="inline-flex items-center rounded-full bg-accent-gold/10 px-1.5 py-0.5 text-[10px] font-semibold text-accent-gold leading-none">
-                Incumbent
-              </span>
-            )}
+            {/* Party + incumbent as inline text */}
+            <p className="text-xs font-mono uppercase tracking-[0.08em] text-text-muted mt-1">
+              {partyName}
+              {candidate.is_incumbent && (
+                <span className="text-accent-gold"> &middot; Incumbent</span>
+              )}
+            </p>
           </div>
-
-          {/* Office */}
-          <p className="mt-1 text-xs text-text-muted truncate">
-            {candidate.office_sought}
-          </p>
         </div>
-      </div>
 
-      {/* Coverage bar */}
-      <CoverageBar percentage={candidate.coverage_percentage} />
+        {/* Office as context line */}
+        <p className="text-sm text-text-secondary mt-2">
+          {candidate.office_sought}
+        </p>
+
+        {/* Stance minibar */}
+        {candidate.stances && candidate.stances.length > 0 && (
+          <div className="mt-3">
+            <StanceMinibar stances={candidate.stances} />
+          </div>
+        )}
+      </div>
     </Link>
   );
 }

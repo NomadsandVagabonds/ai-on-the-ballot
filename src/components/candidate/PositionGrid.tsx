@@ -2,9 +2,7 @@
 
 import { useState } from "react";
 import type { PositionWithIssue } from "@/types/domain";
-import { StanceIndicator } from "@/components/shared/StanceIndicator";
-import { ConfidenceBadge } from "@/components/shared/ConfidenceBadge";
-import { QuoteCard } from "@/components/candidate/QuoteCard";
+import { STANCE_DISPLAY, CONFIDENCE_DISPLAY } from "@/lib/utils/stance";
 import { useAppStore } from "@/stores/appStore";
 import { ToggleSwitch } from "@/components/shared/ToggleSwitch";
 
@@ -12,8 +10,122 @@ interface PositionGridProps {
   positions: PositionWithIssue[];
 }
 
+/** Map stance to Tailwind border-l color class */
+function stanceBorderClass(stance: string): string {
+  switch (stance) {
+    case "support":
+      return "border-l-stance-support";
+    case "oppose":
+      return "border-l-stance-oppose";
+    case "mixed":
+      return "border-l-stance-mixed";
+    case "unclear":
+      return "border-l-stance-unclear";
+    default:
+      return "border-l-stance-no-mention";
+  }
+}
+
+/** Map stance to a very faint background tint */
+function stanceBgStyle(stance: string): React.CSSProperties {
+  const display = STANCE_DISPLAY[stance as keyof typeof STANCE_DISPLAY];
+  if (!display || stance === "no_mention") return {};
+  // Use the color with very low opacity for a structural tint
+  return { backgroundColor: display.bgColor };
+}
+
+function PositionRow({ position }: { position: PositionWithIssue }) {
+  const [showFullQuote, setShowFullQuote] = useState(false);
+  const display = STANCE_DISPLAY[position.stance];
+  const confidenceDisplay = CONFIDENCE_DISPLAY[position.confidence];
+  const isLongQuote = position.full_quote && position.full_quote.length > 200;
+
+  return (
+    <div
+      className={`border-l-[4px] ${stanceBorderClass(position.stance)} pl-5 pr-5 py-5 md:pl-6 md:pr-6 md:py-6`}
+      style={stanceBgStyle(position.stance)}
+    >
+      {/* Issue name + stance inline */}
+      <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
+        <h3 className="text-base font-semibold text-text-primary leading-snug">
+          {position.issue.display_name}
+        </h3>
+        <span className="text-sm font-bold" style={{ color: display.color }}>
+          &mdash; {display.label}
+        </span>
+        <span className="text-xs text-text-muted">
+          ({confidenceDisplay.label.toLowerCase()})
+        </span>
+      </div>
+
+      {/* Summary — always visible */}
+      {position.summary && (
+        <p className="mt-2 text-sm text-text-secondary leading-relaxed max-w-prose">
+          {position.summary}
+        </p>
+      )}
+
+      {/* Source + date */}
+      <div className="mt-3 flex items-center gap-2 text-xs text-text-muted">
+        {position.source_url && (
+          <a
+            href={position.source_url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-accent-primary hover:underline hover:underline-offset-2"
+          >
+            Source
+          </a>
+        )}
+        {position.source_url && position.date_recorded && (
+          <span aria-hidden="true">&middot;</span>
+        )}
+        {position.date_recorded && (
+          <time className="font-mono" dateTime={position.date_recorded}>
+            {new Date(position.date_recorded).toLocaleDateString("en-US", {
+              year: "numeric",
+              month: "short",
+            })}
+          </time>
+        )}
+      </div>
+
+      {/* Full quote as pull-quote */}
+      {position.full_quote && (
+        <div className="mt-4">
+          {isLongQuote && !showFullQuote ? (
+            <>
+              <blockquote
+                className="border-l-2 border-accent-primary/30 pl-4 py-1"
+              >
+                <p className="font-display text-sm italic text-text-secondary leading-relaxed">
+                  &ldquo;{position.full_quote.slice(0, 180)}&hellip;&rdquo;
+                </p>
+              </blockquote>
+              <button
+                type="button"
+                onClick={() => setShowFullQuote(true)}
+                className="mt-1.5 text-xs font-medium text-accent-primary hover:underline hover:underline-offset-2"
+              >
+                Read full quote
+              </button>
+            </>
+          ) : (
+            <blockquote
+              className="border-l-2 border-accent-primary/30 pl-4 py-1"
+            >
+              <p className="font-display text-sm italic text-text-secondary leading-relaxed">
+                &ldquo;{position.full_quote}&rdquo;
+              </p>
+            </blockquote>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export function PositionGrid({ positions }: PositionGridProps) {
-  const [expandedId, setExpandedId] = useState<string | null>(null);
   const hideNoMention = useAppStore((s) => s.hideNoMention);
   const toggleHideNoMention = useAppStore((s) => s.toggleHideNoMention);
 
@@ -23,10 +135,7 @@ export function PositionGrid({ positions }: PositionGridProps) {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="font-display text-lg font-semibold text-text-primary">
-          Positions on AI Issues
-        </h3>
+      <div className="flex items-center justify-end mb-5">
         <ToggleSwitch
           checked={hideNoMention}
           onChange={toggleHideNoMention}
@@ -39,108 +148,10 @@ export function PositionGrid({ positions }: PositionGridProps) {
           No recorded positions on tracked AI issues.
         </p>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filtered.map((position) => {
-            const isExpanded = expandedId === position.id;
-
-            return (
-              <div
-                key={position.id}
-                className="bg-bg-surface border border-border rounded-lg overflow-hidden transition-shadow hover:shadow-[var(--shadow-md)]"
-              >
-                <button
-                  type="button"
-                  onClick={() =>
-                    setExpandedId(isExpanded ? null : position.id)
-                  }
-                  className="w-full text-left px-4 py-3 flex items-start justify-between gap-3"
-                  aria-expanded={isExpanded}
-                >
-                  <div className="space-y-1.5 min-w-0">
-                    <p className="text-sm font-semibold text-text-primary truncate">
-                      {position.issue.display_name}
-                    </p>
-                    <StanceIndicator stance={position.stance} size="sm" />
-                  </div>
-                  <div className="shrink-0 flex items-center gap-2">
-                    <ConfidenceBadge confidence={position.confidence} />
-                    <svg
-                      className={`h-4 w-4 text-text-muted transition-transform ${
-                        isExpanded ? "rotate-180" : ""
-                      }`}
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      strokeWidth={2}
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M19.5 8.25l-7.5 7.5-7.5-7.5"
-                      />
-                    </svg>
-                  </div>
-                </button>
-
-                {isExpanded && (
-                  <div className="px-4 pb-4 border-t border-border pt-3 space-y-3">
-                    {position.summary && (
-                      <p className="text-sm text-text-secondary leading-relaxed">
-                        {position.summary}
-                      </p>
-                    )}
-
-                    {position.full_quote && (
-                      <QuoteCard
-                        quote={position.full_quote}
-                        source={null}
-                        sourceUrl={position.source_url}
-                        date={position.date_recorded}
-                      />
-                    )}
-
-                    {position.source_url && !position.full_quote && (
-                      <a
-                        href={position.source_url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1 text-xs text-accent-primary hover:underline"
-                      >
-                        View source
-                        <svg
-                          className="h-3 w-3"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          strokeWidth={2}
-                          stroke="currentColor"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25"
-                          />
-                        </svg>
-                      </a>
-                    )}
-
-                    {position.date_recorded && (
-                      <p className="text-xs text-text-muted font-mono">
-                        Recorded{" "}
-                        {new Date(position.date_recorded).toLocaleDateString(
-                          "en-US",
-                          {
-                            year: "numeric",
-                            month: "short",
-                            day: "numeric",
-                          }
-                        )}
-                      </p>
-                    )}
-                  </div>
-                )}
-              </div>
-            );
-          })}
+        <div className="space-y-4">
+          {filtered.map((position) => (
+            <PositionRow key={position.id} position={position} />
+          ))}
         </div>
       )}
     </div>

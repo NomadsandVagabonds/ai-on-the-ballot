@@ -8,21 +8,12 @@ interface LegislativeActivityProps {
 }
 
 const ACTIVITY_TYPE_LABELS: Record<LegislativeActivityType, string> = {
-  bill_sponsored: "Sponsored",
-  bill_cosponsored: "Cosponsored",
-  vote: "Vote",
-  hearing: "Hearing",
-  letter: "Letter",
-  statement: "Statement",
-};
-
-const ACTIVITY_TYPE_STYLES: Record<LegislativeActivityType, string> = {
-  bill_sponsored: "bg-accent-primary/10 text-accent-primary",
-  bill_cosponsored: "bg-accent-secondary/10 text-accent-secondary",
-  vote: "bg-accent-gold/10 text-accent-gold",
-  hearing: "bg-gray-100 text-text-secondary",
-  letter: "bg-gray-100 text-text-secondary",
-  statement: "bg-gray-100 text-text-secondary",
+  bill_sponsored: "BILL SPONSORED",
+  bill_cosponsored: "BILL COSPONSORED",
+  vote: "VOTE",
+  hearing: "HEARING",
+  letter: "LETTER",
+  statement: "STATEMENT",
 };
 
 const INITIAL_VISIBLE = 5;
@@ -42,27 +33,15 @@ export function LegislativeActivity({ activities }: LegislativeActivityProps) {
   const hasMore = activities.length > INITIAL_VISIBLE;
 
   return (
-    <div className="space-y-4">
-      <ol className="relative border-l-2 border-border ml-3 space-y-6">
+    <div>
+      <ul className="divide-y divide-border">
         {visible.map((activity) => (
-          <li key={activity.id} className="ml-6">
-            {/* Timeline dot */}
-            <span className="absolute -left-[7px] mt-1.5 h-3 w-3 rounded-full border-2 border-bg-surface bg-accent-primary" />
-
-            <div className="flex flex-wrap items-start gap-2 mb-1">
-              {/* Type badge */}
-              <span
-                className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider leading-none ${
-                  ACTIVITY_TYPE_STYLES[activity.activity_type] ?? "bg-gray-100 text-text-secondary"
-                }`}
-              >
-                {ACTIVITY_TYPE_LABELS[activity.activity_type] ?? activity.activity_type}
-              </span>
-
-              {/* Date */}
+          <li key={activity.id} className="py-5 first:pt-0">
+            {/* Date + type on same line */}
+            <div className="flex items-baseline gap-3 mb-1.5">
               {activity.date && (
                 <time
-                  className="text-xs font-mono text-text-muted"
+                  className="text-sm font-mono font-semibold text-text-primary tabular-nums shrink-0"
                   dateTime={activity.date}
                 >
                   {new Date(activity.date).toLocaleDateString("en-US", {
@@ -72,6 +51,9 @@ export function LegislativeActivity({ activities }: LegislativeActivityProps) {
                   })}
                 </time>
               )}
+              <span className="text-[10px] font-mono uppercase tracking-[0.12em] text-text-muted">
+                {ACTIVITY_TYPE_LABELS[activity.activity_type] ?? activity.activity_type}
+              </span>
             </div>
 
             {/* Title */}
@@ -81,7 +63,7 @@ export function LegislativeActivity({ activities }: LegislativeActivityProps) {
 
             {/* Description */}
             {activity.description && (
-              <p className="mt-1 text-sm text-text-secondary leading-relaxed">
+              <p className="mt-1 text-sm text-text-secondary leading-relaxed max-w-prose">
                 {activity.description}
               </p>
             )}
@@ -92,23 +74,21 @@ export function LegislativeActivity({ activities }: LegislativeActivityProps) {
                 href={activity.source_url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1 mt-1.5 text-xs text-accent-primary hover:underline"
+                className="inline-flex items-center gap-1 mt-2 text-xs text-accent-primary hover:underline hover:underline-offset-2"
               >
                 View source
-                <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
-                </svg>
+                <span aria-hidden="true">&rarr;</span>
               </a>
             )}
           </li>
         ))}
-      </ol>
+      </ul>
 
       {hasMore && (
         <button
           type="button"
           onClick={() => setExpanded(!expanded)}
-          className="text-sm font-medium text-accent-primary hover:underline"
+          className="mt-4 text-sm font-medium text-accent-primary hover:underline hover:underline-offset-2"
         >
           {expanded
             ? "Show less"

@@ -5,6 +5,8 @@ interface StanceIndicatorProps {
   stance: Stance;
   size?: "sm" | "md" | "lg";
   showLabel?: boolean;
+  /** "icon" renders shape + text (default). "inline" renders colored text only, for use in position rows. */
+  variant?: "icon" | "inline";
 }
 
 const SIZE_MAP = {
@@ -112,9 +114,23 @@ export function StanceIndicator({
   stance,
   size = "md",
   showLabel = true,
+  variant = "icon",
 }: StanceIndicatorProps) {
   const display = STANCE_DISPLAY[stance];
   const sizeConfig = SIZE_MAP[size];
+
+  if (variant === "inline") {
+    return (
+      <span
+        className={`${sizeConfig.text} font-bold`}
+        style={{ color: display.color }}
+        role="img"
+        aria-label={display.label}
+      >
+        {display.label}
+      </span>
+    );
+  }
 
   return (
     <span

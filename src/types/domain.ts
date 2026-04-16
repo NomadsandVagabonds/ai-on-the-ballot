@@ -38,6 +38,8 @@ export interface CandidateSummary {
   is_incumbent: boolean;
   position_count: number;
   coverage_percentage: number;
+  /** Ordered stance values for the stance minibar (one per issue, in issue sort order) */
+  stances?: Stance[];
 }
 
 /** A position with its issue info joined */

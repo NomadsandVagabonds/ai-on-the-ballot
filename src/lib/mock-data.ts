@@ -1101,6 +1101,15 @@ function buildSummary(c: CandidateRow): CandidateSummary {
   );
   const posCount = candidatePositions.length;
   const issueCount = MOCK_ISSUES.length;
+
+  // Build ordered stance array (one per issue, in sort order)
+  const stances = MOCK_ISSUES.map((issue) => {
+    const pos = MOCK_POSITIONS.find(
+      (p) => p.candidate_id === c.id && p.issue_id === issue.id
+    );
+    return pos?.stance ?? ("no_mention" as const);
+  });
+
   return {
     id: c.id,
     name: c.name,
@@ -1113,6 +1122,7 @@ function buildSummary(c: CandidateRow): CandidateSummary {
     is_incumbent: c.is_incumbent,
     position_count: posCount,
     coverage_percentage: issueCount > 0 ? Math.round((posCount / issueCount) * 100) : 0,
+    stances,
   };
 }
 
