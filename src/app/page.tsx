@@ -52,18 +52,13 @@ export default async function Home() {
       </section>
 
       {/* ============================================================
-          Hero — dek + zip + map
+          Hero — zip + map
          ============================================================ */}
       <section className="relative bg-bg-elevated">
         <div className="relative z-10 pt-10 md:pt-14 pb-6 md:pb-8 px-4">
           <div className="mx-auto max-w-3xl text-center">
-            <p className="dek mx-auto">
-              Where do your representatives stand on the most consequential
-              technology of our time?
-            </p>
-
             {/* Zip input */}
-            <div className="flex justify-center mt-8 mb-2">
+            <div className="flex justify-center mb-2">
               <HeroZipInput />
             </div>
             <p className="marginalia mt-3">
