@@ -1,6 +1,6 @@
 import type { MetadataRoute } from "next";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
-import type { RaceRow, CandidateRow } from "@/types/database";
+import type { RaceRow, CandidateRow, IssueRow } from "@/types/database";
 import { stateAbbrToSlug } from "@/lib/utils/states";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
@@ -95,7 +95,27 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.6,
     }));
 
-    dynamicPages = [...statePages, ...racePages, ...candidatePages];
+    // Issue pages
+    const { data: rawIssues } = await supabase
+      .from("issues")
+      .select("slug, updated_at");
+    const issues = (rawIssues ?? []) as unknown as Pick<
+      IssueRow,
+      "slug" | "updated_at"
+    >[];
+    const issuePages: MetadataRoute.Sitemap = issues.map((iss) => ({
+      url: `${baseUrl}/issue/${iss.slug}`,
+      lastModified: iss.updated_at ? new Date(iss.updated_at) : new Date(),
+      changeFrequency: "weekly" as const,
+      priority: 0.85,
+    }));
+
+    dynamicPages = [
+      ...statePages,
+      ...issuePages,
+      ...racePages,
+      ...candidatePages,
+    ];
   } catch {
     // If Supabase is unreachable, return static pages only
   }

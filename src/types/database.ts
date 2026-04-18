@@ -27,9 +27,37 @@ export interface CandidateRow {
   committee_assignments: string[];
   election_year: number;
   fec_id: string | null;
+  /**
+   * Library of Congress Bioguide ID (e.g. "C001098" for Cruz).
+   * When present and photo_url is null, the frontend falls back to the
+   * public-domain portrait hosted at unitedstates.github.io/images/congress.
+   * Only incumbents have bioguide IDs; challengers are null.
+   */
+  bioguide_id: string | null;
   is_incumbent: boolean;
+  /** Campaign funds raised, in whole dollars. Source: FEC filings. */
+  total_raised: number | null;
   created_at: string;
   updated_at: string;
+}
+
+/** Type of citation source (statement, legislation, survey, etc.) */
+export type SourceType =
+  | "statement"
+  | "legislation"
+  | "survey"
+  | "social_media"
+  | "news";
+
+/** A single citation attached to a position or a candidate. */
+export interface PositionSource {
+  type: SourceType;
+  title: string | null;
+  url: string | null;
+  /** ISO date (YYYY-MM-DD) */
+  date: string | null;
+  /** Pull-quote from the source, suitable for inline display. */
+  excerpt: string | null;
 }
 
 export interface RaceRow {

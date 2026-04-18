@@ -1,0 +1,62 @@
+[
+  {
+    "id": "3ac03928-c3cd-542b-bea6-41812ba02b18",
+    "slug": "export-control",
+    "display_name": "Export Control and Compute Governance",
+    "description": "Government control or restriction of advanced AI capabilities through trade, export, or compute access.",
+    "icon": null,
+    "sort_order": 1,
+    "created_at": "2026-04-17T00:00:00Z",
+    "updated_at": "2026-04-17T00:00:00Z"
+  },
+  {
+    "id": "2494a20c-1383-5a58-88f6-3ea1163f6a78",
+    "slug": "military-ai",
+    "display_name": "Military and National Security Uses of AI",
+    "description": "Positions on the use of AI in military, intelligence, or national security contexts.",
+    "icon": null,
+    "sort_order": 2,
+    "created_at": "2026-04-17T00:00:00Z",
+    "updated_at": "2026-04-17T00:00:00Z"
+  },
+  {
+    "id": "fd88bcf2-cbfe-5e52-a46b-06d9bd74e96f",
+    "slug": "regulation-philosophy",
+    "display_name": "AI Regulation Philosophy",
+    "description": "A candidate's general stance on regulating AI systems.",
+    "icon": null,
+    "sort_order": 3,
+    "created_at": "2026-04-17T00:00:00Z",
+    "updated_at": "2026-04-17T00:00:00Z"
+  },
+  {
+    "id": "bf0ae53c-8797-5396-8f02-d4df0d370b8f",
+    "slug": "companion-chatbots",
+    "display_name": "AI Companion Chatbots",
+    "description": "Positions on AI systems designed for emotional, relational, or social interaction.",
+    "icon": null,
+    "sort_order": 4,
+    "created_at": "2026-04-17T00:00:00Z",
+    "updated_at": "2026-04-17T00:00:00Z"
+  },
+  {
+    "id": "510b98cc-3a7d-53f8-b397-164388653e9a",
+    "slug": "children-safety",
+    "display_name": "Children's Online Safety",
+    "description": "Views on protecting minors from harms related to AI or AI-mediated platforms.",
+    "icon": null,
+    "sort_order": 5,
+    "created_at": "2026-04-17T00:00:00Z",
+    "updated_at": "2026-04-17T00:00:00Z"
+  },
+  {
+    "id": "b176306c-07a8-5f51-b44d-381ef18cab58",
+    "slug": "data-centers",
+    "display_name": "Data Centers",
+    "description": "Positions on the development, regulation, or public impact of data center infrastructure as it relates to AI, including energy consumption and grid reliability concerns tied to AI workloads.",
+    "icon": null,
+    "sort_order": 6,
+    "created_at": "2026-04-17T00:00:00Z",
+    "updated_at": "2026-04-17T00:00:00Z"
+  }
+]

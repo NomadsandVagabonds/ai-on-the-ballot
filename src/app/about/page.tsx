@@ -24,6 +24,11 @@ const ISSUE_CATEGORIES = [
       "Positions on how (or whether) to regulate AI — covering licensing, liability, open-source, and federal agency roles.",
   },
   {
+    name: "AI Companions & Companion Chatbots",
+    description:
+      "Positions on AI companions, romantic or emotional companion chatbots, and their psychological effects on users.",
+  },
+  {
     name: "Data Centers",
     description:
       "Positions on data center permitting, energy consumption, federal support, and environmental impact.",
@@ -211,7 +216,7 @@ export default function AboutPage() {
           Tracked Issue Categories
         </h3>
         <p className="text-text-secondary text-lg leading-relaxed mb-5">
-          We track candidate positions across five AI governance issue areas:
+          We track candidate positions across six AI governance issue areas:
         </p>
         <div className="grid grid-cols-1 gap-4 mb-4">
           {ISSUE_CATEGORIES.map((issue, i) => (

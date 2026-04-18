@@ -405,6 +405,264 @@ body {
   overflow: hidden;
 }
 
+/* ========================================
+   Editorial Voice — Dek, Kicker, Byline, Folio, Marginalia
+   ======================================== */
+
+/* Dek — the italic sentence that sets up a headline */
+.dek {
+  font-family: var(--font-display), Georgia, serif;
+  font-style: italic;
+  font-size: clamp(1.15rem, 1vw + 1rem, 1.4rem);
+  line-height: 1.45;
+  color: var(--text-secondary);
+  max-width: 56ch;
+}
+
+/* Kicker — small, wide-tracked, all-caps section signal */
+.kicker {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.6875rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--accent-secondary);
+  line-height: 1;
+}
+
+.kicker-muted {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.6875rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  line-height: 1;
+}
+
+/* Byline — attribution strip */
+.byline {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.6875rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+/* Folio — running page number / roman numeral in mono */
+.folio {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-muted);
+}
+
+/* Rule ornament — thin rule · dingbat · thin rule (used between sections) */
+.rule-ornament {
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+  margin: 3rem 0;
+}
+
+.rule-ornament::before,
+.rule-ornament::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--border-strong);
+}
+
+.rule-ornament > span {
+  font-family: var(--font-display), Georgia, serif;
+  color: var(--accent-gold);
+  font-size: 0.875rem;
+  line-height: 1;
+}
+
+/* Drop cap — for lede paragraphs on feature spreads */
+.drop-cap::first-letter {
+  font-family: var(--font-display), Georgia, serif;
+  font-weight: 700;
+  float: left;
+  font-size: 3.6em;
+  line-height: 0.85;
+  padding: 0.25rem 0.5rem 0 0;
+  color: var(--accent-primary);
+}
+
+/* Marginalia — mono metadata that lives in the sidebar rail */
+.marginalia {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.6875rem;
+  line-height: 1.6;
+  color: var(--text-muted);
+  letter-spacing: 0.02em;
+}
+
+.marginalia-label {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.625rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  display: block;
+  margin-bottom: 0.125rem;
+}
+
+/* Hanging punctuation — for pull quotes */
+.hanging-quote {
+  text-indent: -0.4em;
+}
+
+/* All-smallcaps for list items / labels */
+.smallcaps {
+  font-variant-caps: all-small-caps;
+  letter-spacing: 0.08em;
+}
+
+/* Leader-dot line — bridges title and figure, like a TOC */
+.leader-dots {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+}
+
+.leader-dots > .leader-fill {
+  flex: 1;
+  border-bottom: 1px dotted var(--border-strong);
+  transform: translateY(-4px);
+}
+
+/* Nameplate (masthead) — homepage top strip */
+.nameplate {
+  font-family: var(--font-display), Georgia, serif;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  color: var(--text-primary);
+}
+
+/* Hairline rule */
+.rule-hair {
+  height: 1px;
+  background: var(--border-strong);
+}
+
+.rule-hair-soft {
+  height: 1px;
+  background: var(--border);
+}
+
+/* Double rule — top rail of masthead */
+.rule-double {
+  border-top: 1px solid var(--border-strong);
+  border-bottom: 1px solid var(--border-strong);
+  padding-block: 0.375rem;
+}
+
+/* Ornamental quote mark for pull quotes */
+.quote-ornament {
+  font-family: var(--font-display), Georgia, serif;
+  color: var(--accent-gold);
+  font-size: 3.25em;
+  line-height: 0.6;
+  font-style: normal;
+  user-select: none;
+  pointer-events: none;
+}
+
+/* Section opener — display-md title + dek + thin rule */
+.section-opener {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-block: 2.5rem 1.5rem;
+}
+
+/* Editorial matrix grid baseline — dotted row under every 5th row */
+.matrix-baseline > :nth-child(5n) {
+  border-bottom-style: dotted;
+}
+
+/* Confidence bars glyph (ConfidenceBadge rebuild) */
+.confidence-bars {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.confidence-bars > span {
+  display: inline-block;
+  width: 3px;
+  height: 10px;
+  background: var(--text-muted);
+  opacity: 0.25;
+}
+
+.confidence-bars[data-level="high"] > span {
+  opacity: 1;
+  background: var(--confidence-high);
+}
+
+.confidence-bars[data-level="medium"] > span:nth-child(-n+2) {
+  opacity: 1;
+  background: var(--confidence-medium);
+}
+
+.confidence-bars[data-level="low"] > span:first-child {
+  opacity: 1;
+  background: var(--confidence-low);
+}
+
+/* Square portrait frame — replaces rounded-xl avatar on editorial spreads */
+.portrait-frame {
+  border: 1px solid var(--border-strong);
+  border-radius: 2px;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.5),
+    var(--shadow-sm);
+  background: var(--bg-surface);
+  overflow: hidden;
+}
+
+/* Monogram — serif initials inside portrait frame */
+.monogram {
+  font-family: var(--font-display), Georgia, serif;
+  font-weight: 700;
+  color: var(--text-secondary);
+  letter-spacing: -0.02em;
+  background: var(--bg-elevated);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
+/* Gold incumbent tag */
+.tag-incumbent {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.6875rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--accent-gold);
+  border: 1px solid var(--accent-gold);
+  padding: 0.25rem 0.5rem 0.2rem;
+  border-radius: 2px;
+  line-height: 1;
+}
+
+/* Figure caption */
+.figcaption {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.6875rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
 /* Reduced motion: disable all custom animations */
 @media (prefers-reduced-motion: reduce) {
   .stagger-in > *,

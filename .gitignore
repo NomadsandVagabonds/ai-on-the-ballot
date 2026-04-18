@@ -32,6 +32,7 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+!.env.example
 
 # vercel
 .vercel
@@ -46,3 +47,6 @@ next-env.d.ts
 /data/source-verification-report.json
 /data/candidate-manifest.csv
 /data/fec-to-bioguide.json
+
+# Claude Code workspace (local agent state, worktrees)
+.claude/

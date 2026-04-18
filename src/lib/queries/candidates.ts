@@ -47,10 +47,15 @@ export async function getCandidateBySlug(
   // Sort positions by issue sort_order
   positions.sort((a, b) => a.issue.sort_order - b.issue.sort_order);
 
+  // Until Supabase has a position_sources table, sources come in empty.
+  // The mock layer supplies them from the research spreadsheet.
+  const positionsWithSources = positions.map((p) => ({ ...p, sources: [] }));
+
   return {
     ...candidate,
-    positions,
+    positions: positionsWithSources,
     legislative_activity: activity,
+    general_sources: [],
   };
 }
 
@@ -123,11 +128,13 @@ export async function getCandidateSummaries(
       name: c.name,
       slug: c.slug,
       photo_url: c.photo_url,
+      bioguide_id: c.bioguide_id,
       party: c.party,
       state: c.state,
       district: c.district,
       office_sought: c.office_sought,
       is_incumbent: c.is_incumbent,
+      total_raised: c.total_raised,
       position_count: count,
       coverage_percentage:
         issueCount > 0 ? Math.round((count / issueCount) * 100) : 0,

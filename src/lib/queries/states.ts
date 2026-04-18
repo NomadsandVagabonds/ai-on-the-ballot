@@ -1,6 +1,6 @@
 import { createServerSupabaseClient, isSupabaseConfigured } from "@/lib/supabase/server";
 import { getRacesByState } from "./races";
-import { getMockRacesByState } from "@/lib/mock-data";
+import { getMockRacesByState, MOCK_RACES } from "@/lib/mock-data";
 import {
   STATE_MAP,
   stateSlugToAbbr,
@@ -8,12 +8,6 @@ import {
   stateAbbrToSlug,
 } from "@/lib/utils/states";
 import type { StateData, StateMapEntry } from "@/types/domain";
-
-/** Launch states for demo/preview when Supabase isn't configured */
-const DEMO_STATES = new Set(["AR", "NC", "TX", "MS", "IL"]);
-const DEMO_RACE_COUNTS: Record<string, number> = {
-  TX: 3, NC: 2, IL: 2, AR: 1, MS: 1,
-};
 
 /** Get state-level data including all races */
 export async function getStateData(
@@ -58,15 +52,20 @@ export async function getStateData(
 /** Get map-level data for all states (minimal, for performance) */
 export async function getAllStatesForMap(): Promise<StateMapEntry[]> {
   if (!isSupabaseConfigured()) {
-    // Return demo data so the site is reviewable without a database
+    // Build a tally directly from the mock race set so counts reflect
+    // whatever's currently in data/tracker/.
+    const tally = new Map<string, number>();
+    for (const race of MOCK_RACES) {
+      tally.set(race.state, (tally.get(race.state) ?? 0) + 1);
+    }
     return Object.entries(STATE_MAP).map(([abbr, name]) => {
-      const isDemo = DEMO_STATES.has(abbr);
+      const count = tally.get(abbr) ?? 0;
       return {
         abbreviation: abbr,
         name,
         slug: stateAbbrToSlug(abbr),
-        race_count: isDemo ? (DEMO_RACE_COUNTS[abbr] ?? 2) : 0,
-        has_data: isDemo,
+        race_count: count,
+        has_data: count > 0,
       };
     });
   }

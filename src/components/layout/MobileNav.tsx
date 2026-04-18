@@ -7,7 +7,7 @@ import { useAppStore } from "@/stores/appStore";
 import { ZipCodeInput } from "@/components/shared/ZipCodeInput";
 
 const NAV_LINKS = [
-  { href: "/map", label: "Explore Map" },
+  { href: "/#issues", label: "Explore the Issues" },
   { href: "/about", label: "Methodology" },
   { href: "/corrections", label: "Corrections" },
 ] as const;

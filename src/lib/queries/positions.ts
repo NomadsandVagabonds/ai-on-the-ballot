@@ -21,7 +21,8 @@ export async function getPositionsForCandidate(
   })[];
 
   // Sort by issue sort_order
-  return positions.sort((a, b) => a.issue.sort_order - b.issue.sort_order);
+  positions.sort((a, b) => a.issue.sort_order - b.issue.sort_order);
+  return positions.map((p) => ({ ...p, sources: [] }));
 }
 
 /** Build comparison rows for a race (for the side-by-side grid) */
@@ -67,6 +68,8 @@ export async function getComparisonData(
         confidence: pos?.confidence ?? "low",
         summary: pos?.summary ?? null,
         source_url: pos?.source_url ?? null,
+        // Supabase path: no position_sources table yet; empty for now.
+        sources: [],
       };
     }),
   }));

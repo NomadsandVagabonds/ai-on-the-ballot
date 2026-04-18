@@ -23,6 +23,7 @@ export const useAppStore = create<AppState>((set) => ({
   searchQuery: "",
   setSearchQuery: (query) => set({ searchQuery: query }),
 
-  hideNoMention: false,
+  // Default to hiding no-mention so readers start with the record, not noise.
+  hideNoMention: true,
   toggleHideNoMention: () => set((s) => ({ hideNoMention: !s.hideNoMention })),
 }));

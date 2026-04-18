@@ -158,8 +158,6 @@ export function USMap({ states }: USMapProps) {
     [handleStateClick]
   );
 
-  const totalStatesWithData = states.filter((s) => s.has_data).length;
-  const totalRaces = states.reduce((sum, s) => sum + s.race_count, 0);
   const sortedStates = useMemo(
     () => [...states].sort((a, b) => a.name.localeCompare(b.name)),
     [states]
@@ -287,12 +285,6 @@ export function USMap({ states }: USMapProps) {
           </div>
         </div>
 
-        {/* Stats bar */}
-        <div className="grid grid-cols-3 gap-px border-t border-border-strong">
-          <StatBox label="States Tracked" value={totalStatesWithData} />
-          <StatBox label="Races" value={totalRaces} />
-          <StatBox label="AI Issues" value={5} />
-        </div>
       </div>
 
       {/* Mobile: searchable state cards */}
@@ -303,24 +295,6 @@ export function USMap({ states }: USMapProps) {
   );
 }
 
-function StatBox({
-  label,
-  value,
-}: {
-  label: string;
-  value: number | string;
-}) {
-  return (
-    <div className="flex flex-col items-center justify-center py-5 px-4 bg-bg-surface/60">
-      <span className="text-2xl font-bold text-accent-primary font-mono tabular-nums">
-        {value}
-      </span>
-      <span className="text-[10px] text-text-muted mt-1 uppercase tracking-[0.1em] font-mono">
-        {label}
-      </span>
-    </div>
-  );
-}
 
 function MobileStateList({ states }: { states: StateMapEntry[] }) {
   const [filter, setFilter] = useState("");
