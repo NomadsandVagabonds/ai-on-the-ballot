@@ -29,7 +29,14 @@ export async function generateMetadata({
 
 /** Pre-build the 5 launch state pages */
 export function generateStaticParams() {
-  const launchStates = ["texas", "california", "new-york", "virginia", "colorado"];
+  // Pre-build state pages for every state covered in the v3 tracker.
+  const launchStates = [
+    "arkansas",
+    "illinois",
+    "mississippi",
+    "north-carolina",
+    "texas",
+  ];
   return launchStates.map((slug) => ({ slug }));
 }
 

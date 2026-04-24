@@ -6,7 +6,8 @@ import { HeroZipInput } from "./HeroZipInput";
 
 export const revalidate = 1800;
 
-const FEATURED_STATE_ABBRS = ["CA", "TX", "OH", "PA", "NC"] as const;
+/** Number of states to feature on the homepage. */
+const FEATURED_COUNT = 5;
 
 export default async function Home() {
   const [states, issues] = await Promise.all([
@@ -17,9 +18,12 @@ export default async function Home() {
   const totalRaces = states.reduce((sum, s) => sum + s.race_count, 0);
   const statesWithData = states.filter((s) => s.has_data).length;
 
-  const featuredRaces = FEATURED_STATE_ABBRS.map((abbr) =>
-    states.find((s) => s.abbreviation === abbr)
-  ).filter((s): s is NonNullable<typeof s> => Boolean(s && s.has_data));
+  // Auto-select the top states by tracked race count. Keeps the grid
+  // full + self-updates as new state coverage lands in the dataset.
+  const featuredRaces = [...states]
+    .filter((s) => s.has_data)
+    .sort((a, b) => b.race_count - a.race_count || a.name.localeCompare(b.name))
+    .slice(0, FEATURED_COUNT);
 
   return (
     <div>

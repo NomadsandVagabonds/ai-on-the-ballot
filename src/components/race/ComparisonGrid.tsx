@@ -140,13 +140,15 @@ function DesktopMatrix({
 
   return (
     <div role="table" aria-label="Candidate positions by issue">
-      {/* Header row */}
+      {/* Header row — items-start so every portrait box aligns on the
+          same top edge; name + party badge flow below with room for
+          two-line names without shifting the portraits. */}
       <div
         role="row"
-        className="grid items-end border-b border-border-strong pb-1"
+        className="grid items-start border-b border-border-strong pt-4 pb-4"
         style={gridTemplate}
       >
-        <div role="columnheader" className="px-4 pb-4">
+        <div role="columnheader" className="px-4 pt-1">
           <span className="marginalia-label">Issue</span>
         </div>
         {candidates.map((c) => (

@@ -36,7 +36,32 @@ from typing import Any, Iterable
 import pandas as pd  # type: ignore[import-not-found]
 
 ROOT = Path(__file__).resolve().parent.parent
-XLSX_PATH = ROOT.parent / "tracker_update.xlsx"
+def _pick_xlsx() -> Path:
+    """Prefer the v3 file from the client's new design drop; fall back
+    to the legacy tracker_update.xlsx for older workflows."""
+    candidates = [
+        ROOT.parent / "new design" / "trackerv3.xlsx",
+        ROOT.parent / "tracker_update.xlsx",
+    ]
+    for c in candidates:
+        if c.exists():
+            return c
+    return candidates[0]
+
+
+XLSX_PATH = _pick_xlsx()
+
+
+def _positions_sheet_name(xlsx_path: Path) -> str:
+    """v3 renamed the sheet to 'Positions v2' and deprecated the old one."""
+    import openpyxl  # type: ignore[import-not-found]
+
+    wb = openpyxl.load_workbook(xlsx_path, data_only=True, read_only=True)
+    names = wb.sheetnames
+    for candidate in ("Positions v2", "Positions"):
+        if candidate in names:
+            return candidate
+    return names[0]
 OUT_DIR = ROOT / "data" / "tracker"
 OUT_DIR.mkdir(parents=True, exist_ok=True)
 
@@ -441,7 +466,7 @@ def main() -> None:
 
     df_cands = pd.read_excel(XLSX_PATH, sheet_name="Candidates")
     df_topics = pd.read_excel(XLSX_PATH, sheet_name="Topics")
-    df_pos = pd.read_excel(XLSX_PATH, sheet_name="Positions")
+    df_pos = pd.read_excel(XLSX_PATH, sheet_name=_positions_sheet_name(XLSX_PATH))
     df_sources = pd.read_excel(XLSX_PATH, sheet_name="Sources")
 
     issues = build_issues(df_topics)
