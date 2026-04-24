@@ -132,7 +132,6 @@ function DesktopMatrix({
   candidates: CandidateSummary[];
   rows: ComparisonRow[];
 }) {
-  const [expandedIssue, setExpandedIssue] = useState<string | null>(null);
   const n = candidates.length;
 
   const gridTemplate = {
@@ -164,7 +163,6 @@ function DesktopMatrix({
       {/* Body rows */}
       <div role="rowgroup">
         {rows.map((row, i) => {
-          const isExpanded = expandedIssue === row.issue.id;
           const isLast = i === rows.length - 1;
           const isBaselineRow = (i + 1) % 5 === 0 && !isLast;
 
@@ -177,169 +175,78 @@ function DesktopMatrix({
               } border-border hover:bg-bg-elevated/30 transition-colors`}
               style={gridTemplate}
             >
-              {/* Issue cell — folio + name + always-visible description */}
+              {/* Issue cell — folio + name + description (static) */}
               <div role="cell" className="px-4 py-5 pr-6">
-                <button
-                  type="button"
-                  onClick={() =>
-                    setExpandedIssue(isExpanded ? null : row.issue.id)
-                  }
-                  aria-expanded={isExpanded}
-                  aria-controls={`issue-expand-${row.issue.id}`}
-                  className="group w-full text-left"
-                >
-                  <div className="flex items-baseline gap-3">
-                    <span className="folio text-xs shrink-0 pt-0.5">
-                      {roman(i)}.
-                    </span>
-                    <div className="min-w-0 flex-1">
-                      <h3 className="font-display text-[17px] leading-[1.3] font-semibold text-text-primary group-hover:text-accent-primary transition-colors">
-                        {row.issue.display_name}
-                      </h3>
-                      {row.issue.description && (
-                        <p className="mt-1.5 text-[13px] leading-[1.5] text-text-secondary">
-                          {row.issue.description}
-                        </p>
-                      )}
-                      <span
-                        className="mt-2 inline-block marginalia"
-                        style={{ letterSpacing: "0.18em", textTransform: "uppercase" }}
-                      >
-                        {isExpanded ? "Collapse ↑" : "Expand quotes ↓"}
-                      </span>
-                    </div>
+                <div className="flex items-baseline gap-3">
+                  <span className="folio text-xs shrink-0 pt-0.5">
+                    {roman(i)}.
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <h3 className="font-display text-[17px] leading-[1.3] font-semibold text-text-primary">
+                      {row.issue.display_name}
+                    </h3>
+                    {row.issue.description && (
+                      <p className="mt-1.5 text-[13px] leading-[1.5] text-text-secondary">
+                        {row.issue.description}
+                      </p>
+                    )}
                   </div>
-                </button>
+                </div>
               </div>
 
-              {/* Stance cells */}
-              {row.positions.map((pos, ci) => (
-                <div
-                  key={pos.candidate_id}
-                  role="cell"
-                  className="px-4 py-5 border-l border-border flex flex-col items-center gap-1.5 text-center"
-                >
-                  <span
-                    className="stance-mark"
-                    data-stance={pos.stance}
-                  >
-                    {STANCE_DISPLAY[pos.stance].label}
-                  </span>
-                  {microSummary(pos.summary) && (
-                    <p className="mt-1 text-[12.5px] leading-[1.45] text-text-secondary max-w-[18ch]">
-                      {microSummary(pos.summary)}
-                    </p>
-                  )}
-                  {/* Invisible spacer to keep column widths even when only some have summaries */}
-                  {ci === -1 && null}
-                </div>
-              ))}
+              {/* Stance cells — stance mark + micro summary + primary source link */}
+              {row.positions.map((pos) => {
+                const primarySource =
+                  pos.sources && pos.sources.length > 0
+                    ? pos.sources[0]
+                    : pos.source_url
+                      ? {
+                          type: "statement" as const,
+                          title: null,
+                          url: pos.source_url,
+                          date: null,
+                          excerpt: null,
+                        }
+                      : null;
+                const host = primarySource ? hostnameOf(primarySource.url) : null;
+                const typeLabel = primarySource
+                  ? SOURCE_TYPE_LABELS[primarySource.type] ?? primarySource.type
+                  : null;
 
-              {/* Expanded full-row content — pull quotes per candidate */}
-              {isExpanded && (
-                <div
-                  id={`issue-expand-${row.issue.id}`}
-                  className="col-span-full bg-bg-elevated/40 border-t border-border -mt-px"
-                  style={{ gridColumn: "1 / -1" }}
-                >
+                return (
                   <div
-                    className="grid gap-x-4 px-4 py-6"
-                    style={{
-                      gridTemplateColumns: `minmax(15rem, 1.3fr) repeat(${n}, minmax(9rem, 1fr))`,
-                    }}
+                    key={pos.candidate_id}
+                    role="cell"
+                    className="px-4 py-5 border-l border-border flex flex-col items-center gap-1.5 text-center"
                   >
-                    <div className="pr-4">
-                      <p className="kicker-muted mb-2">On the record</p>
-                      <p className="font-display italic text-[15px] leading-[1.55] text-text-secondary">
-                        {row.issue.description ||
-                          "Candidate positions on this issue, drawn from the public record."}
+                    <span className="stance-mark" data-stance={pos.stance}>
+                      {STANCE_DISPLAY[pos.stance].label}
+                    </span>
+                    {microSummary(pos.summary) && (
+                      <p className="mt-1 text-[12.5px] leading-[1.45] text-text-secondary max-w-[18ch]">
+                        {microSummary(pos.summary)}
                       </p>
-                    </div>
-                    {row.positions.map((pos) => {
-                      // Prefer multi-source list; fall back to legacy single URL
-                      const sources =
-                        pos.sources && pos.sources.length > 0
-                          ? pos.sources
-                          : pos.source_url
-                            ? [
-                                {
-                                  type: "statement" as const,
-                                  title: null,
-                                  url: pos.source_url,
-                                  date: null,
-                                  excerpt: null,
-                                },
-                              ]
-                            : [];
-                      return (
-                        <div
-                          key={pos.candidate_id}
-                          className="border-l border-border pl-4"
-                        >
-                          {pos.summary ? (
-                            <blockquote className="relative pl-5 hanging-quote">
-                              <span
-                                className="quote-ornament absolute -left-1 -top-2"
-                                aria-hidden="true"
-                              >
-                                &ldquo;
-                              </span>
-                              <p className="font-display italic text-[14.5px] leading-[1.55] text-text-primary">
-                                {pos.summary}
-                              </p>
-                            </blockquote>
-                          ) : (
-                            <p className="marginalia">— no summary recorded</p>
-                          )}
-                          {sources.length > 0 && (
-                            <ul
-                              className="mt-3 space-y-1.5 m-0 p-0 list-none"
-                              style={{ marginTop: "0.75rem" }}
-                            >
-                              {sources.map((s, i) => {
-                                const host = hostnameOf(s.url);
-                                const typeLabel =
-                                  SOURCE_TYPE_LABELS[s.type] ?? s.type;
-                                return (
-                                  <li
-                                    key={`${s.url ?? "src"}-${i}`}
-                                    className="leading-[1.45]"
-                                  >
-                                    <span
-                                      className="marginalia-label"
-                                      style={{ margin: 0, display: "inline" }}
-                                    >
-                                      {typeLabel}
-                                    </span>
-                                    {s.url && host && (
-                                      <>
-                                        {" "}
-                                        <a
-                                          href={s.url}
-                                          target="_blank"
-                                          rel="noopener noreferrer"
-                                          className="marginalia hover:text-accent-primary transition-colors break-all"
-                                          style={{
-                                            textTransform: "uppercase",
-                                            letterSpacing: "0.08em",
-                                          }}
-                                        >
-                                          {host}
-                                          <span aria-hidden="true"> →</span>
-                                        </a>
-                                      </>
-                                    )}
-                                  </li>
-                                );
-                              })}
-                            </ul>
-                          )}
-                        </div>
-                      );
-                    })}
+                    )}
+                    {primarySource && (
+                      <p className="mt-1 text-[11px] leading-[1.4] text-text-muted">
+                        <span className="font-semibold">Source:</span>{" "}
+                        {primarySource.url && host ? (
+                          <a
+                            href={primarySource.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="hover:text-accent-primary transition-colors underline-offset-2 hover:underline"
+                          >
+                            {typeLabel}
+                          </a>
+                        ) : (
+                          <span>{typeLabel}</span>
+                        )}
+                      </p>
+                    )}
                   </div>
-                </div>
-              )}
+                );
+              })}
             </div>
           );
         })}
@@ -360,7 +267,6 @@ function MobileDispatches({
   rows: ComparisonRow[];
 }) {
   const [activeIndex, setActiveIndex] = useState(0);
-  const [expandedIssue, setExpandedIssue] = useState<string | null>(null);
   const active = candidates[activeIndex];
 
   return (
@@ -371,10 +277,7 @@ function MobileDispatches({
           <button
             key={c.id}
             type="button"
-            onClick={() => {
-              setActiveIndex(i);
-              setExpandedIssue(null);
-            }}
+            onClick={() => setActiveIndex(i)}
             aria-pressed={i === activeIndex}
             className={`flex-1 min-w-0 px-3 py-2.5 text-center truncate transition-colors border-l first:border-l-0 border-border ${
               i === activeIndex
@@ -427,63 +330,63 @@ function MobileDispatches({
         {rows.map((row, i) => {
           const pos = row.positions.find((p) => p.candidate_id === active.id);
           if (!pos) return null;
-          const isExpanded = expandedIssue === row.issue.id;
-          const host = hostnameOf(pos.source_url);
+
+          const primarySource =
+            pos.sources && pos.sources.length > 0
+              ? pos.sources[0]
+              : pos.source_url
+                ? {
+                    type: "statement" as const,
+                    title: null,
+                    url: pos.source_url,
+                    date: null,
+                    excerpt: null,
+                  }
+                : null;
+          const host = primarySource ? hostnameOf(primarySource.url) : null;
+          const typeLabel = primarySource
+            ? SOURCE_TYPE_LABELS[primarySource.type] ?? primarySource.type
+            : null;
 
           return (
             <li key={row.issue.id} className="py-5">
-              <button
-                type="button"
-                onClick={() =>
-                  setExpandedIssue(isExpanded ? null : row.issue.id)
-                }
-                aria-expanded={isExpanded}
-                className="w-full text-left"
-              >
-                <div className="flex items-baseline gap-3">
-                  <span className="folio text-[11px] shrink-0 pt-0.5">
-                    {roman(i)}.
-                  </span>
-                  <div className="flex-1 min-w-0">
-                    <h3 className="font-display text-base font-semibold leading-snug text-text-primary">
-                      {row.issue.display_name}
-                    </h3>
-                    <div className="mt-2">
-                      <span
-                        className="stance-mark"
-                        data-stance={pos.stance}
-                      >
-                        {STANCE_DISPLAY[pos.stance].label}
-                      </span>
-                    </div>
-                    {microSummary(pos.summary) && (
-                      <p className="mt-2 text-[13px] leading-[1.5] text-text-secondary">
-                        {microSummary(pos.summary)}
-                      </p>
-                    )}
+              <div className="flex items-baseline gap-3">
+                <span className="folio text-[11px] shrink-0 pt-0.5">
+                  {roman(i)}.
+                </span>
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-display text-base font-semibold leading-snug text-text-primary">
+                    {row.issue.display_name}
+                  </h3>
+                  <div className="mt-2">
+                    <span className="stance-mark" data-stance={pos.stance}>
+                      {STANCE_DISPLAY[pos.stance].label}
+                    </span>
                   </div>
-                </div>
-              </button>
-
-              {isExpanded && pos.summary && (
-                <div className="mt-3 ml-6 pl-4 border-l-2 border-accent-gold/50">
-                  <p className="font-display italic text-sm leading-relaxed text-text-primary">
-                    &ldquo;{pos.summary}&rdquo;
-                  </p>
-                  {host && pos.source_url && (
-                    <a
-                      href={pos.source_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="mt-2 inline-flex items-center gap-1.5 marginalia-label hover:text-accent-primary transition-colors"
-                      style={{ margin: "0.5rem 0 0" }}
-                    >
-                      Source: {host}
-                      <span aria-hidden="true">→</span>
-                    </a>
+                  {microSummary(pos.summary) && (
+                    <p className="mt-2 text-[13px] leading-[1.5] text-text-secondary">
+                      {microSummary(pos.summary)}
+                    </p>
+                  )}
+                  {primarySource && (
+                    <p className="mt-2 text-[12px] leading-[1.4] text-text-muted">
+                      <span className="font-semibold">Source:</span>{" "}
+                      {primarySource.url && host ? (
+                        <a
+                          href={primarySource.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="hover:text-accent-primary transition-colors underline-offset-2 hover:underline"
+                        >
+                          {typeLabel}
+                        </a>
+                      ) : (
+                        <span>{typeLabel}</span>
+                      )}
+                    </p>
                   )}
                 </div>
-              )}
+              </div>
             </li>
           );
         })}
