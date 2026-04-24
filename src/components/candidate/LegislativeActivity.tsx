@@ -78,8 +78,8 @@ function ActivityNode({ activity }: { activity: LegislativeActivityRow }) {
           </time>
         )}
         <span
-          className="font-mono text-[10px] uppercase text-text-muted"
-          style={{ letterSpacing: "0.18em" }}
+          className="text-[11px] font-semibold uppercase text-text-muted"
+          style={{ letterSpacing: "0.08em" }}
         >
           {typeLabel}
         </span>

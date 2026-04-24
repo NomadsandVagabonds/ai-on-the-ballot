@@ -47,10 +47,8 @@ export default function SearchPage() {
 
   return (
     <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
-      <p className="text-[10px] font-mono uppercase tracking-[0.2em] text-accent-primary mb-3">
-        Find
-      </p>
-      <h1 className="font-display text-display-md font-bold tracking-tight mb-8">
+      <p className="kicker mb-3">Find</p>
+      <h1 className="font-display text-display-md font-bold tracking-tight text-text-primary mb-8">
         Search
       </h1>
 
@@ -157,10 +155,10 @@ function ResultGroup({
   return (
     <div>
       <div className="flex items-center gap-3 mb-3">
-        <h2 className="text-[10px] font-mono font-semibold text-text-muted uppercase tracking-[0.15em]">
+        <h2 className="text-xs font-semibold tracking-[0.08em] uppercase text-text-muted">
           {title}
         </h2>
-        <span className="font-mono text-xs text-text-muted tabular-nums">{count}</span>
+        <span className="text-xs text-text-muted tabular-nums">{count}</span>
         <div className="h-px flex-1 bg-border" />
       </div>
       <div className="card-elevated divide-y divide-border overflow-hidden">

@@ -23,7 +23,7 @@ Nonpartisan candidate tracker — documents U.S. congressional candidates' publi
 
 ## Key Conventions
 - **Path alias:** `@/*` maps to `./src/*`
-- **Fonts:** Inter (body), Crimson Text (display headings), JetBrains Mono (data)
+- **Fonts:** Inter (body), Lora (display headings), JetBrains Mono (data)
 - **Design tokens:** CSS custom properties in `globals.css`, bridged to Tailwind via `@theme inline`
 - **Party colors:** Red/blue used ONLY in PartyBadge component. Site chrome uses teal/indigo/amber palette.
 - **Server Components by default.** Use `'use client'` only when needed (interactivity, Zustand, event handlers).

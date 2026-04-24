@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, Crimson_Text, JetBrains_Mono } from "next/font/google";
+import { Inter, Lora, JetBrains_Mono } from "next/font/google";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import "./globals.css";
@@ -10,9 +10,9 @@ const inter = Inter({
   display: "swap",
 });
 
-const crimsonText = Crimson_Text({
-  variable: "--font-crimson-text",
-  weight: ["400", "600", "700"],
+const lora = Lora({
+  variable: "--font-lora",
+  weight: ["400", "500", "600", "700"],
   subsets: ["latin"],
   display: "swap",
 });
@@ -61,7 +61,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${inter.variable} ${crimsonText.variable} ${jetbrainsMono.variable} h-full antialiased`}
+      className={`${inter.variable} ${lora.variable} ${jetbrainsMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-bg-primary text-text-primary font-body">
         <a href="#main-content" className="skip-to-content">

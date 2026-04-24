@@ -6,6 +6,7 @@ import { stateSlugToName } from "@/lib/utils/states";
 import { chamberLabel } from "@/lib/utils/stance";
 import { capByFundraising } from "@/lib/utils/ranking";
 import { CandidateCard } from "@/components/race/CandidateCard";
+import { StateOutline } from "@/components/state/StateOutline";
 
 export const revalidate = 1800;
 
@@ -32,8 +33,6 @@ export function generateStaticParams() {
   return launchStates.map((slug) => ({ slug }));
 }
 
-const ROMAN = ["I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X"];
-
 export default async function StatePage({ params }: StatePageProps) {
   const { slug } = await params;
   const stateData = await getStateData(slug);
@@ -42,49 +41,77 @@ export default async function StatePage({ params }: StatePageProps) {
     notFound();
   }
 
+  const [firstRace, ...restRaces] = stateData.races;
+
   return (
-    <div className="mx-auto max-w-5xl px-4 pt-10 pb-20 md:pt-14 md:pb-28">
+    <div className="mx-auto max-w-5xl px-4 pt-8 pb-20 md:pt-10 md:pb-24">
       {/* ============================================================
-          State header — editorial masthead
+          State header
+            Left column:  state name (top) ⇢ first race title (bottom)
+            Right column: silhouette ⇢ tally boxes
+          items-stretch + flex-1 spacer makes the first race's title
+          bottom-align with the tally boxes, so the hairline rule below
+          slots in just under both columns with no dead space.
          ============================================================ */}
-      <header className="grid grid-cols-1 md:grid-cols-12 gap-x-8 gap-y-6 mb-8">
-        <div className="md:col-span-8">
-          <p className="kicker mb-4">{stateData.abbreviation}</p>
-          <h1 className="font-display text-display-xl font-bold text-text-primary leading-[0.98]">
+      <header className="grid grid-cols-[1fr_auto] items-stretch gap-x-6 md:gap-x-8 mb-4">
+        <div className="min-w-0 flex flex-col">
+          <h1 className="font-display text-[2.75rem] md:text-[3.75rem] font-bold text-text-primary leading-[0.98] tracking-[-0.015em]">
             {stateData.name}
           </h1>
-          <p className="dek mt-4">
-            {stateData.races.length === 0
-              ? `No tracked races in ${stateData.name} yet.`
-              : `${stateData.races.length} tracked race${stateData.races.length === 1 ? "" : "s"}, ${stateData.candidate_count} candidate${stateData.candidate_count === 1 ? "" : "s"}, six AI issues on the record.`}
-          </p>
+
+          {/* Pushes the first race title to the bottom of the left column */}
+          <div className="flex-1 min-h-6" aria-hidden="true" />
+
+          {firstRace && (
+            <div className="flex flex-wrap items-baseline justify-between gap-3">
+              <h2 className="font-display text-2xl md:text-[1.75rem] font-bold text-text-primary leading-tight">
+                {chamberLabel(firstRace.chamber)}
+                {firstRace.district ? ` — District ${firstRace.district}` : ""}
+              </h2>
+
+              {firstRace.race_type === "special" && (
+                <span className="text-xs font-semibold tracking-[0.08em] uppercase text-accent-gold">
+                  Special Election
+                </span>
+              )}
+            </div>
+          )}
         </div>
 
-        {/* Tally rail */}
-        <aside className="md:col-span-4 md:pl-8 md:border-l md:border-border self-end">
-          <div className="rule-hair" aria-hidden="true" />
-          <dl className="grid grid-cols-2 gap-4 py-4">
-            <div>
-              <dt className="marginalia-label">Races</dt>
-              <dd className="font-mono text-2xl font-bold text-text-primary tabular-nums">
+        {/* State silhouette + tally stack — right column */}
+        <div className="shrink-0 flex flex-col items-end gap-4">
+          <div className="w-20 sm:w-24 md:w-[130px] aspect-square">
+            <StateOutline
+              abbr={stateData.abbreviation}
+              label={stateData.name}
+              size={130}
+              fill="#5B7B6A"
+            />
+          </div>
+
+          <dl className="flex items-start gap-6">
+            <div className="text-right">
+              <dt className="text-[11px] font-medium tracking-[0.08em] uppercase text-text-muted mb-1.5">
+                Races
+              </dt>
+              <dd className="font-display text-2xl md:text-3xl font-bold text-text-primary tabular-nums leading-none">
                 {stateData.races.length}
               </dd>
             </div>
-            <div>
-              <dt className="marginalia-label">Candidates</dt>
-              <dd className="font-mono text-2xl font-bold text-text-primary tabular-nums">
+            <div className="text-right">
+              <dt className="text-[11px] font-medium tracking-[0.08em] uppercase text-text-muted mb-1.5">
+                Candidates
+              </dt>
+              <dd className="font-display text-2xl md:text-3xl font-bold text-text-primary tabular-nums leading-none">
                 {stateData.candidate_count}
               </dd>
             </div>
           </dl>
-          <div className="rule-hair" aria-hidden="true" />
-        </aside>
+        </div>
       </header>
 
-      {/* Ornament */}
-      <div className="rule-ornament" aria-hidden="true">
-        <span>&#10086;</span>
-      </div>
+      {/* Full-width hairline under both columns */}
+      {firstRace && <div className="h-px bg-border mb-5" />}
 
       {/* ============================================================
           Races
@@ -96,66 +123,62 @@ export default async function StatePage({ params }: StatePageProps) {
           </p>
         </div>
       ) : (
-        <div className="space-y-16">
-          {stateData.races.map((race, i) => {
+        <div className="space-y-10">
+          {/* First race — title already rendered in the header above.
+              This section just shows its cards. */}
+          {firstRace && (
+            <FirstRaceCards race={firstRace} />
+          )}
+
+          {restRaces.map((race) => {
             const { shown: visibleCandidates, hidden: hiddenCount } =
               capByFundraising(race.candidates);
 
             return (
               <section key={race.id}>
-                {/* Race opener — folio + title + meta */}
+                {/* Race title — chamber + (district) */}
                 <div className="flex flex-wrap items-baseline justify-between gap-3 mb-3">
-                  <div className="flex items-baseline gap-4 min-w-0">
-                    <span
-                      className="font-display text-[26px] leading-none font-normal text-text-muted shrink-0"
-                      aria-hidden="true"
-                    >
-                      {ROMAN[i] ?? String(i + 1)}
-                    </span>
-                    <div>
-                      <p className="kicker-muted mb-1.5">
-                        Race {ROMAN[i] ?? String(i + 1)}
-                      </p>
-                      <h2 className="font-display text-display-md font-bold text-text-primary leading-tight">
-                        {chamberLabel(race.chamber)}
-                        {race.district ? ` — District ${race.district}` : ""}
-                      </h2>
-                    </div>
-                  </div>
+                  <h2 className="font-display text-2xl md:text-[1.75rem] font-bold text-text-primary leading-tight">
+                    {chamberLabel(race.chamber)}
+                    {race.district ? ` — District ${race.district}` : ""}
+                  </h2>
 
                   {race.race_type === "special" && (
-                    <span className="byline text-accent-gold shrink-0" style={{ margin: 0 }}>
+                    <span className="text-xs font-semibold tracking-[0.08em] uppercase text-accent-gold">
                       Special Election
                     </span>
                   )}
                 </div>
 
-                {/* Rule under the opener */}
-                <div className="rule-hair mb-6" aria-hidden="true" />
+                <div className="h-px bg-border mb-5" />
 
                 {/* Candidate cards */}
                 {race.candidates.length === 0 ? (
-                  <p className="marginalia italic">
+                  <p className="italic text-text-muted">
                     No candidates tracked for this race yet.
                   </p>
                 ) : (
                   <>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       {visibleCandidates.map((candidate) => (
-                        <CandidateCard key={candidate.id} candidate={candidate} />
+                        <CandidateCard
+                          key={candidate.id}
+                          candidate={candidate}
+                        />
                       ))}
                     </div>
 
-                    {/* Compare CTA — the standout feature, not a ghost link */}
                     {race.candidates.length >= 2 && (
                       <div className="mt-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                         <Link
                           href={`/race/${race.slug}`}
-                          className="group inline-flex items-center justify-center gap-2.5 bg-accent-primary text-white px-6 py-3.5 rounded-sm border border-accent-primary hover:bg-accent-primary-hover hover:border-accent-primary-hover focus-visible:outline-2 focus-visible:outline-accent-primary focus-visible:outline-offset-2 transition-colors shadow-[var(--shadow-sm)]"
+                          className="group inline-flex items-center justify-center gap-2.5 bg-accent-primary text-white px-6 py-3 rounded-sm border border-accent-primary hover:bg-accent-primary-hover hover:border-accent-primary-hover transition-colors shadow-[var(--shadow-sm)]"
                         >
                           <span className="font-display text-[17px] font-semibold tracking-[-0.005em]">
                             Compare the {visibleCandidates.length}{" "}
-                            {visibleCandidates.length === 1 ? "candidate" : "candidates"}
+                            {visibleCandidates.length === 1
+                              ? "candidate"
+                              : "candidates"}
                           </span>
                           <span
                             aria-hidden="true"
@@ -165,10 +188,7 @@ export default async function StatePage({ params }: StatePageProps) {
                           </span>
                         </Link>
                         {hiddenCount > 0 && (
-                          <p
-                            className="marginalia text-right sm:text-right"
-                            style={{ margin: 0 }}
-                          >
+                          <p className="text-sm text-text-muted sm:text-right">
                             {hiddenCount} more{" "}
                             {hiddenCount === 1 ? "candidate" : "candidates"} not shown.
                             <br className="hidden sm:inline" />
@@ -185,20 +205,78 @@ export default async function StatePage({ params }: StatePageProps) {
         </div>
       )}
 
-      {/* Closing ornament + return */}
-      <div className="rule-ornament mt-16" aria-hidden="true">
-        <span>&#10086;</span>
-      </div>
-      <div className="text-center">
+      {/* Back link */}
+      <div className="mt-16 pt-6 border-t border-border">
         <Link
-          href="/"
-          className="byline inline-flex items-center gap-2 text-text-secondary hover:text-accent-primary transition-colors"
-          style={{ margin: 0 }}
+          href="/map"
+          className="inline-flex items-center gap-2 text-sm text-text-secondary hover:text-accent-primary transition-colors"
         >
-          <span aria-hidden="true">&larr;</span>
+          <span aria-hidden="true">←</span>
           All states
         </Link>
       </div>
     </div>
+  );
+}
+
+/** Renders the first race's card grid (title is already in the header). */
+function FirstRaceCards({
+  race,
+}: {
+  race: Awaited<ReturnType<typeof getStateData>> extends infer T
+    ? T extends { races: Array<infer R> }
+      ? R
+      : never
+    : never;
+}) {
+  if (!race) return null;
+  const { shown: visibleCandidates, hidden: hiddenCount } = capByFundraising(
+    race.candidates
+  );
+
+  if (race.candidates.length === 0) {
+    return (
+      <p className="italic text-text-muted">
+        No candidates tracked for this race yet.
+      </p>
+    );
+  }
+
+  return (
+    <section>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        {visibleCandidates.map((candidate) => (
+          <CandidateCard key={candidate.id} candidate={candidate} />
+        ))}
+      </div>
+
+      {race.candidates.length >= 2 && (
+        <div className="mt-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <Link
+            href={`/race/${race.slug}`}
+            className="group inline-flex items-center justify-center gap-2.5 bg-accent-primary text-white px-6 py-3 rounded-sm border border-accent-primary hover:bg-accent-primary-hover hover:border-accent-primary-hover transition-colors shadow-[var(--shadow-sm)]"
+          >
+            <span className="font-display text-[17px] font-semibold tracking-[-0.005em]">
+              Compare the {visibleCandidates.length}{" "}
+              {visibleCandidates.length === 1 ? "candidate" : "candidates"}
+            </span>
+            <span
+              aria-hidden="true"
+              className="font-mono text-lg leading-none transition-transform duration-200 group-hover:translate-x-0.5"
+            >
+              →
+            </span>
+          </Link>
+          {hiddenCount > 0 && (
+            <p className="text-sm text-text-muted sm:text-right">
+              {hiddenCount} more{" "}
+              {hiddenCount === 1 ? "candidate" : "candidates"} not shown.
+              <br className="hidden sm:inline" />
+              Top five ranked by reported fundraising.
+            </p>
+          )}
+        </div>
+      )}
+    </section>
   );
 }

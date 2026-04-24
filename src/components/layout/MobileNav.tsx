@@ -7,9 +7,9 @@ import { useAppStore } from "@/stores/appStore";
 import { ZipCodeInput } from "@/components/shared/ZipCodeInput";
 
 const NAV_LINKS = [
-  { href: "/#issues", label: "Explore the Issues" },
-  { href: "/about", label: "Methodology" },
-  { href: "/corrections", label: "Corrections" },
+  { href: "/map", label: "Map" },
+  { href: "/about", label: "About" },
+  { href: "/corrections", label: "Submit Correction" },
 ] as const;
 
 export function MobileNav() {

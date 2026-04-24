@@ -17,6 +17,15 @@
   --accent-secondary: #5B7B6A;
   --accent-gold: #A67C37;
 
+  /* Landing palette — navy hero + amber CTA */
+  --navy: #12192c;
+  --navy-hover: #1b2340;
+  --amber: #c97d1e;
+  --amber-hover: #b26d17;
+  --amber-light: #fdecd0;
+  --map-tracked: #5B7B6A;
+  --map-tracked-hover: #3f5e4e;
+
   /* Borders & Dividers */
   --border: #E5E0D8;
   --border-strong: #C9C2B6;
@@ -65,7 +74,9 @@
   --color-party-dem: var(--party-dem);
   --color-party-rep: var(--party-rep);
   --color-party-ind: var(--party-ind);
-  --font-display: var(--font-crimson-text);
+  --color-navy: var(--navy);
+  --color-amber: var(--amber);
+  --font-display: var(--font-lora);
   --font-body: var(--font-inter);
   --font-mono: var(--font-jetbrains-mono);
 }
@@ -419,23 +430,25 @@ body {
   max-width: 56ch;
 }
 
-/* Kicker — small, wide-tracked, all-caps section signal */
+/* Kicker — small section eyebrow. Softened from thin all-caps to
+   a readable semibold label with gentle tracking. */
 .kicker {
-  font-family: var(--font-mono), ui-monospace, monospace;
-  font-size: 0.6875rem;
-  letter-spacing: 0.2em;
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: var(--accent-secondary);
+  color: var(--amber);
   line-height: 1;
 }
 
 .kicker-muted {
-  font-family: var(--font-mono), ui-monospace, monospace;
-  font-size: 0.6875rem;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
   color: var(--text-muted);
-  line-height: 1;
+  line-height: 1.2;
 }
 
 /* Byline — attribution strip */
@@ -661,6 +674,393 @@ body {
   text-transform: uppercase;
   color: var(--text-muted);
   line-height: 1.5;
+}
+
+/* ========================================
+   Landing Hero — Navy block with amber CTA
+   ======================================== */
+
+.hero-navy {
+  background: var(--navy);
+  color: #ffffff;
+}
+
+.hero-navy .hero-eyebrow {
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--amber);
+}
+
+.hero-navy .hero-h1 {
+  font-family: var(--font-display), Georgia, serif;
+  font-weight: 700;
+  font-size: clamp(2.25rem, 4.5vw + 0.5rem, 4.25rem);
+  line-height: 1.08;
+  letter-spacing: -0.015em;
+  color: #ffffff;
+}
+
+.hero-navy .hero-sub {
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-size: 1.0625rem;
+  line-height: 1.65;
+  color: rgba(255, 255, 255, 0.72);
+  max-width: 58ch;
+}
+
+.btn-amber {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background: var(--amber);
+  color: var(--navy);
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-weight: 600;
+  font-size: 0.9375rem;
+  padding: 0.75rem 1.4rem;
+  border-radius: 6px;
+  border: 1px solid var(--amber);
+  cursor: pointer;
+  transition: background 0.18s ease, border-color 0.18s ease, transform 0.08s ease;
+}
+
+.btn-amber:hover {
+  background: var(--amber-hover);
+  border-color: var(--amber-hover);
+}
+
+.btn-amber:active {
+  transform: translateY(1px);
+}
+
+.btn-ghost-light {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.9);
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-weight: 500;
+  font-size: 0.9375rem;
+  padding: 0.75rem 1.4rem;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  cursor: pointer;
+  transition: background 0.18s ease, border-color 0.18s ease;
+}
+
+.btn-ghost-light:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+.btn-ghost-dark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background: transparent;
+  color: var(--navy);
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-weight: 500;
+  font-size: 0.9375rem;
+  padding: 0.7rem 1.2rem;
+  border-radius: 6px;
+  border: 1px solid var(--border-strong);
+  cursor: pointer;
+  transition: background 0.18s ease, border-color 0.18s ease;
+}
+
+.btn-ghost-dark:hover {
+  background: var(--bg-elevated);
+  border-color: var(--navy);
+}
+
+/* Hero stat counters — large serif numbers + vertical dividers */
+.hero-stats {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.hero-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.hero-stat-num {
+  font-family: var(--font-display), Georgia, serif;
+  font-size: clamp(1.75rem, 2vw + 1rem, 2.25rem);
+  font-weight: 700;
+  color: #ffffff;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.hero-stat-label {
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-size: 0.8125rem;
+  color: rgba(255, 255, 255, 0.55);
+  letter-spacing: 0.01em;
+}
+
+.hero-stat-divider {
+  width: 1px;
+  height: 36px;
+  background: rgba(255, 255, 255, 0.15);
+}
+
+/* ========================================
+   Candidate page — compact overview + rows
+   ======================================== */
+
+/* Overview bar — one row of (topic label + stance pill) cells */
+.overview-bar {
+  display: grid;
+  gap: 1rem;
+  padding: 1.25rem 1.5rem;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+}
+
+.overview-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  text-align: center;
+  gap: 1rem;
+  min-height: 4.5rem;
+}
+
+.overview-cell-label {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  line-height: 1.3;
+}
+
+/* Stance mark — editorial, no pill. Colored shape glyph + uppercase label.
+   Looks like a datatable indicator, not a marketing chip. */
+.stance-mark {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  line-height: 1;
+  white-space: nowrap;
+  color: var(--text-primary);
+}
+
+.stance-mark::before {
+  content: "";
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  flex-shrink: 0;
+  background: currentColor;
+}
+
+.stance-mark[data-stance="support"] {
+  color: #15803d;
+}
+.stance-mark[data-stance="support"]::before {
+  background: #15803d;
+  /* filled square */
+}
+
+.stance-mark[data-stance="oppose"] {
+  color: #b91c1c;
+}
+.stance-mark[data-stance="oppose"]::before {
+  background: #b91c1c;
+  /* filled square rotated 45° = diamond */
+  transform: rotate(45deg);
+  width: 8px;
+  height: 8px;
+}
+
+.stance-mark[data-stance="mixed"] {
+  color: #b45309;
+}
+.stance-mark[data-stance="mixed"]::before {
+  background: linear-gradient(90deg, #b45309 50%, transparent 50%);
+  border: 1px solid #b45309;
+}
+
+.stance-mark[data-stance="unclear"] {
+  color: #4b5563;
+}
+.stance-mark[data-stance="unclear"]::before {
+  background: transparent;
+  border: 1.5px solid #4b5563;
+}
+
+.stance-mark[data-stance="no_mention"] {
+  color: #9ca3af;
+}
+.stance-mark[data-stance="no_mention"]::before {
+  background: transparent;
+  border: 1px dashed #9ca3af;
+}
+
+/* Confidence dot — small filled circle + label */
+.confidence-dot {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+.confidence-dot::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: currentColor;
+  display: inline-block;
+}
+
+.confidence-dot[data-level="high"] {
+  color: #15803d;
+}
+.confidence-dot[data-level="medium"] {
+  color: #b45309;
+}
+.confidence-dot[data-level="low"] {
+  color: #6b7280;
+}
+
+/* Position row — white card, colored left border by stance */
+.position-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1rem;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-left-width: 4px;
+  border-radius: 6px;
+  padding: 1.25rem 1.5rem;
+}
+
+@media (min-width: 768px) {
+  .position-row {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr);
+    gap: 2rem;
+  }
+}
+
+.position-row[data-stance="support"] {
+  border-left-color: #4ade80;
+}
+.position-row[data-stance="oppose"] {
+  border-left-color: #f87171;
+}
+.position-row[data-stance="mixed"] {
+  border-left-color: #fbbf24;
+}
+.position-row[data-stance="unclear"] {
+  border-left-color: #d1d5db;
+}
+.position-row[data-stance="no_mention"] {
+  border-left-color: #e5e7eb;
+}
+
+.position-issue-name {
+  font-family: var(--font-display), Georgia, serif;
+  font-weight: 700;
+  font-size: 1.1rem;
+  line-height: 1.3;
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+}
+
+.position-issue-desc {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+}
+
+.position-note {
+  font-size: 0.9375rem;
+  color: var(--text-primary);
+  line-height: 1.6;
+  margin-top: 0.75rem;
+}
+
+.position-source {
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+  margin-top: 0.5rem;
+}
+
+.position-source-label {
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+/* Compact candidate header meta */
+.cand-meta {
+  font-size: 0.9375rem;
+  color: var(--text-secondary);
+}
+
+/* Featured race cards — "Key Congressional Races" block */
+.race-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1.25rem 1.4rem;
+  text-align: left;
+  transition: border-color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease;
+}
+
+.race-card:hover {
+  border-color: var(--navy);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+.race-card-abbr {
+  font-family: var(--font-display), Georgia, serif;
+  font-size: 1.625rem;
+  font-weight: 700;
+  color: var(--navy);
+  line-height: 1.1;
+}
+
+.race-card-name {
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.race-card-meta {
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+  margin-top: 0.25rem;
+}
+
+.race-card-arrow {
+  font-size: 1.1rem;
+  color: var(--amber);
+  margin-top: 0.5rem;
 }
 
 /* Reduced motion: disable all custom animations */

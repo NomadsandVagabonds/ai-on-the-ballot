@@ -215,8 +215,8 @@ function RecordCard({ record }: { record: IssuePositionRecord }) {
         <div className="md:col-span-2 flex md:flex-col md:items-start items-center gap-3 md:gap-1.5 md:pt-1">
           <StanceIndicator stance={record.stance} size="md" />
           <span
-            className="font-mono text-[10px] uppercase"
-            style={{ letterSpacing: "0.15em", color: display.color }}
+            className="text-[11px] font-semibold uppercase"
+            style={{ letterSpacing: "0.08em", color: display.color }}
           >
             {display.label}
           </span>

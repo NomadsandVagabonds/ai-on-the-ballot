@@ -1,14 +1,14 @@
 import type { Metadata } from "next";
 import { createServerSupabaseClient, isSupabaseConfigured } from "@/lib/supabase/server";
 import type { PublicCorrection } from "@/types/domain";
-import { CorrectionForm } from "./CorrectionForm";
+import { FeedbackTabs } from "./CorrectionForm";
 
 export const revalidate = 1800;
 
 export const metadata: Metadata = {
-  title: "Corrections",
+  title: "Corrections & Feedback",
   description:
-    "View the corrections log and submit corrections to AI on the Ballot's candidate data.",
+    "Submit corrections, candidate clarifications, or questions about AI on the Ballot's data and methodology.",
 };
 
 export default async function CorrectionsPage() {
@@ -28,27 +28,29 @@ export default async function CorrectionsPage() {
   }
 
   return (
-    <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
+    <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 py-16 sm:py-20">
       {/* Page header */}
-      <header className="mb-16">
-        <h1 className="font-display text-4xl sm:text-5xl font-bold tracking-tight mb-4">
-          Corrections
+      <header className="mb-10">
+        <p className="kicker mb-3">Participate</p>
+        <h1 className="font-display text-4xl sm:text-5xl font-bold tracking-tight text-text-primary">
+          Corrections &amp; Feedback
         </h1>
-        <p className="text-lg text-text-secondary leading-relaxed">
-          Accuracy matters. This page logs all published corrections to the
-          dataset and provides a form to submit new ones.
-        </p>
       </header>
 
-      {/* Section 1 — Corrections Log */}
-      <section className="mb-16">
-        <h2 className="font-display text-2xl sm:text-3xl font-semibold mb-4">
+      {/* Tabbed feedback forms */}
+      <section className="mb-20">
+        <FeedbackTabs />
+      </section>
+
+      {/* Public corrections log */}
+      <section>
+        <h2 className="font-display text-2xl sm:text-3xl font-semibold text-text-primary mb-4">
           Corrections Log
         </h2>
         <div className="h-px bg-border mb-6" />
 
         {corrections.length === 0 ? (
-          <p className="text-text-muted text-lg leading-relaxed">
+          <p className="text-text-muted leading-relaxed">
             No corrections have been published yet. The corrections log will be
             updated as corrections are reviewed.
           </p>
@@ -117,20 +119,6 @@ export default async function CorrectionsPage() {
             </table>
           </div>
         )}
-      </section>
-
-      {/* Section 2 — Submit a Correction */}
-      <section>
-        <h2 className="font-display text-2xl sm:text-3xl font-semibold mb-4">
-          Submit a Correction
-        </h2>
-        <div className="h-px bg-border mb-6" />
-        <p className="text-text-secondary text-lg leading-relaxed mb-6">
-          If you believe any candidate position, stance coding, or factual
-          detail on this site is inaccurate, please let us know. All submissions
-          are reviewed before any changes are made.
-        </p>
-        <CorrectionForm />
       </section>
     </div>
   );

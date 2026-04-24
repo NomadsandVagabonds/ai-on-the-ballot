@@ -28,15 +28,16 @@ const FIPS_TO_ABBR: Record<string, string> = {
   "51": "VA", "53": "WA", "54": "WV", "55": "WI", "56": "WY",
 };
 
-/* Academic palette for map states */
+/* Academic palette for map states — neutral sage for tracked so that
+   it doesn't read as "Democrat blue" on a partisan lookup. */
 const MAP_COLORS = {
-  activeFill: "#2E4057",       // Deep slate navy — tracked states
-  activeHover: "#5B7B6A",      // Sage green on hover
-  inactiveFill: "#DDD8D0",     // Warm beige-gray — coming soon
+  activeFill: "#5B7B6A",       // Sage green — tracked states
+  activeHover: "#3F5E4E",      // Deeper sage on hover
+  inactiveFill: "#E5E0D8",     // Warm beige-gray — coming soon
   inactiveHover: "#C9C2B6",    // Slightly darker on hover
-  stroke: "#F0EDE7",           // Cream border between states
-  tooltipBg: "#2E4057",        // Navy tooltip
-  tooltipBorder: "#3D5A6E",
+  stroke: "#FAF6F0",           // Cream border between states
+  tooltipBg: "#12192c",        // Navy tooltip
+  tooltipBorder: "#2B3654",
 };
 
 interface StateFeature {

@@ -1,7 +1,6 @@
 import Link from "next/link";
 import type { CandidateSummary } from "@/types/domain";
-import type { Stance } from "@/types/database";
-import { partyLabel, STANCE_DISPLAY } from "@/lib/utils/stance";
+import { partyLabel } from "@/lib/utils/stance";
 import { PartyBadge } from "@/components/shared/PartyBadge";
 import { resolveCandidatePhoto } from "@/lib/utils/portrait";
 
@@ -17,29 +16,6 @@ function initials(name: string): string {
     .join("")
     .slice(0, 2)
     .toUpperCase();
-}
-
-/** Tiny heatmap row: colored blocks showing stance at a glance */
-function StanceMinibar({ stances }: { stances: Stance[] }) {
-  return (
-    <div
-      className="flex gap-px mt-4"
-      aria-label="Stance overview across all issues"
-    >
-      {stances.map((stance, i) => {
-        const display = STANCE_DISPLAY[stance];
-        return (
-          <div
-            key={i}
-            className="h-1 flex-1"
-            style={{ backgroundColor: display.color }}
-            title={display.label}
-            aria-hidden="true"
-          />
-        );
-      })}
-    </div>
-  );
 }
 
 export function CandidateCard({ candidate }: CandidateCardProps) {
@@ -69,8 +45,7 @@ export function CandidateCard({ candidate }: CandidateCardProps) {
           <div className="flex items-center gap-2 mb-1.5">
             <PartyBadge party={candidate.party} size="sm" />
             <span
-              className="marginalia-label"
-              style={{ margin: 0 }}
+              className="text-[11px] font-semibold tracking-[0.08em] uppercase text-text-muted"
               aria-label={partyName}
             >
               {candidate.is_incumbent ? "Incumbent" : "Challenger"}
@@ -93,11 +68,6 @@ export function CandidateCard({ candidate }: CandidateCardProps) {
           →
         </span>
       </div>
-
-      {/* Stance minibar — along the bottom edge */}
-      {candidate.stances && candidate.stances.length > 0 && (
-        <StanceMinibar stances={candidate.stances} />
-      )}
     </Link>
   );
 }

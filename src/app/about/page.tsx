@@ -45,10 +45,8 @@ export default function AboutPage() {
     <article className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
       {/* Hero */}
       <header className="mb-16">
-        <p className="text-[10px] font-mono uppercase tracking-[0.2em] text-accent-primary mb-4">
-          About & Methodology
-        </p>
-        <h1 className="font-display text-display-lg font-bold tracking-tight mb-6">
+        <p className="kicker mb-4">About & Methodology</p>
+        <h1 className="font-display text-display-lg font-bold tracking-tight text-text-primary mb-6">
           How We Track AI Policy Positions
         </h1>
         <p className="text-lg sm:text-xl text-text-secondary leading-relaxed">

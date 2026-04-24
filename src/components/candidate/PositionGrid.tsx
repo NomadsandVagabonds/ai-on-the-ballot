@@ -2,7 +2,6 @@
 
 import type { PositionSource, PositionWithIssue } from "@/types/domain";
 import { STANCE_DISPLAY, CONFIDENCE_DISPLAY } from "@/lib/utils/stance";
-import { StanceIndicator } from "@/components/shared/StanceIndicator";
 import { useAppStore } from "@/stores/appStore";
 import { ToggleSwitch } from "@/components/shared/ToggleSwitch";
 
@@ -10,32 +9,10 @@ interface PositionGridProps {
   positions: PositionWithIssue[];
 }
 
-const ROMAN = [
-  "I",
-  "II",
-  "III",
-  "IV",
-  "V",
-  "VI",
-  "VII",
-  "VIII",
-  "IX",
-  "X",
-  "XI",
-  "XII",
-  "XIII",
-  "XIV",
-  "XV",
-];
-
-function roman(i: number): string {
-  return ROMAN[i] ?? String(i + 1);
-}
-
 function hostnameOf(url: string | null): string | null {
   if (!url) return null;
   try {
-    return new URL(url).hostname.replace(/^www\./, "").toUpperCase();
+    return new URL(url).hostname.replace(/^www\./, "");
   } catch {
     return null;
   }
@@ -49,18 +26,13 @@ const SOURCE_TYPE_LABELS: Record<string, string> = {
   news: "News",
 };
 
-/** Render a list of citations (type + linked host). Used in the marginalia
- *  rail and mobile stack on each position row. */
-function SourceList({
+function PrimarySource({
   sources,
   legacySingleUrl,
 }: {
   sources: PositionSource[];
-  /** Back-compat: if the position has no `sources` yet (live Supabase path),
-   *  fall back to rendering the single `source_url` if set. */
   legacySingleUrl?: string | null;
 }) {
-  // Normalize — prefer sources array; fall back to the legacy single URL.
   const list: PositionSource[] = sources.length
     ? sources
     : legacySingleUrl
@@ -77,249 +49,84 @@ function SourceList({
 
   if (list.length === 0) return null;
 
+  const first = list[0];
+  const typeLabel = SOURCE_TYPE_LABELS[first.type] ?? first.type;
+  const host = hostnameOf(first.url);
+  const more = list.length - 1;
+
   return (
-    <dd className="space-y-2">
-      {list.map((s, i) => {
-        const host = hostnameOf(s.url);
-        const typeLabel = SOURCE_TYPE_LABELS[s.type] ?? s.type;
-        return (
-          <div key={`${s.url ?? "src"}-${i}`} className="leading-[1.45]">
-            <span
-              className="marginalia-label"
-              style={{ margin: 0, display: "inline" }}
-            >
-              {typeLabel}
-            </span>
-            {s.url && host ? (
-              <>
-                {" "}
-                <a
-                  href={s.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="marginalia hover:text-accent-primary transition-colors break-all"
-                  style={{
-                    textTransform: "uppercase",
-                    letterSpacing: "0.08em",
-                  }}
-                  title={s.title ?? undefined}
-                >
-                  {host}
-                  <span aria-hidden="true"> →</span>
-                </a>
-              </>
-            ) : (
-              <span className="marginalia ml-1 italic">— no link</span>
-            )}
-          </div>
-        );
-      })}
-    </dd>
+    <p className="position-source">
+      <span className="position-source-label">Source:</span>{" "}
+      {first.url ? (
+        <a
+          href={first.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="hover:text-accent-primary transition-colors underline-offset-2 hover:underline"
+        >
+          {typeLabel}
+          {host ? ` — ${host}` : ""}
+        </a>
+      ) : (
+        <span>{typeLabel}</span>
+      )}
+      {more > 0 && (
+        <span className="text-text-muted">
+          {" "}
+          · +{more} more
+        </span>
+      )}
+    </p>
   );
 }
 
-/* ============================================================
-   Position row — [folio] [main] [marginalia]
-   ============================================================ */
-
-function PositionRow({
-  position,
-  index,
-}: {
-  position: PositionWithIssue;
-  index: number;
-}) {
+function PositionRow({ position }: { position: PositionWithIssue }) {
   const stanceDisplay = STANCE_DISPLAY[position.stance];
   const confidence = position.confidence;
   const confidenceLabel = CONFIDENCE_DISPLAY[confidence].label;
   const sources = position.sources ?? [];
-  const hasAnySource = sources.length > 0 || !!position.source_url;
-  const isLongQuote =
-    !!position.full_quote && position.full_quote.length > 240;
-  const quoteInline =
-    position.full_quote && !isLongQuote
-      ? position.full_quote
-      : position.full_quote
-        ? position.full_quote.slice(0, 220).trimEnd() + "…"
-        : null;
 
-  const recordedMonth = position.date_recorded
-    ? new Date(position.date_recorded).toLocaleDateString("en-US", {
-        year: "numeric",
-        month: "short",
-      })
-    : null;
+  const note =
+    position.summary ||
+    (position.full_quote
+      ? position.full_quote.length > 260
+        ? position.full_quote.slice(0, 240).trimEnd() + "…"
+        : position.full_quote
+      : null);
 
   return (
-    <article
-      className="grid gap-x-6 py-8 first:pt-4 border-b border-border last:border-b-0"
-      style={{
-        gridTemplateColumns:
-          "minmax(0, 3.5rem) minmax(0, 1fr) minmax(0, 14rem)",
-      }}
-    >
-      {/* Folio — Roman numeral, Crimson, right-aligned */}
-      <div className="text-right">
-        <span
-          className="font-display text-[28px] leading-none font-normal text-text-muted"
-          aria-hidden="true"
-        >
-          {roman(index)}
-        </span>
+    <article className="position-row" data-stance={position.stance}>
+      {/* Left column — issue name + description */}
+      <div>
+        <h3 className="position-issue-name">{position.issue.display_name}</h3>
+        <p className="position-issue-desc">{position.issue.description}</p>
       </div>
 
-      {/* Main column — issue name, stance, summary, hanging quote */}
-      <div className="min-w-0">
-        <h3 className="font-display text-[22px] leading-[1.25] font-semibold text-text-primary">
-          {position.issue.display_name}
-        </h3>
-        <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1">
-          <StanceIndicator stance={position.stance} size="md" />
-          <span
-            className="text-[11px] font-mono uppercase"
-            style={{ letterSpacing: "0.15em", color: stanceDisplay.color }}
-          >
+      {/* Right column — stance + confidence + note + source */}
+      <div>
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
+          <span className="stance-mark" data-stance={position.stance}>
             {stanceDisplay.label}
+          </span>
+          <span
+            className="confidence-dot"
+            data-level={confidence}
+            aria-label={confidenceLabel}
+          >
+            {confidence.charAt(0).toUpperCase() + confidence.slice(1)}
           </span>
         </div>
 
-        {position.summary && (
-          <p
-            className="mt-4 text-[15.5px] leading-[1.65] text-text-secondary"
-            style={{ maxWidth: "60ch" }}
-          >
-            {position.summary}
-          </p>
-        )}
+        {note && <p className="position-note">{note}</p>}
 
-        {position.full_quote && (
-          <figure className="mt-5 relative pl-8" style={{ maxWidth: "62ch" }}>
-            <span
-              className="quote-ornament absolute left-0 -top-1"
-              aria-hidden="true"
-            >
-              &ldquo;
-            </span>
-            {isLongQuote ? (
-              <details className="group">
-                <summary
-                  className="cursor-pointer list-none"
-                  aria-label="Expand full quote"
-                >
-                  <blockquote>
-                    <p className="font-display italic text-[16px] leading-[1.6] text-text-primary">
-                      {quoteInline}
-                    </p>
-                  </blockquote>
-                  <span className="mt-2 inline-flex items-center gap-1 marginalia-label hover:text-accent-primary transition-colors" style={{ margin: "0.5rem 0 0" }}>
-                    Read full quote <span aria-hidden="true">↓</span>
-                  </span>
-                </summary>
-                <blockquote className="mt-1">
-                  <p className="font-display italic text-[16px] leading-[1.6] text-text-primary">
-                    &ldquo;{position.full_quote}&rdquo;
-                  </p>
-                </blockquote>
-              </details>
-            ) : (
-              <blockquote>
-                <p className="font-display italic text-[16px] leading-[1.6] text-text-primary">
-                  {quoteInline}
-                </p>
-              </blockquote>
-            )}
-          </figure>
-        )}
-
-        {/* Mobile-only marginalia (stacks under main on narrow viewports) */}
-        <dl className="md:hidden mt-5 pt-4 border-t border-dotted border-border-strong grid grid-cols-2 gap-y-3 gap-x-5">
-          {hasAnySource && (
-            <div className="col-span-2">
-              <dt className="marginalia-label">
-                {sources.length > 1 ? "Sources" : "Source"}
-              </dt>
-              <SourceList
-                sources={sources}
-                legacySingleUrl={position.source_url}
-              />
-            </div>
-          )}
-          {recordedMonth && (
-            <div>
-              <dt className="marginalia-label">Recorded</dt>
-              <dd className="marginalia" style={{ textTransform: "uppercase", letterSpacing: "0.08em" }}>
-                {recordedMonth}
-              </dd>
-            </div>
-          )}
-          <div>
-            <dt className="marginalia-label">Confidence</dt>
-            <dd className="mt-0.5 flex items-center gap-2">
-              <span
-                className="confidence-bars"
-                data-level={confidence}
-                aria-label={confidenceLabel}
-              >
-                <span />
-                <span />
-                <span />
-              </span>
-              <span className="marginalia" style={{ textTransform: "uppercase", letterSpacing: "0.08em" }}>
-                {confidence}
-              </span>
-            </dd>
-          </div>
-        </dl>
-      </div>
-
-      {/* Marginalia rail — desktop only */}
-      <div className="hidden md:block pl-5 border-l border-border">
-        <dl className="space-y-4">
-          {hasAnySource && (
-            <div>
-              <dt className="marginalia-label">
-                {sources.length > 1 ? "Sources" : "Source"}
-              </dt>
-              <SourceList
-                sources={sources}
-                legacySingleUrl={position.source_url}
-              />
-            </div>
-          )}
-          {recordedMonth && (
-            <div>
-              <dt className="marginalia-label">Recorded</dt>
-              <dd className="marginalia" style={{ textTransform: "uppercase", letterSpacing: "0.08em" }}>
-                {recordedMonth}
-              </dd>
-            </div>
-          )}
-          <div>
-            <dt className="marginalia-label">Confidence</dt>
-            <dd className="mt-0.5 flex items-center gap-2">
-              <span
-                className="confidence-bars"
-                data-level={confidence}
-                aria-label={confidenceLabel}
-              >
-                <span />
-                <span />
-                <span />
-              </span>
-              <span className="marginalia" style={{ textTransform: "uppercase", letterSpacing: "0.08em" }}>
-                {confidence}
-              </span>
-            </dd>
-          </div>
-        </dl>
+        <PrimarySource
+          sources={sources}
+          legacySingleUrl={position.source_url}
+        />
       </div>
     </article>
   );
 }
-
-/* ============================================================
-   PositionGrid — thin client wrapper with the filter toggle
-   ============================================================ */
 
 export function PositionGrid({ positions }: PositionGridProps) {
   const hideNoMention = useAppStore((s) => s.hideNoMention);
@@ -331,14 +138,14 @@ export function PositionGrid({ positions }: PositionGridProps) {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-2 mt-4">
-        <p className="kicker-muted">
+      <div className="flex items-center justify-between mb-4">
+        <p className="text-sm text-text-muted">
           {filtered.length} position{filtered.length === 1 ? "" : "s"} on record
         </p>
         <ToggleSwitch
           checked={hideNoMention}
           onChange={toggleHideNoMention}
-          label="Hide no mention"
+          label='Hide "No Mention" entries'
         />
       </div>
 
@@ -349,12 +156,36 @@ export function PositionGrid({ positions }: PositionGridProps) {
           </p>
         </div>
       ) : (
-        <div>
-          {filtered.map((position, i) => (
-            <PositionRow key={position.id} position={position} index={i} />
+        <div className="flex flex-col gap-3">
+          {filtered.map((position) => (
+            <PositionRow key={position.id} position={position} />
           ))}
         </div>
       )}
+    </div>
+  );
+}
+
+/* Overview bar — rendered at top of candidate page, above PositionGrid.
+   Exposed as a named export so the server page can render it statically. */
+export function PositionOverview({ positions }: { positions: PositionWithIssue[] }) {
+  if (positions.length === 0) return null;
+
+  return (
+    <div className="overview-bar">
+      {positions.map((p) => {
+        const stanceDisplay = STANCE_DISPLAY[p.stance];
+        return (
+          <div key={p.id} className="overview-cell">
+            <span className="overview-cell-label">
+              {p.issue.display_name}
+            </span>
+            <span className="stance-mark" data-stance={p.stance}>
+              {stanceDisplay.label}
+            </span>
+          </div>
+        );
+      })}
     </div>
   );
 }

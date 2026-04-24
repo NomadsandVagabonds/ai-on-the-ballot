@@ -16,54 +16,42 @@ export function Footer() {
       </div>
 
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12 md:py-16">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12">
+        <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-8">
           {/* Site identity */}
-          <div>
+          <div className="max-w-md">
             <p className="font-display text-lg font-bold text-text-primary tracking-[-0.02em]">
               AI on the Ballot
             </p>
-            <p className="mt-2 text-sm text-text-muted leading-relaxed max-w-xs">
-              Tracking where U.S. candidates stand on artificial intelligence policy for the 2026 elections.
+            <p className="mt-2 text-sm text-text-muted leading-relaxed">
+              Nonpartisan research tracking where U.S. candidates running for Congress in the midterm elections stand on artificial intelligence policy.
             </p>
           </div>
 
-          {/* Navigation */}
-          <nav className="flex flex-col gap-2.5" aria-label="Footer navigation">
-            <p className="text-[10px] font-mono uppercase tracking-[0.15em] text-text-muted mb-1">
+          {/* Navigation — right aligned */}
+          <nav
+            className="flex flex-col md:items-end gap-2.5"
+            aria-label="Footer navigation"
+          >
+            <p className="text-xs font-medium tracking-[0.08em] uppercase text-text-muted mb-1">
               Navigate
             </p>
             {FOOTER_LINKS.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
-                className="text-sm text-text-secondary hover:text-accent-primary transition-colors w-fit"
+                className="text-sm text-text-secondary hover:text-accent-primary transition-colors"
               >
                 {link.label}
               </Link>
             ))}
           </nav>
-
-          {/* Disclaimer */}
-          <div>
-            <p className="text-[10px] font-mono uppercase tracking-[0.15em] text-text-muted mb-3">
-              About
-            </p>
-            <p className="text-sm text-text-muted leading-relaxed">
-              A nonpartisan transparency resource. We do not endorse, score, or recommend candidates.
-            </p>
-          </div>
         </div>
 
         {/* Bottom bar */}
         <div className="mt-12 pt-6 border-t border-border">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
-            <p className="text-xs text-text-muted">
-              &copy; {new Date().getFullYear()} AI on the Ballot
-            </p>
-            <p className="text-xs font-mono text-text-muted tracking-wide">
-              Independent Research
-            </p>
-          </div>
+          <p className="text-xs text-text-muted">
+            &copy; {new Date().getFullYear()} AI on the Ballot
+          </p>
         </div>
       </div>
     </footer>

@@ -17,9 +17,7 @@ export default async function MapPage() {
     <div className="bg-bg-elevated">
       <section className="max-w-6xl mx-auto px-4 pt-10 md:pt-14">
         <div className="text-center mb-6 md:mb-10">
-          <p className="text-[10px] font-mono uppercase tracking-[0.2em] text-accent-secondary mb-3">
-            Interactive
-          </p>
+          <p className="kicker mb-3">Interactive</p>
           <h1 className="font-display text-display-lg font-bold text-text-primary mb-3">
             Explore by State
           </h1>
