@@ -2,11 +2,11 @@
 
 import { useState } from "react";
 import type { CandidateSummary, ComparisonRow } from "@/types/domain";
-import { StanceIndicator } from "@/components/shared/StanceIndicator";
 import { PartyBadge } from "@/components/shared/PartyBadge";
 import { ToggleSwitch } from "@/components/shared/ToggleSwitch";
 import { useAppStore } from "@/stores/appStore";
 import { resolveCandidatePhoto } from "@/lib/utils/portrait";
+import { STANCE_DISPLAY } from "@/lib/utils/stance";
 
 interface ComparisonGridProps {
   candidates: CandidateSummary[];
@@ -219,7 +219,12 @@ function DesktopMatrix({
                   role="cell"
                   className="px-4 py-5 border-l border-border flex flex-col items-center gap-1.5 text-center"
                 >
-                  <StanceIndicator stance={pos.stance} size="lg" />
+                  <span
+                    className="stance-mark"
+                    data-stance={pos.stance}
+                  >
+                    {STANCE_DISPLAY[pos.stance].label}
+                  </span>
                   {microSummary(pos.summary) && (
                     <p className="mt-1 text-[12.5px] leading-[1.45] text-text-secondary max-w-[18ch]">
                       {microSummary(pos.summary)}
@@ -444,7 +449,12 @@ function MobileDispatches({
                       {row.issue.display_name}
                     </h3>
                     <div className="mt-2">
-                      <StanceIndicator stance={pos.stance} size="sm" />
+                      <span
+                        className="stance-mark"
+                        data-stance={pos.stance}
+                      >
+                        {STANCE_DISPLAY[pos.stance].label}
+                      </span>
                     </div>
                     {microSummary(pos.summary) && (
                       <p className="mt-2 text-[13px] leading-[1.5] text-text-secondary">
