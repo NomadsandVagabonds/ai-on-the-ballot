@@ -501,19 +501,22 @@ body {
   color: var(--accent-primary);
 }
 
-/* Marginalia — mono metadata that lives in the sidebar rail */
+/* Marginalia — sidebar metadata. Migrated off JetBrains Mono so these
+   small labels match the overall Inter/Lora typography instead of
+   reading as a separate typewriter voice. */
 .marginalia {
-  font-family: var(--font-mono), ui-monospace, monospace;
-  font-size: 0.6875rem;
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-size: 0.75rem;
   line-height: 1.6;
   color: var(--text-muted);
-  letter-spacing: 0.02em;
+  letter-spacing: 0.01em;
 }
 
 .marginalia-label {
-  font-family: var(--font-mono), ui-monospace, monospace;
-  font-size: 0.625rem;
-  letter-spacing: 0.18em;
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--text-muted);
   display: block;
