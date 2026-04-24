@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="380" height="56" viewBox="0 0 380 56" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <text x="0" y="40" font-family="&#39;Libre Baskerville&#39;, Georgia, serif" font-size="44" font-weight="700" fill="#12192c" letter-spacing="-2">AI</text>
+  <rect x="1" y="44" width="56" height="3.5" rx="1.75" fill="#c97d1e"></rect>
+  <line x1="70" y1="8" x2="70" y2="46" stroke="#12192c" stroke-width="1" opacity="0.12"></line>
+  <text x="82" y="28" font-family="&#39;Libre Baskerville&#39;, Georgia, serif" font-size="18" font-weight="700" fill="#12192c" letter-spacing="-0.3">on the Ballot</text>
+  <text x="82" y="44" font-family="&#39;IBM Plex Sans&#39;, sans-serif" font-size="9" font-weight="500" fill="#b0a898" letter-spacing="2">2026 CONGRESSIONAL TRACKER</text>
+</svg>

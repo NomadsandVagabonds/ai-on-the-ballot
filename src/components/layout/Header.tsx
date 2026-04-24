@@ -16,14 +16,18 @@ export function Header() {
     <header className="sticky top-0 z-40 bg-bg-surface/95 backdrop-blur-sm border-b border-border">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between gap-4">
-          {/* Masthead / Site name */}
-          <Link href="/" className="flex flex-col shrink-0 group leading-none">
-            <span className="font-display text-xl md:text-[1.35rem] font-bold text-text-primary tracking-[-0.01em] group-hover:text-accent-primary transition-colors">
-              AI on the Ballot
-            </span>
-            <span className="hidden sm:inline-block text-[0.625rem] font-medium tracking-[0.14em] uppercase text-text-muted mt-1">
-              2026 Congressional AI Tracker
-            </span>
+          {/* Masthead / Site logo */}
+          <Link
+            href="/"
+            className="shrink-0 group inline-flex items-center"
+            aria-label="AI on the Ballot — 2026 Congressional Tracker"
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/logo-compact-light.svg"
+              alt="AI on the Ballot"
+              className="h-10 md:h-11 w-auto transition-opacity group-hover:opacity-80"
+            />
           </Link>
 
           {/* Desktop navigation */}

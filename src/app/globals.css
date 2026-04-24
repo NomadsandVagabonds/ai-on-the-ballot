@@ -420,10 +420,9 @@ body {
    Editorial Voice — Dek, Kicker, Byline, Folio, Marginalia
    ======================================== */
 
-/* Dek — the italic sentence that sets up a headline */
+/* Dek — the setup sentence beneath a headline */
 .dek {
   font-family: var(--font-display), Georgia, serif;
-  font-style: italic;
   font-size: clamp(1.15rem, 1vw + 1rem, 1.4rem);
   line-height: 1.45;
   color: var(--text-secondary);
