@@ -59,8 +59,27 @@ export default async function StatePage({ params }: StatePageProps) {
             {stateData.name}
           </h1>
 
+          <dl className="mt-4 flex items-start gap-8">
+            <div>
+              <dt className="text-[11px] font-medium tracking-[0.08em] uppercase text-text-muted mb-1.5">
+                Races
+              </dt>
+              <dd className="font-display text-2xl md:text-3xl font-bold text-text-primary tabular-nums leading-none">
+                {stateData.races.length}
+              </dd>
+            </div>
+            <div>
+              <dt className="text-[11px] font-medium tracking-[0.08em] uppercase text-text-muted mb-1.5">
+                Candidates
+              </dt>
+              <dd className="font-display text-2xl md:text-3xl font-bold text-text-primary tabular-nums leading-none">
+                {stateData.candidate_count}
+              </dd>
+            </div>
+          </dl>
+
           {/* Pushes the first race title to the bottom of the left column */}
-          <div className="flex-1 min-h-6" aria-hidden="true" />
+          <div className="flex-1 min-h-4" aria-hidden="true" />
 
           {firstRace && (
             <div className="flex flex-wrap items-baseline justify-between gap-3">
@@ -78,8 +97,8 @@ export default async function StatePage({ params }: StatePageProps) {
           )}
         </div>
 
-        {/* State silhouette + tally stack — right column */}
-        <div className="shrink-0 flex flex-col items-end gap-4">
+        {/* State silhouette — right column */}
+        <div className="shrink-0 flex items-start justify-end">
           <div className="w-20 sm:w-24 md:w-[130px] aspect-square">
             <StateOutline
               abbr={stateData.abbreviation}
@@ -88,25 +107,6 @@ export default async function StatePage({ params }: StatePageProps) {
               fill="#5B7B6A"
             />
           </div>
-
-          <dl className="flex items-start gap-6">
-            <div className="text-right">
-              <dt className="text-[11px] font-medium tracking-[0.08em] uppercase text-text-muted mb-1.5">
-                Races
-              </dt>
-              <dd className="font-display text-2xl md:text-3xl font-bold text-text-primary tabular-nums leading-none">
-                {stateData.races.length}
-              </dd>
-            </div>
-            <div className="text-right">
-              <dt className="text-[11px] font-medium tracking-[0.08em] uppercase text-text-muted mb-1.5">
-                Candidates
-              </dt>
-              <dd className="font-display text-2xl md:text-3xl font-bold text-text-primary tabular-nums leading-none">
-                {stateData.candidate_count}
-              </dd>
-            </div>
-          </dl>
         </div>
       </header>
 
