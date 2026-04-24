@@ -5,7 +5,7 @@ import { isValidZipCode } from "@/lib/utils/states";
 
 interface ZipCodeInputProps {
   onSubmit: (zip: string) => void;
-  variant?: "hero" | "hero-dark" | "compact";
+  variant?: "hero" | "hero-dark" | "card-dark" | "compact";
 }
 
 export function ZipCodeInput({ onSubmit, variant = "hero" }: ZipCodeInputProps) {
@@ -76,6 +76,46 @@ export function ZipCodeInput({ onSubmit, variant = "hero" }: ZipCodeInputProps) 
         </form>
         {error && (
           <p id="zip-error" className={`mt-2 text-sm ${isDark ? "text-red-400" : "text-red-600"}`} role="alert">
+            {error}
+          </p>
+        )}
+      </div>
+    );
+  }
+
+  if (variant === "card-dark") {
+    return (
+      <div className="w-full">
+        <form onSubmit={handleSubmit} className="flex gap-2">
+          <input
+            type="text"
+            inputMode="numeric"
+            pattern="[0-9]*"
+            maxLength={5}
+            value={value}
+            onChange={handleChange}
+            onKeyDown={handleKeyDown}
+            placeholder="ZIP code"
+            className={`flex-1 min-w-0 rounded-md border bg-white/[0.06] px-3 py-2 text-sm font-mono tracking-[0.15em] text-white placeholder:text-white/35 transition-colors focus:outline-none focus:ring-1 focus:ring-amber focus:border-amber/70 ${
+              error ? "border-red-400/70" : "border-white/20"
+            }`}
+            aria-label="Zip code"
+            aria-invalid={!!error}
+            aria-describedby={error ? "zip-card-error" : undefined}
+          />
+          <button
+            type="submit"
+            className="shrink-0 rounded-md bg-amber px-4 py-2 text-sm font-semibold text-navy transition-colors hover:bg-[var(--amber-hover)]"
+          >
+            Find &rarr;
+          </button>
+        </form>
+        {error && (
+          <p
+            id="zip-card-error"
+            className="mt-2 text-xs text-red-300"
+            role="alert"
+          >
             {error}
           </p>
         )}

@@ -78,6 +78,9 @@ export default async function StatePage({ params }: StatePageProps) {
             </div>
           </dl>
 
+          {/* Delineator between tally and the first race title */}
+          <div className="h-0.5 bg-border-strong mt-5" aria-hidden="true" />
+
           {/* Pushes the first race title to the bottom of the left column */}
           <div className="flex-1 min-h-4" aria-hidden="true" />
 

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { getAllStatesForMap } from "@/lib/queries/states";
 import { getAllIssuesWithCounts } from "@/lib/queries/issues";
 import { AnimatedCounter } from "@/components/home/AnimatedCounter";
+import { HeroZipInput } from "./HeroZipInput";
 
 export const revalidate = 1800;
 
@@ -26,27 +27,60 @@ export default async function Home() {
           Hero — navy landing with amber CTAs + animated stats
          ============================================================ */}
       <section className="hero-navy">
-        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 pt-20 pb-16 md:pt-28 md:pb-20">
-          <p className="hero-eyebrow mb-5">2026 U.S. Congressional Elections</p>
-
-          <h1 className="hero-h1 mb-6" style={{ maxWidth: "16ch" }}>
-            Where do your candidates stand on AI?
-          </h1>
-
-          <p className="hero-sub mb-10">
-            Nonpartisan research tracking where U.S. candidates running for Congress in the midterm elections stand on artificial intelligence policy.
-          </p>
-
-          <div className="flex flex-wrap items-center gap-3 mb-14">
-            <Link href="/map" className="btn-amber">
-              Explore the Map
-            </Link>
-            <Link href="/about#methodology" className="btn-ghost-light">
-              How We Code Positions
-            </Link>
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 pt-16 pb-16 md:pt-20 md:pb-20">
+          {/* Top kicker band — spans full width so both columns share a
+              single top datum line. Thin amber hairline below establishes
+              the print-magazine "masthead" feel. */}
+          <div className="mb-10 md:mb-14">
+            <p className="hero-eyebrow mb-3">
+              2026 U.S. Congressional Elections
+            </p>
+            <div className="h-px bg-amber/30" aria-hidden="true" />
           </div>
 
-          <div className="hero-stats">
+          {/* Hero grid — 3 rows on lg+ so the card can span the sub + CTA
+              rows, bottom-aligning precisely with the CTA baseline while the
+              headline lives alone above. Two strong anchor lines:
+                • Top:    h1 top-cap  aligns with row 1 start
+                • Bottom: card bottom aligns with CTA baseline (row 3 end) */}
+          <div
+            className="grid gap-y-6 lg:gap-x-16 lg:gap-y-0 lg:grid-cols-[1fr_minmax(0,360px)] lg:grid-rows-[auto_auto_auto] items-start"
+          >
+            <h1
+              className="hero-h1 lg:col-start-1 lg:row-start-1"
+              style={{ maxWidth: "16ch" }}
+            >
+              Where do your candidates stand on AI?
+            </h1>
+
+            <p className="hero-sub lg:col-start-1 lg:row-start-2 lg:mt-6">
+              Nonpartisan research tracking where U.S. candidates running for Congress in the midterm elections stand on artificial intelligence policy.
+            </p>
+
+            <div className="flex flex-wrap items-center gap-3 lg:col-start-1 lg:row-start-3 lg:mt-8">
+              <Link href="/map" className="btn-amber">
+                Explore the Map
+              </Link>
+              <Link href="/about#methodology" className="btn-ghost-light">
+                How We Code Positions
+              </Link>
+            </div>
+
+            {/* Zip card — spans the sub + CTA rows. Top aligns with sub, bottom aligns with CTAs. */}
+            <aside className="zip-card w-full lg:col-start-2 lg:row-start-2 lg:row-end-4 lg:justify-self-end lg:self-stretch lg:flex lg:flex-col">
+              <p className="zip-card-kicker">Find Your Candidates</p>
+              <h2 className="zip-card-title">Who&rsquo;s on your ballot?</h2>
+              <p className="zip-card-sub">
+                Enter your zip code to see candidates in your district.
+              </p>
+              <div className="mt-4 lg:mt-auto lg:pt-5">
+                <HeroZipInput variant="card-dark" />
+              </div>
+            </aside>
+          </div>
+
+          {/* Stats row — full width below the hero columns */}
+          <div className="hero-stats mt-14">
             <div className="hero-stat">
               <span className="hero-stat-num">
                 <AnimatedCounter value={totalRaces} />
