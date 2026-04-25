@@ -1183,19 +1183,19 @@ body {
 }
 
 .position-row[data-stance="support"] {
-  border-left-color: #4ade80;
+  border-left-color: #15803d;
 }
 .position-row[data-stance="oppose"] {
-  border-left-color: #f87171;
+  border-left-color: #b91c1c;
 }
 .position-row[data-stance="mixed"] {
-  border-left-color: #fbbf24;
+  border-left-color: #b45309;
 }
 .position-row[data-stance="unclear"] {
-  border-left-color: #d1d5db;
+  border-left-color: #4b5563;
 }
 .position-row[data-stance="no_mention"] {
-  border-left-color: #e5e7eb;
+  border-left-color: #9ca3af;
 }
 
 .position-issue-name {

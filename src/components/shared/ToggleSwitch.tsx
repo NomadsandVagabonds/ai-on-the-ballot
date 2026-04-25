@@ -9,6 +9,7 @@ interface ToggleSwitchProps {
 export function ToggleSwitch({ checked, onChange, label }: ToggleSwitchProps) {
   return (
     <label className="inline-flex items-center gap-2.5 cursor-pointer select-none">
+      <span className="text-sm text-text-secondary">{label}</span>
       <button
         type="button"
         role="switch"
@@ -25,7 +26,6 @@ export function ToggleSwitch({ checked, onChange, label }: ToggleSwitchProps) {
           }`}
         />
       </button>
-      <span className="text-sm text-text-secondary">{label}</span>
     </label>
   );
 }
