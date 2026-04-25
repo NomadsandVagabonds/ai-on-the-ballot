@@ -210,10 +210,7 @@ export default function AboutPage() {
           AI on the Ballot is an independent research project tracking congressional candidates&rsquo; public positions on AI governance issues.
         </p>
         <p className="text-base leading-relaxed text-text-secondary mb-3">
-          This project originated within MATS Research and is now independently operated. AI on the Ballot retains full editorial independence from MATS Research and all affiliated organizations.
-        </p>
-        <p className="text-base leading-relaxed text-text-secondary mb-3">
-          The project received financial support from Evitable. Evitable had no role in candidate selection, data collection, coding decisions, or any editorial content. Our funders do not review or influence how candidates are coded or what is published. In any instance where we report on our funders or their affiliated work, we will disclose that relationship.
+          This project originated within MATS Research and is now independently operated under Evitable. AI on the Ballot retains full editorial independence from MATS Research and all affiliated organizations. Evitable had no role in candidate selection, data collection, coding decisions, or any editorial content. Evitable does not review or influence how candidates are coded or what is published. In any instance where we report on our funders or their affiliated work, we will disclose that relationship.
         </p>
         <p className="text-base leading-relaxed text-text-secondary">
           AI on the Ballot&rsquo;s findings and methodology are solely the work of its researchers and do not reflect the views of any funding or affiliated organization.
