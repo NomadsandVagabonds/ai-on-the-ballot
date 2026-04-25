@@ -166,7 +166,7 @@ export default async function RacePage({ params }: RacePageProps) {
          ============================================================ */}
       {displayedCandidates.length === 0 ? (
         <div className="py-20 text-center">
-          <p className="font-display text-2xl italic text-text-secondary">
+          <p className="font-display text-2xl text-text-secondary">
             No candidates tracked in this race yet.
           </p>
         </div>

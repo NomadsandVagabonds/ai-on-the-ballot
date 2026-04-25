@@ -151,7 +151,7 @@ export function PositionGrid({ positions }: PositionGridProps) {
 
       {filtered.length === 0 ? (
         <div className="py-14 text-center">
-          <p className="font-display italic text-lg text-text-secondary">
+          <p className="font-display text-lg text-text-secondary">
             No recorded positions on tracked AI issues.
           </p>
         </div>

@@ -232,7 +232,7 @@ function RecordCard({ record }: { record: IssuePositionRecord }) {
               {record.summary}
             </p>
           ) : (
-            <p className="marginalia italic">
+            <p className="marginalia">
               — no summary recorded for this position.
             </p>
           )}
@@ -267,7 +267,7 @@ function RecordCard({ record }: { record: IssuePositionRecord }) {
                     >
                       &ldquo;
                     </span>
-                    <p className="font-display italic text-[15px] leading-[1.65] text-text-primary">
+                    <p className="font-display text-[15px] leading-[1.65] text-text-primary">
                       {truncatedQuote}
                     </p>
                   </blockquote>
@@ -307,7 +307,7 @@ function RecordCard({ record }: { record: IssuePositionRecord }) {
                               <span aria-hidden="true"> →</span>
                             </a>
                           ) : (
-                            <span className="marginalia ml-1 italic">
+                            <span className="marginalia ml-1">
                               — no link
                             </span>
                           )}
@@ -546,7 +546,7 @@ export function IssueRoster({ data }: IssueRosterProps) {
          ============================================================ */}
       {filtered.length === 0 ? (
         <div className="py-20 text-center border border-border rounded-sm">
-          <p className="font-display italic text-xl text-text-secondary">
+          <p className="font-display text-xl text-text-secondary">
             No candidates match the current filter.
           </p>
           <p className="marginalia mt-3">

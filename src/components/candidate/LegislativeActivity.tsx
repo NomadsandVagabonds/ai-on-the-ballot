@@ -169,7 +169,7 @@ export function LegislativeActivity({ activities }: LegislativeActivityProps) {
   if (activities.length === 0) {
     return (
       <div className="py-14 text-center">
-        <p className="font-display italic text-lg text-text-secondary">
+        <p className="font-display text-lg text-text-secondary">
           No legislative activity tracked yet.
         </p>
       </div>

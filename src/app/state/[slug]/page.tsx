@@ -128,7 +128,7 @@ export default async function StatePage({ params }: StatePageProps) {
          ============================================================ */}
       {stateData.races.length === 0 ? (
         <div className="py-20 text-center">
-          <p className="font-display italic text-xl text-text-secondary">
+          <p className="font-display text-xl text-text-secondary">
             No tracked races in {stateData.name} yet.
           </p>
         </div>
@@ -164,7 +164,7 @@ export default async function StatePage({ params }: StatePageProps) {
 
                 {/* Candidate cards */}
                 {race.candidates.length === 0 ? (
-                  <p className="italic text-text-muted">
+                  <p className="text-text-muted">
                     No candidates tracked for this race yet.
                   </p>
                 ) : (
@@ -246,7 +246,7 @@ function FirstRaceCards({
 
   if (race.candidates.length === 0) {
     return (
-      <p className="italic text-text-muted">
+      <p className="text-text-muted">
         No candidates tracked for this race yet.
       </p>
     );

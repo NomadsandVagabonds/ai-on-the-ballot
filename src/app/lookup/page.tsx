@@ -225,7 +225,7 @@ function LookupContent() {
             </div>
           ) : (
             <div className="mt-8 border border-border rounded-sm px-6 py-8 text-center bg-bg-surface">
-              <p className="font-display italic text-lg text-text-secondary">
+              <p className="font-display text-lg text-text-secondary">
                 No races tracked in {stateName} yet.
               </p>
               <p className="marginalia mt-3" style={{ margin: "0.75rem 0 0" }}>

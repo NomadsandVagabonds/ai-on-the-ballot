@@ -10,7 +10,7 @@ export default function Loading() {
           <div className="w-2 bg-accent-primary/20 rounded-sm animate-pulse" style={{ height: '80%', animationDelay: '0.45s' }} />
           <div className="w-2 bg-accent-primary/20 rounded-sm animate-pulse" style={{ height: '55%', animationDelay: '0.6s' }} />
         </div>
-        <p className="text-sm text-text-muted font-mono tracking-wide">
+        <p className="text-sm text-text-muted tracking-wide">
           Loading policy data...
         </p>
       </div>

@@ -431,7 +431,7 @@ export function ComparisonGrid({
 
       {filteredRows.length === 0 ? (
         <div className="py-16 text-center border border-border rounded-sm">
-          <p className="font-display italic text-xl text-text-secondary">
+          <p className="font-display text-xl text-text-secondary">
             No position data available for this race yet.
           </p>
           <p className="marginalia mt-3">Check back as we expand coverage</p>
