@@ -101,8 +101,10 @@ function FilterPill({
   disabledTitle?: string;
 }) {
   const activeStyle: React.CSSProperties | undefined =
-    active && accent && !disabled
-      ? { backgroundColor: accent, borderColor: accent, color: "#FFFFFF" }
+    active && !disabled
+      ? accent
+        ? { backgroundColor: accent, borderColor: accent, color: "#FFFFFF" }
+        : { color: "#FFFFFF" }
       : undefined;
 
   const baseClasses =

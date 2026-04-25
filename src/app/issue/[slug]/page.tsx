@@ -121,9 +121,39 @@ export default async function IssuePage({ params }: IssuePageProps) {
         </div>
       </header>
 
-      {/* Thin hairline divider — replaces the decorative rule ornament here
-          so the filter bar starts immediately. The ornament still closes
-          the record section at the foot. */}
+      {/* Issue switcher — sits between two hairlines so users can jump
+          between the ten tracked issues without bouncing back to the index. */}
+      <div className="rule-hair" aria-hidden="true" />
+      <nav
+        aria-label="All issues"
+        className="py-3 overflow-x-auto"
+      >
+        <ul className="flex items-center gap-1.5 whitespace-nowrap">
+          {allIssues.map((i) => {
+            const isActive = i.issue.slug === slug;
+            return (
+              <li key={i.issue.slug}>
+                <Link
+                  href={`/issue/${i.issue.slug}`}
+                  aria-current={isActive ? "page" : undefined}
+                  className={`inline-flex items-center px-3 py-1.5 rounded-sm border marginalia-label transition-colors ${
+                    isActive
+                      ? "bg-accent-primary border-accent-primary"
+                      : "bg-bg-surface text-text-secondary border-border hover:border-border-strong hover:text-text-primary"
+                  }`}
+                  style={
+                    isActive
+                      ? { margin: 0, color: "#FFFFFF" }
+                      : { margin: 0 }
+                  }
+                >
+                  {i.issue.display_name}
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
+      </nav>
       <div className="rule-hair mb-5" aria-hidden="true" />
 
       <IssueRoster data={data} />
