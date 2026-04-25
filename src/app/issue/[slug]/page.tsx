@@ -6,6 +6,7 @@ import {
   getIssueBySlug,
 } from "@/lib/queries/issues";
 import { IssueRoster } from "@/components/issue/IssueRoster";
+import { IssueSwitcher } from "@/components/issue/IssueSwitcher";
 
 export const revalidate = 1800;
 
@@ -121,39 +122,18 @@ export default async function IssuePage({ params }: IssuePageProps) {
         </div>
       </header>
 
-      {/* Issue switcher — sits between two hairlines so users can jump
-          between the ten tracked issues without bouncing back to the index. */}
+      {/* Issue switcher — dropdown between two hairlines so users can
+          jump between the ten tracked issues without bouncing back to
+          the index. */}
       <div className="rule-hair" aria-hidden="true" />
-      <nav
-        aria-label="All issues"
-        className="py-3 overflow-x-auto"
-      >
-        <ul className="flex items-center gap-1.5 whitespace-nowrap">
-          {allIssues.map((i) => {
-            const isActive = i.issue.slug === slug;
-            return (
-              <li key={i.issue.slug}>
-                <Link
-                  href={`/issue/${i.issue.slug}`}
-                  aria-current={isActive ? "page" : undefined}
-                  className={`inline-flex items-center px-3 py-1.5 rounded-sm border marginalia-label transition-colors ${
-                    isActive
-                      ? "bg-accent-primary border-accent-primary"
-                      : "bg-bg-surface text-text-secondary border-border hover:border-border-strong hover:text-text-primary"
-                  }`}
-                  style={
-                    isActive
-                      ? { margin: 0, color: "#FFFFFF" }
-                      : { margin: 0 }
-                  }
-                >
-                  {i.issue.display_name}
-                </Link>
-              </li>
-            );
-          })}
-        </ul>
-      </nav>
+      <IssueSwitcher
+        issues={allIssues.map((i) => ({
+          slug: i.issue.slug,
+          display_name: i.issue.display_name,
+          description: i.issue.description,
+        }))}
+        currentSlug={slug}
+      />
       <div className="rule-hair mb-5" aria-hidden="true" />
 
       <IssueRoster data={data} />
