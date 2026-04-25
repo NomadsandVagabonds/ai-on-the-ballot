@@ -134,7 +134,6 @@ export default async function IssuePage({ params }: IssuePageProps) {
         }))}
         currentSlug={slug}
       />
-      <div className="rule-hair mb-5" aria-hidden="true" />
 
       <IssueRoster data={data} />
 
