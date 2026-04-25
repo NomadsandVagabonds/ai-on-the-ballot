@@ -28,6 +28,11 @@ interface GeocodioDistrict {
   district_number?: number;
   congress_number?: string;
   current?: boolean;
+  /** Fraction of the ZIP that falls in this district (0–1). Geocodio
+   *  reports every district a ZIP centroid touches — including thin
+   *  edge slivers — so this field is how we distinguish the primary
+   *  district from incidental overlap. */
+  proportion?: number;
 }
 
 interface GeocodioResult {
@@ -79,24 +84,32 @@ async function resolveViaGeocodio(
     .find((s) => s && STATE_MAP[s.toUpperCase()]);
   if (!state) return null;
 
-  // Collect + dedupe every current congressional district across all
-  // results (ZIPs can legitimately span multiple districts).
-  const districtSet = new Set<string>();
+  // Pick the district with the highest Geocodio `proportion` across all
+  // results. Geocodio returns every district a ZIP touches — including
+  // sub-1% slivers where the ZIP barely crosses a boundary (e.g. ZIP
+  // 71601 is 99.5% in AR-4 and 0.5% in AR-1). Aggregate proportion by
+  // district, then return the dominant one.
+  const proportions = new Map<string, number>();
   for (const r of results) {
     const cds = r.fields?.congressional_districts ?? [];
     for (const cd of cds) {
-      // Prefer `current` === true when the field exists, but if absent
-      // fall back to including the district anyway — Geocodio doesn't
-      // always populate it.
       if (cd.current === false) continue;
       const padded = padDistrict(cd.district_number ?? null);
-      if (padded) districtSet.add(padded);
+      if (!padded) continue;
+      const p = typeof cd.proportion === "number" ? cd.proportion : 1;
+      proportions.set(padded, (proportions.get(padded) ?? 0) + p);
     }
   }
 
+  const ranked = [...proportions.entries()].sort((a, b) => {
+    if (b[1] !== a[1]) return b[1] - a[1];
+    return a[0].localeCompare(b[0]);
+  });
+
+  const primary = ranked.length > 0 ? ranked[0][0] : null;
   return {
     state: state.toUpperCase(),
-    districts: [...districtSet].sort(),
+    districts: primary ? [primary] : [],
   };
 }
 

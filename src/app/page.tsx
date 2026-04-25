@@ -50,11 +50,10 @@ export default async function Home() {
           <div
             className="grid gap-y-6 lg:gap-x-16 lg:gap-y-0 lg:grid-cols-[1fr_minmax(0,360px)] lg:grid-rows-[auto_auto_auto] items-start"
           >
-            <h1
-              className="hero-h1 lg:col-start-1 lg:row-start-1"
-              style={{ maxWidth: "16ch" }}
-            >
-              Where do your candidates stand on AI?
+            <h1 className="hero-h1 lg:col-start-1 lg:row-start-1">
+              Where do your candidates
+              <br />
+              stand on AI?
             </h1>
 
             <p className="hero-sub lg:col-start-1 lg:row-start-2 lg:mt-6">
@@ -175,7 +174,7 @@ export default async function Home() {
                   Key Congressional Races
                 </h2>
                 <p className="mt-3 text-base text-text-secondary max-w-xl">
-                  States with current candidate data. Data is being collected on an ongoing basis.
+                  States with current candidate data. Data is being collected on an ongoing basis in accordance with the state primaries calendar.
                 </p>
               </div>
               <Link href="/map" className="btn-ghost-dark self-start md:self-auto">

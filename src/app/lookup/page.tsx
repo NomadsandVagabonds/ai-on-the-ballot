@@ -141,31 +141,22 @@ function LookupContent() {
         <section>
           {/* Resolved summary */}
           <div className="rule-hair" aria-hidden="true" />
-          <div className="flex items-baseline justify-between gap-3 py-4">
-            <div>
-              <p className="kicker-muted">Zip {result.zip}</p>
-              <p className="font-display text-[22px] font-semibold text-text-primary leading-tight mt-1">
-                {stateName}
-                {result.districts.length > 0 && (
-                  <>
-                    {" "}
-                    &middot;{" "}
-                    <span className="text-text-secondary font-normal">
-                      {result.districts.length === 1
-                        ? `Congressional District ${parseInt(result.districts[0], 10)}`
-                        : `Districts ${result.districts.map((d) => parseInt(d, 10)).join(", ")}`}
-                    </span>
-                  </>
-                )}
-              </p>
-            </div>
-            <Link
-              href={`/state/${result.state_slug}`}
-              className="byline shrink-0 hover:text-accent-primary transition-colors"
-              style={{ margin: 0 }}
-            >
-              All {stateName} races &rarr;
-            </Link>
+          <div className="py-4">
+            <p className="kicker-muted">Zip {result.zip}</p>
+            <p className="font-display text-[22px] font-semibold text-text-primary leading-tight mt-1">
+              {stateName}
+              {result.districts.length > 0 && (
+                <>
+                  {" "}
+                  &middot;{" "}
+                  <span className="text-text-secondary font-normal">
+                    {result.districts.length === 1
+                      ? `Congressional District ${parseInt(result.districts[0], 10)}`
+                      : `Districts ${result.districts.map((d) => parseInt(d, 10)).join(", ")}`}
+                  </span>
+                </>
+              )}
+            </p>
           </div>
           <div className="rule-hair" aria-hidden="true" />
 
@@ -174,7 +165,7 @@ function LookupContent() {
               className="marginalia mt-4"
               style={{ margin: "1rem 0 0" }}
             >
-              District lookup is currently limited — we resolved state only.
+              District lookup is currently limited; we resolved state only.
               Senate and statewide races are listed; your House race isn&rsquo;t
               auto-matched.
             </p>
@@ -183,14 +174,24 @@ function LookupContent() {
           {/* Tracked races for this zip */}
           {result.race_slugs.length > 0 ? (
             <div className="mt-8">
-              <p className="kicker mb-4">Races on your ballot</p>
+              <div className="flex items-baseline justify-between gap-4 mb-4">
+                <p className="kicker" style={{ margin: 0 }}>
+                  Races on your ballot
+                </p>
+                <Link
+                  href={`/state/${result.state_slug}`}
+                  className="text-xs font-semibold tracking-[0.1em] uppercase text-text-muted hover:text-accent-primary transition-colors"
+                >
+                  All {stateName} Races &rarr;
+                </Link>
+              </div>
               <ul className="border-t border-border">
                 {result.race_slugs.map((slug) => {
                   const parsed = parseRaceSlug(slug);
                   if (!parsed) return null;
                   const chamber = chamberLabel(parsed.chamber);
                   const district = parsed.district
-                    ? ` — District ${parseInt(parsed.district, 10)}`
+                    ? `, District ${parseInt(parsed.district, 10)}`
                     : "";
                   return (
                     <li

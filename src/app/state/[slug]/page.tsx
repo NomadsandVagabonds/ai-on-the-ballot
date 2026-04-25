@@ -95,7 +95,7 @@ export default async function StatePage({ params }: StatePageProps) {
             <div className="flex flex-wrap items-baseline justify-between gap-3">
               <h2 className="font-display text-2xl md:text-[1.75rem] font-bold text-text-primary leading-tight">
                 {chamberLabel(firstRace.chamber)}
-                {firstRace.district ? ` — District ${firstRace.district}` : ""}
+                {firstRace.district ? `, District ${firstRace.district}` : ""}
               </h2>
 
               {firstRace.race_type === "special" && (
@@ -150,7 +150,7 @@ export default async function StatePage({ params }: StatePageProps) {
                 <div className="flex flex-wrap items-baseline justify-between gap-3 mb-3">
                   <h2 className="font-display text-2xl md:text-[1.75rem] font-bold text-text-primary leading-tight">
                     {chamberLabel(race.chamber)}
-                    {race.district ? ` — District ${race.district}` : ""}
+                    {race.district ? `, District ${race.district}` : ""}
                   </h2>
 
                   {race.race_type === "special" && (

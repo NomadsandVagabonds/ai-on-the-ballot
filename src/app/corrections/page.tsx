@@ -96,21 +96,21 @@ export default async function CorrectionsPage() {
                       {correction.issue}
                     </td>
                     <td className="py-3 pr-4 text-sm text-text-secondary">
-                      {correction.nature_of_change ?? "—"}
+                      {correction.nature_of_change ?? "–"}
                     </td>
                     <td className="py-3 text-sm text-text-secondary">
                       {correction.previous_value || correction.new_value ? (
                         <>
                           <span className="text-text-muted">
-                            {correction.previous_value ?? "—"}
+                            {correction.previous_value ?? "–"}
                           </span>
                           <span className="mx-1.5">&rarr;</span>
                           <span className="text-text-primary font-medium">
-                            {correction.new_value ?? "—"}
+                            {correction.new_value ?? "–"}
                           </span>
                         </>
                       ) : (
-                        "—"
+                        "–"
                       )}
                     </td>
                   </tr>

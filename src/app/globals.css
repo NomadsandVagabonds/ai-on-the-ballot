@@ -914,7 +914,10 @@ body {
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid rgba(255, 255, 255, 0.14);
   border-radius: 12px;
-  padding: 1.25rem 1.375rem 1.375rem;
+  /* Top padding matched to the .hero-sub's leading so the card's
+     "FIND YOUR CANDIDATES" kicker sits on the same baseline as the
+     sub-copy on the left. */
+  padding: 1rem 1.375rem 1.375rem;
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
   box-shadow:
