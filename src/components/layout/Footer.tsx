@@ -50,7 +50,15 @@ export function Footer() {
         {/* Bottom bar */}
         <div className="mt-12 pt-6 border-t border-border">
           <p className="text-xs text-text-muted">
-            &copy; {new Date().getFullYear()} AI on the Ballot
+            An independent project of{" "}
+            <a
+              href="https://evitable.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-accent-primary transition-colors underline underline-offset-2"
+            >
+              Evitable
+            </a>
           </p>
         </div>
       </div>
