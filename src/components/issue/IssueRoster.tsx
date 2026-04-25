@@ -9,7 +9,6 @@ import type {
 import type { Party, Stance } from "@/types/database";
 import { STANCE_DISPLAY, partyLabel } from "@/lib/utils/stance";
 import { STATE_MAP } from "@/lib/utils/states";
-import { StanceIndicator } from "@/components/shared/StanceIndicator";
 import { PartyBadge } from "@/components/shared/PartyBadge";
 import { ToggleSwitch } from "@/components/shared/ToggleSwitch";
 import { resolveCandidatePhoto } from "@/lib/utils/portrait";
@@ -214,12 +213,8 @@ function RecordCard({ record }: { record: IssuePositionRecord }) {
         </div>
 
         {/* Stance — cols 5–6 */}
-        <div className="md:col-span-2 flex md:flex-col md:items-start items-center gap-3 md:gap-1.5 md:pt-1">
-          <StanceIndicator stance={record.stance} size="md" />
-          <span
-            className="text-[11px] font-semibold uppercase"
-            style={{ letterSpacing: "0.08em", color: display.color }}
-          >
+        <div className="md:col-span-2 flex md:items-start items-center md:pt-1">
+          <span className="stance-mark" data-stance={record.stance}>
             {display.label}
           </span>
         </div>
@@ -562,7 +557,6 @@ export function IssueRoster({ data }: IssueRosterProps) {
             return (
               <section key={group.stance} className="mb-12 last:mb-0">
                 <header className="flex items-baseline gap-4 mb-4">
-                  <StanceIndicator stance={group.stance} size="md" />
                   <h3
                     className="font-display text-[24px] font-bold leading-none"
                     style={{ color: display.color }}
