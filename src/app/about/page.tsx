@@ -224,10 +224,10 @@ export default function AboutPage() {
         <p className="text-base leading-relaxed text-text-secondary">
           For press inquiries, partnership questions, or general feedback, contact us at{" "}
           <a
-            href="mailto:vinaya@ontheballot.ai"
+            href="mailto:vinayasivakumar@berkeley.edu"
             className="text-accent-primary hover:text-accent-primary-hover font-medium underline underline-offset-2"
           >
-            vinaya@ontheballot.ai
+            vinayasivakumar@berkeley.edu
           </a>{" "}
           or follow on X at{" "}
           <a

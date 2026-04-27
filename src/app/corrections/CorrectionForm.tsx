@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 
-const CONTACT_EMAIL = "vinaya@ontheballot.ai";
+const CONTACT_EMAIL = "vinayasivakumar@berkeley.edu";
 
 const ISSUE_OPTIONS = [
   "Export Control & Compute Governance",
