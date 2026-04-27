@@ -157,6 +157,8 @@ export interface IssuePositionRecord {
   date_recorded: string | null;
   /** All citations for this position (may be empty) */
   sources: PositionSource[];
+  /** True once a researcher has actively investigated this candidate × issue. */
+  researched?: boolean;
 }
 
 /** An issue page's data — the issue plus every candidate's record on it */

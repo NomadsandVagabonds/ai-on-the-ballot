@@ -295,6 +295,7 @@ export function getMockIssueBySlug(slug: string): IssueWithRecords | null {
       source_url: pos?.source_url ?? null,
       date_recorded: pos?.date_recorded ?? null,
       sources: pos?.sources ?? [],
+      researched: pos?.researched ?? false,
     };
   });
 

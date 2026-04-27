@@ -47,6 +47,7 @@ next-env.d.ts
 /data/source-verification-report.json
 /data/candidate-manifest.csv
 /data/fec-to-bioguide.json
+/scripts/.research-cache/
 
 # Claude Code workspace (local agent state, worktrees)
 .claude/

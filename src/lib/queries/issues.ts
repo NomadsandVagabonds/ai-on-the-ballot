@@ -123,6 +123,7 @@ export async function getIssueBySlug(
       source_url: pos?.source_url ?? null,
       date_recorded: pos?.date_recorded ?? null,
       sources: [],
+      researched: pos?.researched ?? false,
     };
   });
 

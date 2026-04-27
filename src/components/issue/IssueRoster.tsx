@@ -215,7 +215,9 @@ function RecordCard({ record }: { record: IssuePositionRecord }) {
         {/* Stance — cols 5–6 */}
         <div className="md:col-span-2 flex md:items-start items-center md:pt-1">
           <span className="stance-mark" data-stance={record.stance}>
-            {display.label}
+            {record.stance === "no_mention" && record.researched
+              ? "No public position found"
+              : display.label}
           </span>
         </div>
 

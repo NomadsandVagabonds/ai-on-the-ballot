@@ -410,9 +410,27 @@ def build_positions(
         if not cand or not issue:
             continue
 
-        stance = normalize_stance(row.get("stance"))
-        confidence = normalize_confidence(row.get("confidence"))
-        summary = str(row["summary"]).strip() if pd.notna(row.get("summary")) else None
+        # Review gate: rows live in xlsx as drafts until a human reviews
+        # them. Build pipeline only emits "approved" rows (or rows with
+        # no reviewStatus set, which covers the legacy pre-gate dataset).
+        # `draft` rows are research output staged for review and must
+        # never reach the live site.
+        review_status = (
+            str(row["reviewStatus"]).strip().lower()
+            if "reviewStatus" in row.index and pd.notna(row.get("reviewStatus"))
+            else ""
+        )
+        if review_status == "draft":
+            # Demote to no_mention placeholder; preserves the row so
+            # downstream count/coverage logic stays stable.
+            stance = "no_mention"
+            confidence = "low"
+            summary = None
+            sources_by_pos[source_pos_id] = []
+        else:
+            stance = normalize_stance(row.get("stance"))
+            confidence = normalize_confidence(row.get("confidence"))
+            summary = str(row["summary"]).strip() if pd.notna(row.get("summary")) else None
         last_updated = (
             row["lastUpdated"].date().isoformat()
             if pd.notna(row.get("lastUpdated")) and hasattr(row["lastUpdated"], "date")
@@ -423,6 +441,15 @@ def build_positions(
         first_source = sources[0] if sources else None
 
         full_quote = first_source.get("excerpt") if first_source else None
+
+        # Treat any row with evidence (a coded stance, a summary, or any
+        # source) as researched. Plain no_mention rows with no summary or
+        # source remain researched=False (= unprocessed placeholder).
+        researched = (
+            stance != "no_mention"
+            or bool(summary)
+            or bool(sources)
+        )
 
         out.append(
             {
@@ -439,6 +466,7 @@ def build_positions(
                 "created_at": FIXED_TIMESTAMP,
                 "updated_at": FIXED_TIMESTAMP,
                 "sources": sources,
+                "researched": researched,
             }
         )
 

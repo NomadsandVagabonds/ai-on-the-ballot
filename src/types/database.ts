@@ -96,6 +96,13 @@ export interface PositionRow {
   last_updated: string;
   created_at: string;
   updated_at: string;
+  /**
+   * True once a researcher has actively investigated this candidate × issue
+   * pair. Lets the UI distinguish "we looked and found no public stance"
+   * (researched + no_mention) from "we haven't gotten to this one yet"
+   * (placeholder no_mention from initial ingest).
+   */
+  researched?: boolean;
 }
 
 export interface LegislativeActivityRow {

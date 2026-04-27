@@ -85,6 +85,11 @@ function PositionRow({ position }: { position: PositionWithIssue }) {
   const confidence = position.confidence;
   const confidenceLabel = CONFIDENCE_DISPLAY[confidence].label;
   const sources = position.sources ?? [];
+  const researchedNoMention =
+    position.stance === "no_mention" && position.researched === true;
+  const stanceLabel = researchedNoMention
+    ? "No public position found"
+    : stanceDisplay.label;
 
   const note =
     position.summary ||
@@ -106,15 +111,17 @@ function PositionRow({ position }: { position: PositionWithIssue }) {
       <div>
         <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
           <span className="stance-mark" data-stance={position.stance}>
-            {stanceDisplay.label}
+            {stanceLabel}
           </span>
-          <span
-            className="confidence-dot"
-            data-level={confidence}
-            aria-label={confidenceLabel}
-          >
-            {confidence.charAt(0).toUpperCase() + confidence.slice(1)}
-          </span>
+          {!researchedNoMention && position.stance !== "no_mention" && (
+            <span
+              className="confidence-dot"
+              data-level={confidence}
+              aria-label={confidenceLabel}
+            >
+              {confidence.charAt(0).toUpperCase() + confidence.slice(1)}
+            </span>
+          )}
         </div>
 
         {note && <p className="position-note">{note}</p>}
