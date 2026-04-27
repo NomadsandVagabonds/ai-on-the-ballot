@@ -50,7 +50,7 @@ export function Footer() {
         {/* Bottom bar */}
         <div className="mt-12 pt-6 border-t border-border flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <p className="text-xs text-text-muted">
-            An independent project of{" "}
+            A project of{" "}
             <a
               href="https://evitable.com/"
               target="_blank"
