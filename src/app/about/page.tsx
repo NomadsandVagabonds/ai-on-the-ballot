@@ -253,6 +253,28 @@ export default function AboutPage() {
         </p>
       </section>
 
+      <section id="candidate-outreach" className="mb-10">
+        <h2 className="font-display text-xl sm:text-2xl font-semibold text-text-primary mb-3">
+          Candidate outreach
+        </h2>
+        <p className="text-base leading-relaxed text-text-secondary mb-3">
+          As part of our methodology, we are reaching out to each candidate appearing in this tracker to share how their AI governance positions are being characterized on this site, with citations for the public sources used in each coding decision. This outreach is rolling: candidates are contacted as their state&rsquo;s data comes online, so not every candidate listed will have been contacted at the time of publication.
+        </p>
+        <p className="text-base leading-relaxed text-text-secondary mb-3">
+          The outreach is intended to flag any mischaracterization before or shortly after publication, and to invite the candidate or their campaign to clarify their stance — either by pointing us to additional public sources or by submitting a formal clarification through our{" "}
+          <Link
+            href="/corrections#clarification"
+            className="text-accent-primary hover:text-accent-primary-hover font-medium underline underline-offset-2"
+          >
+            feedback form
+          </Link>
+          .
+        </p>
+        <p className="text-base leading-relaxed text-text-secondary">
+          Where a candidate has not yet been reached or chooses not to respond, we publish based on the public record. A candidate&rsquo;s silence is not interpreted as agreement or disagreement with how a position is coded.
+        </p>
+      </section>
+
       <section className="mb-10">
         <h2 className="font-display text-xl sm:text-2xl font-semibold text-text-primary mb-3">
           Coverage timeline
