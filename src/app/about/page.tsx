@@ -60,6 +60,76 @@ const ISSUE_CATEGORIES = [
   },
 ] as const;
 
+const COVERAGE_TIMELINE = [
+  {
+    date: "April 17",
+    lines: [
+      "Initial website launched, tested by friends, family, and close colleagues",
+      "Primaries go live: AR, IL (Senate), MS, NC (Senate), TX (Senate)",
+    ],
+  },
+  {
+    date: "April 21",
+    lines: [
+      "Marketing and press campaigns go live",
+      "Public launch",
+    ],
+  },
+  { date: "May 2", lines: ["Primaries go live: IN, OH (Governor + Senate)"] },
+  { date: "May 9", lines: ["Primaries go live: NC, NE, WV"] },
+  { date: "May 13", lines: ["Primaries go live: LA (Senate)"] },
+  {
+    date: "May 14",
+    lines: [
+      "Primaries go live: AL (Governor + Senate), GA (Governor + Senate), ID, KY (Senate), OR, PA (Governor)",
+    ],
+  },
+  { date: "May 23", lines: ["Primaries go live: TX"] },
+  {
+    date: "May 30",
+    lines: [
+      "Primaries go live: CA (Governor), IA (Governor + Senate), MT (Senate), NJ, NM (Governor), SD",
+    ],
+  },
+  {
+    date: "June 6",
+    lines: [
+      "Primaries go live: ME (Governor + Senate), ND, NV (Governor), SC (Governor)",
+    ],
+  },
+  { date: "June 14", lines: ["Primaries go live: AL, GA, OK (Governor)"] },
+  { date: "June 20", lines: ["Primaries go live: MD, NY (Governor), SC, UT"] },
+  { date: "June 24", lines: ["Primaries go live: LA"] },
+  { date: "June 27", lines: ["Primaries go live: CO (Governor + Senate)"] },
+  { date: "July 18", lines: ["Primaries go live: AZ (Governor)"] },
+  { date: "July 25", lines: ["Primaries go live: SD"] },
+  {
+    date: "August 1",
+    lines: [
+      "Primaries go live: KS (Governor), MI (Governor + Senate), MO, VA, WA",
+    ],
+  },
+  { date: "August 3", lines: ["Primaries go live: TN (Governor)"] },
+  { date: "August 5", lines: ["Primaries go live: HI"] },
+  {
+    date: "August 8",
+    lines: [
+      "Primaries go live: CT, MN (Governor + Senate), VT, WI (Governor)",
+    ],
+  },
+  {
+    date: "August 15",
+    lines: [
+      "Primaries go live: AK (Governor + Senate), FL (Governor + Senate), WY (Senate)",
+    ],
+  },
+  { date: "August 22", lines: ["Primaries go live: OK"] },
+  { date: "August 29", lines: ["Primaries go live: MA (Senate)"] },
+  { date: "September 5", lines: ["Primaries go live: NH (Governor + Senate), RI"] },
+  { date: "September 12", lines: ["Primaries go live: DE"] },
+  { date: "November 3", lines: ["General Election"] },
+] as const;
+
 export default function AboutPage() {
   return (
     <article className="mx-auto max-w-2xl px-4 sm:px-6 lg:px-8 py-12 sm:py-16 prose-body">
@@ -181,6 +251,38 @@ export default function AboutPage() {
         <p className="text-base leading-relaxed text-text-secondary">
           Thresholds are re-evaluated at each FEC quarterly filing deadline. Candidates who fall below the ongoing threshold may be removed from active tracking.
         </p>
+      </section>
+
+      <section className="mb-10">
+        <h2 className="font-display text-xl sm:text-2xl font-semibold text-text-primary mb-3">
+          Coverage timeline
+        </h2>
+        <p className="text-base leading-relaxed text-text-secondary mb-5">
+          Candidate data is published on a rolling state-by-state schedule, aligned with each state&rsquo;s primary calendar. Key races (Senate, Governor) are noted in parentheses.
+        </p>
+        <ol className="space-y-5 border-l border-border pl-6 ml-1">
+          {COVERAGE_TIMELINE.map((entry) => (
+            <li key={entry.date} className="relative">
+              <span
+                aria-hidden="true"
+                className="absolute -left-[29px] top-2 h-2 w-2 rounded-full bg-accent-primary"
+              />
+              <div className="font-display text-base font-semibold text-text-primary">
+                {entry.date}
+              </div>
+              <ul className="mt-1 space-y-1">
+                {entry.lines.map((line, i) => (
+                  <li
+                    key={i}
+                    className="text-sm leading-relaxed text-text-secondary"
+                  >
+                    {line}
+                  </li>
+                ))}
+              </ul>
+            </li>
+          ))}
+        </ol>
       </section>
 
       <section className="mb-10">
