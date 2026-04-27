@@ -228,6 +228,15 @@ export default function AboutPage() {
             className="text-accent-primary hover:text-accent-primary-hover font-medium underline underline-offset-2"
           >
             vinaya@ontheballot.ai
+          </a>{" "}
+          or follow on X at{" "}
+          <a
+            href="https://x.com/v1naya"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-accent-primary hover:text-accent-primary-hover font-medium underline underline-offset-2"
+          >
+            @v1naya
           </a>
           .
         </p>

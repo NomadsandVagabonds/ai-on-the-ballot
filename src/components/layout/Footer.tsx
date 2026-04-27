@@ -48,7 +48,7 @@ export function Footer() {
         </div>
 
         {/* Bottom bar */}
-        <div className="mt-12 pt-6 border-t border-border">
+        <div className="mt-12 pt-6 border-t border-border flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <p className="text-xs text-text-muted">
             An independent project of{" "}
             <a
@@ -60,6 +60,22 @@ export function Footer() {
               Evitable
             </a>
           </p>
+          <a
+            href="https://x.com/v1naya"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Follow on X"
+            className="inline-flex items-center gap-1.5 text-xs text-text-muted hover:text-accent-primary transition-colors"
+          >
+            <svg
+              viewBox="0 0 24 24"
+              aria-hidden="true"
+              className="h-3.5 w-3.5 fill-current"
+            >
+              <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+            </svg>
+            <span>@v1naya</span>
+          </a>
         </div>
       </div>
     </footer>
