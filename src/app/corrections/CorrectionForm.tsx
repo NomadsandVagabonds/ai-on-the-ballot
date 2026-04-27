@@ -2,8 +2,6 @@
 
 import { useEffect, useState } from "react";
 
-const CONTACT_EMAIL = "vinayasivakumar@berkeley.edu";
-
 const ISSUE_OPTIONS = [
   "Export Control & Compute Governance",
   "Military & National Security AI",
@@ -62,10 +60,10 @@ function SuccessPanel({
         </svg>
       </div>
       <p className="text-lg font-medium text-text-primary mb-2">
-        Your email client should have opened.
+        Thank you. Your submission has been received.
       </p>
       <p className="text-text-muted mb-6">
-        Please review and send the pre-filled message to complete your submission. We review submissions regularly and will follow up if needed.
+        We review submissions regularly and will follow up if needed.
       </p>
       <button
         type="button"
@@ -78,10 +76,28 @@ function SuccessPanel({
   );
 }
 
-function openMailto(subject: string, bodyLines: (string | false | null | undefined)[]): void {
-  const body = bodyLines.filter(Boolean).join("\n");
-  const url = `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-  window.location.href = url;
+async function sendSubmission(payload: {
+  kind: "correction" | "clarification" | "question";
+  subject: string;
+  bodyLines: (string | false | null | undefined)[];
+  replyTo?: string;
+}): Promise<void> {
+  const body = payload.bodyLines.filter(Boolean).join("\n");
+  const response = await fetch("/api/corrections", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      kind: payload.kind,
+      subject: payload.subject,
+      body,
+      ...(payload.replyTo && { reply_to: payload.replyTo }),
+    }),
+  });
+
+  if (!response.ok) {
+    const data = await response.json().catch(() => null);
+    throw new Error(data?.error || "Failed to submit");
+  }
 }
 
 /* ========================================
@@ -105,29 +121,33 @@ export function CorrectionForm() {
     setSubmitterEmail("");
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setStatus("submitting");
     setErrorMessage("");
 
     try {
-      const subject = `[Correction] ${candidateName.trim()} — ${issue.trim()}`;
-      openMailto(subject, [
-        `Candidate: ${candidateName.trim()}`,
-        `Issue: ${issue.trim()}`,
-        ``,
-        `Proposed correction:`,
-        proposedCorrection.trim(),
-        ``,
-        sourceUrl.trim() && `Source: ${sourceUrl.trim()}`,
-        submitterEmail.trim() && `Submitter email: ${submitterEmail.trim()}`,
-      ]);
+      await sendSubmission({
+        kind: "correction",
+        subject: `[Correction] ${candidateName.trim()} — ${issue.trim()}`,
+        bodyLines: [
+          `Candidate: ${candidateName.trim()}`,
+          `Issue: ${issue.trim()}`,
+          ``,
+          `Proposed correction:`,
+          proposedCorrection.trim(),
+          ``,
+          sourceUrl.trim() && `Source: ${sourceUrl.trim()}`,
+          submitterEmail.trim() && `Submitter email: ${submitterEmail.trim()}`,
+        ],
+        replyTo: submitterEmail.trim() || undefined,
+      });
       setStatus("success");
       resetForm();
     } catch (err) {
       setStatus("error");
       setErrorMessage(
-        err instanceof Error ? err.message : "Failed to open mail client"
+        err instanceof Error ? err.message : "Failed to submit correction"
       );
     }
   };
@@ -271,30 +291,34 @@ export function ClarificationForm() {
     setEmail("");
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setStatus("submitting");
     setErrorMessage("");
 
     try {
-      const subject = `[Clarification] ${candidateName.trim()} — ${issue || "General"}`;
-      openMailto(subject, [
-        `Candidate: ${candidateName.trim()}`,
-        role && `Submitted by: ${role}`,
-        `Topic: ${issue || "(unspecified)"}`,
-        ``,
-        `Clarification:`,
-        clarification.trim(),
-        ``,
-        sourceUrl.trim() && `Primary source: ${sourceUrl.trim()}`,
-        email.trim() && `Contact email: ${email.trim()}`,
-      ]);
+      await sendSubmission({
+        kind: "clarification",
+        subject: `[Clarification] ${candidateName.trim()} — ${issue || "General"}`,
+        bodyLines: [
+          `Candidate: ${candidateName.trim()}`,
+          role && `Submitted by: ${role}`,
+          `Topic: ${issue || "(unspecified)"}`,
+          ``,
+          `Clarification:`,
+          clarification.trim(),
+          ``,
+          sourceUrl.trim() && `Primary source: ${sourceUrl.trim()}`,
+          email.trim() && `Contact email: ${email.trim()}`,
+        ],
+        replyTo: email.trim() || undefined,
+      });
       setStatus("success");
       resetForm();
     } catch (err) {
       setStatus("error");
       setErrorMessage(
-        err instanceof Error ? err.message : "Failed to open mail client"
+        err instanceof Error ? err.message : "Failed to submit clarification"
       );
     }
   };
@@ -449,27 +473,31 @@ export function QuestionForm() {
     setAffiliation("");
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setStatus("submitting");
     setErrorMessage("");
 
     try {
-      const subject = `[Question] ${name ? `from ${name}` : "General question"}`;
-      openMailto(subject, [
-        name && `From: ${name}`,
-        affiliation && `Affiliation: ${affiliation}`,
-        email.trim() && `Email: ${email.trim()}`,
-        ``,
-        `Question:`,
-        question.trim(),
-      ]);
+      await sendSubmission({
+        kind: "question",
+        subject: `[Question] ${name ? `from ${name}` : "General question"}`,
+        bodyLines: [
+          name && `From: ${name}`,
+          affiliation && `Affiliation: ${affiliation}`,
+          email.trim() && `Email: ${email.trim()}`,
+          ``,
+          `Question:`,
+          question.trim(),
+        ],
+        replyTo: email.trim() || undefined,
+      });
       setStatus("success");
       resetForm();
     } catch (err) {
       setStatus("error");
       setErrorMessage(
-        err instanceof Error ? err.message : "Failed to open mail client"
+        err instanceof Error ? err.message : "Failed to submit question"
       );
     }
   };
