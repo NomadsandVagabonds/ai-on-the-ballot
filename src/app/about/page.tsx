@@ -61,72 +61,42 @@ const ISSUE_CATEGORIES = [
 ] as const;
 
 const COVERAGE_TIMELINE = [
-  {
-    date: "April 17",
-    lines: [
-      "Initial website launched, tested by friends, family, and close colleagues",
-      "Primaries go live: AR, IL (Senate), MS, NC (Senate), TX (Senate)",
-    ],
-  },
-  {
-    date: "April 21",
-    lines: [
-      "Marketing and press campaigns go live",
-      "Public launch",
-    ],
-  },
-  { date: "May 2", lines: ["Primaries go live: IN, OH (Governor + Senate)"] },
-  { date: "May 9", lines: ["Primaries go live: NC, NE, WV"] },
-  { date: "May 13", lines: ["Primaries go live: LA (Senate)"] },
+  { date: "May 2", lines: ["Data released: IN, OH (Senate)"] },
+  { date: "May 9", lines: ["Data released: NC, NE, WV"] },
+  { date: "May 13", lines: ["Data released: LA (Senate)"] },
   {
     date: "May 14",
     lines: [
-      "Primaries go live: AL (Governor + Senate), GA (Governor + Senate), ID, KY (Senate), OR, PA (Governor)",
+      "Data released: AL (Senate), GA (Senate), ID, KY (Senate), OR, PA",
     ],
   },
-  { date: "May 23", lines: ["Primaries go live: TX"] },
+  { date: "May 23", lines: ["Data released: TX"] },
   {
     date: "May 30",
-    lines: [
-      "Primaries go live: CA (Governor), IA (Governor + Senate), MT (Senate), NJ, NM (Governor), SD",
-    ],
+    lines: ["Data released: CA, IA (Senate), MT (Senate), NJ, NM, SD"],
   },
-  {
-    date: "June 6",
-    lines: [
-      "Primaries go live: ME (Governor + Senate), ND, NV (Governor), SC (Governor)",
-    ],
-  },
-  { date: "June 14", lines: ["Primaries go live: AL, GA, OK (Governor)"] },
-  { date: "June 20", lines: ["Primaries go live: MD, NY (Governor), SC, UT"] },
-  { date: "June 24", lines: ["Primaries go live: LA"] },
-  { date: "June 27", lines: ["Primaries go live: CO (Governor + Senate)"] },
-  { date: "July 18", lines: ["Primaries go live: AZ (Governor)"] },
-  { date: "July 25", lines: ["Primaries go live: SD"] },
+  { date: "June 6", lines: ["Data released: ME (Senate), ND, NV, SC"] },
+  { date: "June 14", lines: ["Data released: AL, GA, OK"] },
+  { date: "June 20", lines: ["Data released: MD, NY, SC, UT"] },
+  { date: "June 24", lines: ["Data released: LA"] },
+  { date: "June 27", lines: ["Data released: CO (Senate)"] },
+  { date: "July 18", lines: ["Data released: AZ"] },
+  { date: "July 25", lines: ["Data released: SD"] },
   {
     date: "August 1",
-    lines: [
-      "Primaries go live: KS (Governor), MI (Governor + Senate), MO, VA, WA",
-    ],
+    lines: ["Data released: KS, MI (Senate), MO, VA, WA"],
   },
-  { date: "August 3", lines: ["Primaries go live: TN (Governor)"] },
-  { date: "August 5", lines: ["Primaries go live: HI"] },
-  {
-    date: "August 8",
-    lines: [
-      "Primaries go live: CT, MN (Governor + Senate), VT, WI (Governor)",
-    ],
-  },
+  { date: "August 3", lines: ["Data released: TN"] },
+  { date: "August 5", lines: ["Data released: HI"] },
+  { date: "August 8", lines: ["Data released: CT, MN (Senate), VT, WI"] },
   {
     date: "August 15",
-    lines: [
-      "Primaries go live: AK (Governor + Senate), FL (Governor + Senate), WY (Senate)",
-    ],
+    lines: ["Data released: AK (Senate), FL (Senate), WY (Senate)"],
   },
-  { date: "August 22", lines: ["Primaries go live: OK"] },
-  { date: "August 29", lines: ["Primaries go live: MA (Senate)"] },
-  { date: "September 5", lines: ["Primaries go live: NH (Governor + Senate), RI"] },
-  { date: "September 12", lines: ["Primaries go live: DE"] },
+  { date: "August 22", lines: ["Data released: OK"] },
+  { date: "August 29", lines: ["Data released: MA (Senate)"] },
+  { date: "September 5", lines: ["Data released: NH (Senate), RI"] },
+  { date: "September 12", lines: ["Data released: DE"] },
   { date: "November 3", lines: ["General Election"] },
 ] as const;
 
@@ -280,7 +250,7 @@ export default function AboutPage() {
           Coverage timeline
         </h2>
         <p className="text-base leading-relaxed text-text-secondary mb-5">
-          Candidate data is published on a rolling state-by-state schedule, aligned with each state&rsquo;s primary calendar. Key races (Senate, Governor) are noted in parentheses.
+          Candidate data is released on a rolling state-by-state schedule, aligned with each state&rsquo;s primary calendar. At the latest, data for a given state is released three days ahead of that state&rsquo;s primary. Key Senate races are noted in parentheses.
         </p>
         <ol className="space-y-5 border-l border-border pl-6 ml-1">
           {COVERAGE_TIMELINE.map((entry) => (
