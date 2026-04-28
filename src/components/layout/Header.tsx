@@ -6,6 +6,7 @@ import { useAppStore } from "@/stores/appStore";
 const NAV_LINKS = [
   { href: "/map", label: "Map" },
   { href: "/about", label: "About" },
+  { href: "/corrections", label: "Submit Correction" },
 ] as const;
 
 export function Header() {
@@ -44,9 +45,6 @@ export function Header() {
                 {link.label}
               </Link>
             ))}
-            <Link href="/corrections" className="btn-amber" style={{ padding: "0.5rem 1rem", fontSize: "0.875rem" }}>
-              Submit Correction
-            </Link>
           </nav>
 
           {/* Mobile hamburger */}
