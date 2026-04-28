@@ -156,11 +156,6 @@ export default async function RacePage({ params }: RacePageProps) {
         </aside>
       </header>
 
-      {/* Rule ornament between header and instrument */}
-      <div className="rule-ornament" aria-hidden="true">
-        <span>&#10086;</span>
-      </div>
-
       {/* ============================================================
           Comparison instrument
          ============================================================ */}
@@ -191,11 +186,8 @@ export default async function RacePage({ params }: RacePageProps) {
         </p>
       </aside>
 
-      {/* Closing ornament + return link */}
-      <div className="rule-ornament mt-10" aria-hidden="true">
-        <span>&#10086;</span>
-      </div>
-      <div className="text-center">
+      {/* Return link */}
+      <div className="mt-10 text-center">
         <Link
           href={`/state/${stateSlug}`}
           className="byline inline-flex items-center gap-2 text-text-secondary hover:text-accent-primary transition-colors"

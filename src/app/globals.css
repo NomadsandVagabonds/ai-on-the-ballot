@@ -467,29 +467,6 @@ body {
   color: var(--text-muted);
 }
 
-/* Rule ornament — thin rule · dingbat · thin rule (used between sections) */
-.rule-ornament {
-  display: flex;
-  align-items: center;
-  gap: 0.875rem;
-  margin: 3rem 0;
-}
-
-.rule-ornament::before,
-.rule-ornament::after {
-  content: "";
-  flex: 1;
-  height: 1px;
-  background: var(--border-strong);
-}
-
-.rule-ornament > span {
-  font-family: var(--font-display), Georgia, serif;
-  color: var(--accent-gold);
-  font-size: 0.875rem;
-  line-height: 1;
-}
-
 /* Drop cap — for lede paragraphs on feature spreads */
 .drop-cap::first-letter {
   font-family: var(--font-display), Georgia, serif;

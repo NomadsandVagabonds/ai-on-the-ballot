@@ -140,12 +140,9 @@ export default async function IssuePage({ params }: IssuePageProps) {
       {/* ============================================================
           Prev / next issue nav
          ============================================================ */}
-      <div className="rule-ornament mt-16" aria-hidden="true">
-        <span>&#10086;</span>
-      </div>
       <nav
         aria-label="Adjacent issues"
-        className="grid grid-cols-1 md:grid-cols-2 gap-6"
+        className="mt-16 grid grid-cols-1 md:grid-cols-2 gap-6"
       >
         <div className="md:pr-6 md:border-r md:border-border">
           {prev ? (
