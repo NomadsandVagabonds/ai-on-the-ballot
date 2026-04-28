@@ -312,7 +312,14 @@ export default function AboutPage() {
           Team
         </h2>
         <p className="text-base leading-relaxed text-text-secondary">
-          For press inquiries, partnership questions, or general feedback, reach us on X at{" "}
+          For press inquiries, partnership questions, or general feedback, reach out{" "}
+          <Link
+            href="/corrections#question"
+            className="text-accent-primary hover:text-accent-primary-hover font-medium underline underline-offset-2"
+          >
+            here
+          </Link>{" "}
+          or on X at{" "}
           <a
             href="https://x.com/v1naya"
             target="_blank"
