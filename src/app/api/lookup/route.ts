@@ -5,6 +5,7 @@ import {
   isSupabaseConfigured,
 } from "@/lib/supabase/server";
 import { MOCK_RACES } from "@/lib/mock-data";
+import { getRacesByState } from "@/lib/queries/races";
 import type { LookupResult } from "@/types/domain";
 import type { RaceRow } from "@/types/database";
 
@@ -193,12 +194,12 @@ export async function GET(request: NextRequest) {
   // Match races to the ZIP. Statewide races (Senate, Governor) always
   // match. House races only match when the ZIP gave us a district and
   // the race's district is in that set.
-  const races = await getRacesForState(state);
+  const skeletonRaces = await getRacesForState(state);
   const districtSet = new Set(districts);
-  const raceSlugs: string[] = [];
-  for (const race of races) {
+  const matchingSlugs = new Set<string>();
+  for (const race of skeletonRaces) {
     if (race.chamber === "senate" || race.chamber === "governor") {
-      raceSlugs.push(race.slug);
+      matchingSlugs.add(race.slug);
       continue;
     }
     if (
@@ -206,9 +207,15 @@ export async function GET(request: NextRequest) {
       race.district &&
       districtSet.has(padDistrict(race.district) ?? race.district)
     ) {
-      raceSlugs.push(race.slug);
+      matchingSlugs.add(race.slug);
     }
   }
+
+  // Fetch full races (with candidates) for the matched set so the
+  // lookup page can render candidate cards inline rather than just
+  // race links. One state-scoped query, then in-memory filter.
+  const stateRaces = await getRacesByState(state);
+  const races = stateRaces.filter((r) => matchingSlugs.has(r.slug));
 
   const result: LookupResult = {
     zip,
@@ -216,7 +223,7 @@ export async function GET(request: NextRequest) {
     state_slug: stateSlug,
     district: districts.length === 1 ? districts[0] : null,
     districts,
-    race_slugs: raceSlugs,
+    races,
   };
 
   return NextResponse.json({

@@ -4,19 +4,14 @@ import { useEffect, useState, Suspense } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { ZipCodeInput } from "@/components/shared/ZipCodeInput";
-import { parseRaceSlug } from "@/lib/utils/slugs";
+import { CandidateCard } from "@/components/race/CandidateCard";
+import { capByFundraising } from "@/lib/utils/ranking";
+import { chamberLabel } from "@/lib/utils/stance";
 import { STATE_MAP } from "@/lib/utils/states";
 import type { LookupResult } from "@/types/domain";
 
 interface LookupApiResponse extends LookupResult {
   provider?: "geocodio" | "zippopotam" | null;
-}
-
-function chamberLabel(abbr: string): string {
-  if (abbr === "sen") return "U.S. Senate";
-  if (abbr === "gov") return "Governor";
-  if (abbr === "house") return "U.S. House";
-  return abbr;
 }
 
 function LookupContent() {
@@ -172,56 +167,92 @@ function LookupContent() {
           )}
 
           {/* Tracked races for this zip */}
-          {result.race_slugs.length > 0 ? (
-            <div className="mt-8">
-              <div className="flex items-baseline justify-between gap-4 mb-4">
+          {result.races.length > 0 ? (
+            <div className="mt-8 space-y-10">
+              <div className="flex items-baseline justify-between gap-4">
                 <p className="kicker" style={{ margin: 0 }}>
                   Races on your ballot
                 </p>
                 <Link
                   href={`/state/${result.state_slug}`}
-                  className="text-xs font-semibold tracking-[0.1em] uppercase text-text-muted hover:text-accent-primary transition-colors"
+                  className="text-sm text-text-muted hover:text-accent-primary transition-colors"
                 >
-                  All {stateName} Races &rarr;
+                  All {stateName} races →
                 </Link>
               </div>
-              <ul className="border-t border-border">
-                {result.race_slugs.map((slug) => {
-                  const parsed = parseRaceSlug(slug);
-                  if (!parsed) return null;
-                  const chamber = chamberLabel(parsed.chamber);
-                  const district = parsed.district
-                    ? `, District ${parseInt(parsed.district, 10)}`
-                    : "";
-                  return (
-                    <li
-                      key={slug}
-                      className="border-b border-border"
-                    >
-                      <Link
-                        href={`/race/${slug}`}
-                        className="group flex items-center justify-between gap-4 py-5"
-                      >
-                        <div className="min-w-0">
-                          <p className="kicker-muted mb-1">
-                            {parsed.stateAbbr} &middot; {parsed.year}
-                          </p>
-                          <h3 className="font-display text-[20px] font-semibold leading-tight text-text-primary group-hover:text-accent-primary transition-colors">
-                            {chamber}
-                            {district}
-                          </h3>
-                        </div>
-                        <span
-                          aria-hidden="true"
-                          className="font-mono text-lg text-text-muted group-hover:text-accent-primary group-hover:translate-x-0.5 transition-all"
-                        >
-                          →
+
+              {result.races.map((race) => {
+                const { shown: visibleCandidates, hidden: hiddenCount } =
+                  capByFundraising(race.candidates);
+                const districtLabel = race.district
+                  ? `, District ${parseInt(race.district, 10)}`
+                  : "";
+
+                return (
+                  <section key={race.id}>
+                    <div className="flex flex-wrap items-baseline justify-between gap-3 mb-3">
+                      <h2 className="font-display text-2xl md:text-[1.75rem] font-bold text-text-primary leading-tight">
+                        {chamberLabel(race.chamber)}
+                        {districtLabel}
+                      </h2>
+                      {race.race_type === "special" && (
+                        <span className="text-xs font-semibold tracking-[0.08em] uppercase text-accent-gold">
+                          Special Election
                         </span>
-                      </Link>
-                    </li>
-                  );
-                })}
-              </ul>
+                      )}
+                    </div>
+
+                    <div className="h-px bg-border mb-5" />
+
+                    {race.candidates.length === 0 ? (
+                      <p className="text-text-muted">
+                        No candidates tracked for this race yet.
+                      </p>
+                    ) : (
+                      <>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                          {visibleCandidates.map((candidate) => (
+                            <CandidateCard
+                              key={candidate.id}
+                              candidate={candidate}
+                            />
+                          ))}
+                        </div>
+
+                        {race.candidates.length >= 2 && (
+                          <div className="mt-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                            <Link
+                              href={`/race/${race.slug}`}
+                              className="group inline-flex items-center justify-center gap-2.5 bg-accent-primary text-white px-6 py-3 rounded-sm border border-accent-primary hover:bg-accent-primary-hover hover:border-accent-primary-hover transition-colors shadow-[var(--shadow-sm)]"
+                            >
+                              <span className="font-display text-[17px] font-semibold tracking-[-0.005em]">
+                                Compare the {visibleCandidates.length}{" "}
+                                {visibleCandidates.length === 1
+                                  ? "candidate"
+                                  : "candidates"}
+                              </span>
+                              <span
+                                aria-hidden="true"
+                                className="font-mono text-lg leading-none transition-transform duration-200 group-hover:translate-x-0.5"
+                              >
+                                →
+                              </span>
+                            </Link>
+                            {hiddenCount > 0 && (
+                              <p className="text-sm text-text-muted sm:text-right">
+                                {hiddenCount} more{" "}
+                                {hiddenCount === 1 ? "candidate" : "candidates"} not shown.
+                                <br className="hidden sm:inline" />
+                                Top five ranked by reported fundraising.
+                              </p>
+                            )}
+                          </div>
+                        )}
+                      </>
+                    )}
+                  </section>
+                );
+              })}
             </div>
           ) : (
             <div className="mt-8 border border-border rounded-sm px-6 py-8 text-center bg-bg-surface">

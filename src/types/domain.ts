@@ -183,6 +183,6 @@ export interface LookupResult {
   district: string | null;
   /** All matching congressional districts for the ZIP. */
   districts: string[];
-  /** Race slugs (Senate/Governor + matching House) tracked in our data. */
-  race_slugs: string[];
+  /** Races (Senate/Governor + matching House) tracked in our data, with candidates. */
+  races: RaceWithCandidates[];
 }
