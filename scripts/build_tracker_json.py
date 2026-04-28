@@ -37,9 +37,9 @@ import pandas as pd  # type: ignore[import-not-found]
 
 ROOT = Path(__file__).resolve().parent.parent
 def _pick_xlsx() -> Path:
-    """Prefer the v3 file from the client's new design drop; fall back
-    to the legacy tracker_update.xlsx for older workflows."""
+    """Prefer the latest tracker drop; fall back through earlier versions."""
     candidates = [
+        ROOT.parent / "new design" / "trackerv2.5.xlsx",
         ROOT.parent / "new design" / "trackerv3.xlsx",
         ROOT.parent / "tracker_update.xlsx",
     ]
@@ -146,6 +146,32 @@ def normalize_confidence(raw: Any) -> str:
     if pd.isna(raw):
         return "low"
     return CONFIDENCE_MAP.get(str(raw).strip().lower(), "low")
+
+
+def parse_amount(raw: Any) -> int | None:
+    """Coerce the 'amount raised' column to an int.
+
+    Source data is messy: pure numbers, "$703,432", "$703,432; Dsb $514,589"
+    (raised + disbursements), blanks, NaN. Take the first number — the
+    raised total — and return it as an int.
+    """
+    if pd.isna(raw):
+        return None
+    if isinstance(raw, (int, float)):
+        return int(raw)
+    s = str(raw).strip()
+    if not s:
+        return None
+    m = re.search(r"[\d,]+", s)
+    if not m:
+        return None
+    digits = m.group(0).replace(",", "")
+    if not digits:
+        return None
+    try:
+        return int(digits)
+    except ValueError:
+        return None
 
 
 def normalize_source_type(raw: Any) -> str:
@@ -274,7 +300,7 @@ def build_candidates(df_cands: pd.DataFrame) -> tuple[list[dict[str, Any]], dict
         district = normalize_district(row.get("district"), chamber)
         is_incumbent = str(row.get("incumbency", "N")).strip().upper() == "Y"
         amount_raised = row.get("amount raised")
-        total_raised = int(amount_raised) if pd.notna(amount_raised) else None
+        total_raised = parse_amount(amount_raised)
         notes = str(row["notes"]).strip() if pd.notna(row.get("notes")) else None
 
         slug = candidate_slug(first, last, state)
