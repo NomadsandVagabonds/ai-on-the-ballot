@@ -215,7 +215,7 @@ export default function AboutPage() {
             <strong>Senate.</strong> FEC Form 1 (Statement of Candidacy) filed, plus $100,000 or more raised.
           </li>
           <li>
-            <strong>House.</strong> FEC Form 1 filed, plus $15,000 raised initially and $50,000 raised on an ongoing basis.
+            <strong>House.</strong> FEC Form 1 filed, plus $15,000 raised.
           </li>
         </ul>
         <p className="text-base leading-relaxed text-text-secondary">
@@ -252,29 +252,31 @@ export default function AboutPage() {
         <p className="text-base leading-relaxed text-text-secondary mb-5">
           Candidate data is released on a rolling state-by-state schedule, aligned with each state&rsquo;s primary calendar. At the latest, data for a given state is released three days ahead of that state&rsquo;s primary. Key Senate races are noted in parentheses.
         </p>
-        <ol className="space-y-5 border-l border-border pl-6 ml-1">
-          {COVERAGE_TIMELINE.map((entry) => (
-            <li key={entry.date} className="relative">
-              <span
-                aria-hidden="true"
-                className="absolute -left-[29px] top-2 h-2 w-2 rounded-full bg-accent-primary"
-              />
-              <div className="font-display text-base font-semibold text-text-primary">
-                {entry.date}
-              </div>
-              <ul className="mt-1 space-y-1">
-                {entry.lines.map((line, i) => (
-                  <li
-                    key={i}
-                    className="text-sm leading-relaxed text-text-secondary"
-                  >
-                    {line}
-                  </li>
-                ))}
-              </ul>
-            </li>
-          ))}
-        </ol>
+        <div className="rounded-md border border-border bg-bg-surface max-h-[22rem] overflow-y-auto px-5 py-5">
+          <ol className="space-y-4 border-l border-border pl-5 ml-1">
+            {COVERAGE_TIMELINE.map((entry) => (
+              <li key={entry.date} className="relative">
+                <span
+                  aria-hidden="true"
+                  className="absolute -left-[26px] top-1.5 h-2 w-2 rounded-full bg-accent-primary"
+                />
+                <div className="font-display text-sm font-semibold text-text-primary">
+                  {entry.date}
+                </div>
+                <ul className="mt-0.5 space-y-0.5">
+                  {entry.lines.map((line, i) => (
+                    <li
+                      key={i}
+                      className="text-[13px] leading-relaxed text-text-secondary"
+                    >
+                      {line}
+                    </li>
+                  ))}
+                </ul>
+              </li>
+            ))}
+          </ol>
+        </div>
       </section>
 
       <section className="mb-10">
@@ -310,14 +312,7 @@ export default function AboutPage() {
           Team
         </h2>
         <p className="text-base leading-relaxed text-text-secondary">
-          For press inquiries, partnership questions, or general feedback, contact us at{" "}
-          <a
-            href="mailto:vinayasivakumar@berkeley.edu"
-            className="text-accent-primary hover:text-accent-primary-hover font-medium underline underline-offset-2"
-          >
-            vinayasivakumar@berkeley.edu
-          </a>{" "}
-          or follow on X at{" "}
+          For press inquiries, partnership questions, or general feedback, reach us on X at{" "}
           <a
             href="https://x.com/v1naya"
             target="_blank"

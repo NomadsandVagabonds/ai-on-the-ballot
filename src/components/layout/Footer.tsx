@@ -23,7 +23,7 @@ export function Footer() {
               AI on the Ballot
             </p>
             <p className="mt-2 text-sm text-text-muted leading-relaxed">
-              Nonpartisan research tracking where U.S. candidates running for Congress in the midterm elections stand on artificial intelligence policy.
+              Nonpartisan research tracking where U.S. Congressional candidates in the 2026 midterm elections stand on artificial intelligence policy.
             </p>
           </div>
 

@@ -57,7 +57,7 @@ export default async function Home() {
             </h1>
 
             <p className="hero-sub lg:col-start-1 lg:row-start-2 lg:mt-6">
-              Nonpartisan research tracking where U.S. candidates running for Congress in the midterm elections stand on artificial intelligence policy.
+              Nonpartisan research tracking where U.S. Congressional candidates in the 2026 midterm elections stand on artificial intelligence policy.
             </p>
 
             <div className="flex flex-wrap items-center gap-3 lg:col-start-1 lg:row-start-3 lg:mt-8">
@@ -142,9 +142,7 @@ export default async function Home() {
                       {entry.issue.description}
                     </p>
                     <p className="text-[13px] text-text-muted">
-                      {entry.position_count}{" "}
-                      {entry.position_count === 1 ? "candidate" : "candidates"}{" "}
-                      on record
+                      View positions
                       <span
                         aria-hidden="true"
                         className="ml-2 text-amber transition-transform duration-200 group-hover:translate-x-0.5 inline-block"
