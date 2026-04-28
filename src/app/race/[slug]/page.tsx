@@ -32,7 +32,7 @@ export async function generateMetadata({
   const district = parsed.district ? ` District ${parsed.district}` : "";
 
   return {
-    title: `${stateName} ${chamber}${district} — ${parsed.year}`,
+    title: `${stateName} ${chamber}${district}, ${parsed.year}`,
     description: `${stateName} ${chamber}${district} candidates and their AI policy positions.`,
   };
 }
@@ -59,18 +59,25 @@ export default async function RacePage({ params }: RacePageProps) {
   const stateSlug = stateAbbrToSlug(race.state);
 
   const chamber = chamberLabel(race.chamber);
-  const districtLabel = race.district ? `, District ${race.district}` : "";
+  const districtLabel = race.district ? ` District ${race.district}` : "";
   const candCount = displayedCandidates.length;
 
   return (
     <div className="mx-auto max-w-5xl px-4 pt-10 pb-20 md:pt-12 md:pb-24">
-      {/* Back link */}
+      {/* Back link — Lora treatment, state name as the anchor */}
       <Link
         href={`/state/${stateSlug}`}
-        className="inline-flex items-center gap-1.5 text-sm text-text-secondary hover:text-accent-primary transition-colors mb-6"
+        className="group inline-flex items-baseline gap-2 mb-8 text-text-secondary hover:text-accent-primary transition-colors"
       >
-        <span aria-hidden="true">←</span>
-        Back to {stateName}
+        <span aria-hidden="true" className="font-mono text-base">
+          ←
+        </span>
+        <span className="font-display text-base">
+          Back to{" "}
+          <span className="font-semibold text-text-primary group-hover:text-accent-primary transition-colors">
+            {stateName}
+          </span>
+        </span>
       </Link>
 
       {/* ============================================================
@@ -131,17 +138,44 @@ export default async function RacePage({ params }: RacePageProps) {
         />
       )}
 
-      {/* Footer — matches candidate page */}
-      <div className="mt-12 pt-6 border-t border-border flex flex-wrap items-center justify-between gap-3 text-sm text-text-muted">
-        <p>
-          {stateName} · {race.election_year}
-        </p>
-        <Link
-          href="/about#methodology"
-          className="hover:text-accent-primary transition-colors"
-        >
+      {/* Methodology — full-width strip below the comparison instrument */}
+      <aside className="mt-14 md:mt-16 rounded-md border border-border bg-bg-elevated px-6 py-5 md:px-7 md:py-6">
+        <p className="text-xs font-medium tracking-[0.08em] uppercase text-text-muted mb-2">
           Methodology
+        </p>
+        <p className="text-sm leading-relaxed text-text-secondary">
+          Each candidate&rsquo;s positions are drawn from public statements, votes, bills, and interviews — every stance cited.{" "}
+          <Link
+            href="/about#methodology"
+            className="text-accent-primary hover:text-accent-primary-hover font-medium underline underline-offset-2"
+          >
+            Read the full methodology
+          </Link>
+          .
+        </p>
+      </aside>
+
+      {/* Return link — mirrors the top back link, centered for closure */}
+      <div className="mt-12 text-center">
+        <Link
+          href={`/state/${stateSlug}`}
+          className="group inline-flex items-baseline gap-2 text-text-secondary hover:text-accent-primary transition-colors"
+        >
+          <span aria-hidden="true" className="font-mono text-base">
+            ←
+          </span>
+          <span className="font-display text-base">
+            Return to{" "}
+            <span className="font-semibold text-text-primary group-hover:text-accent-primary transition-colors">
+              {stateName}
+            </span>
+          </span>
         </Link>
+      </div>
+
+      {/* Footer hairline — quiet metadata */}
+      <div className="mt-10 pt-6 border-t border-border text-center text-sm text-text-muted">
+        {stateName} · {race.election_year}
       </div>
     </div>
   );
