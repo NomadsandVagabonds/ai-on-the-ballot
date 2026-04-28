@@ -178,13 +178,13 @@ export default function AboutPage() {
         </p>
         <ul className="list-disc pl-6 space-y-2 text-base leading-relaxed text-text-secondary mb-6">
           <li>
-            <strong>High.</strong> Based on direct, unambiguous statements or legislative actions, e.g.a sponsored bill, explicit policy page, or floor vote.
+            <strong>High.</strong> Based on direct, unambiguous statements or legislative actions, e.g., a sponsored bill, explicit policy page, or floor vote.
           </li>
           <li>
-            <strong>Medium.</strong> Based on clear but indirect evidence, e.g.social media posts, interview remarks, or cosponsorship of a related bill.
+            <strong>Medium.</strong> Based on clear but indirect evidence, e.g., social media posts, interview remarks, or cosponsorship of a related bill.
           </li>
           <li>
-            <strong>Low.</strong> Based on inferred or tangential evidence, e.g.a brief remark in a broader context, or a position extrapolated from related statements.
+            <strong>Low.</strong> Based on inferred or tangential evidence, e.g., a brief remark in a broader context, or a position extrapolated from related statements.
           </li>
         </ul>
 

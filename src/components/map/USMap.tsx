@@ -269,21 +269,26 @@ export function USMap({ states }: USMapProps) {
         </div>
 
         {/* Legend */}
-        <div className="flex items-center justify-center gap-8 py-3">
-          <div className="flex items-center gap-2">
-            <span
-              className="inline-block h-3 w-3 rounded-sm"
-              style={{ backgroundColor: MAP_COLORS.activeFill }}
-            />
-            <span className="text-xs text-text-muted">Tracked races</span>
+        <div className="pt-3 pb-4">
+          <div className="flex items-center justify-center gap-8">
+            <div className="flex items-center gap-2">
+              <span
+                className="inline-block h-3 w-3 rounded-sm"
+                style={{ backgroundColor: MAP_COLORS.activeFill }}
+              />
+              <span className="text-xs text-text-muted">Tracked races</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span
+                className="inline-block h-3 w-3 rounded-sm"
+                style={{ backgroundColor: MAP_COLORS.inactiveFill }}
+              />
+              <span className="text-xs text-text-muted">Coming soon</span>
+            </div>
           </div>
-          <div className="flex items-center gap-2">
-            <span
-              className="inline-block h-3 w-3 rounded-sm"
-              style={{ backgroundColor: MAP_COLORS.inactiveFill }}
-            />
-            <span className="text-xs text-text-muted">Coming soon</span>
-          </div>
+          <p className="mt-2 text-center text-xs text-text-muted">
+            Data will be collected on an ongoing basis.
+          </p>
         </div>
 
       </div>

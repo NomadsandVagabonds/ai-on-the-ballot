@@ -21,9 +21,8 @@ export default async function MapPage() {
           <h1 className="font-display text-display-lg font-bold text-text-primary mb-3">
             Explore by State
           </h1>
-          <p className="text-text-secondary max-w-xl mx-auto text-sm md:text-base">
-            Click any highlighted state to see tracked races and candidate
-            positions on AI policy.
+          <p className="text-text-secondary max-w-2xl mx-auto text-sm md:text-base">
+            Click any highlighted state to see tracked races and candidate positions on AI policy.
           </p>
         </div>
       </section>
