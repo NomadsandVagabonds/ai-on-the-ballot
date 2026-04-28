@@ -182,20 +182,12 @@ export default async function StatePage({ params }: StatePageProps) {
                       <div className="mt-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                         <Link
                           href={`/race/${race.slug}`}
-                          className="group inline-flex items-center justify-center gap-2.5 bg-accent-primary text-white px-6 py-3 rounded-sm border border-accent-primary hover:bg-accent-primary-hover hover:border-accent-primary-hover transition-colors shadow-[var(--shadow-sm)]"
+                          className="inline-flex items-center justify-center bg-accent-primary text-white px-6 py-3 rounded-sm border border-accent-primary hover:bg-accent-primary-hover hover:border-accent-primary-hover transition-colors shadow-[var(--shadow-sm)] font-display text-[17px] font-semibold tracking-[-0.005em]"
                         >
-                          <span className="font-display text-[17px] font-semibold tracking-[-0.005em]">
-                            Compare the {visibleCandidates.length}{" "}
-                            {visibleCandidates.length === 1
-                              ? "candidate"
-                              : "candidates"}
-                          </span>
-                          <span
-                            aria-hidden="true"
-                            className="font-mono text-lg leading-none transition-transform duration-200 group-hover:translate-x-0.5"
-                          >
-                            →
-                          </span>
+                          Compare the {visibleCandidates.length}{" "}
+                          {visibleCandidates.length === 1
+                            ? "candidate"
+                            : "candidates"}
                         </Link>
                         {hiddenCount > 0 && (
                           <p className="text-sm text-text-muted sm:text-right">
@@ -264,18 +256,10 @@ function FirstRaceCards({
         <div className="mt-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <Link
             href={`/race/${race.slug}`}
-            className="group inline-flex items-center justify-center gap-2.5 bg-accent-primary text-white px-6 py-3 rounded-sm border border-accent-primary hover:bg-accent-primary-hover hover:border-accent-primary-hover transition-colors shadow-[var(--shadow-sm)]"
+            className="inline-flex items-center justify-center bg-accent-primary text-white px-6 py-3 rounded-sm border border-accent-primary hover:bg-accent-primary-hover hover:border-accent-primary-hover transition-colors shadow-[var(--shadow-sm)] font-display text-[17px] font-semibold tracking-[-0.005em]"
           >
-            <span className="font-display text-[17px] font-semibold tracking-[-0.005em]">
-              Compare the {visibleCandidates.length}{" "}
-              {visibleCandidates.length === 1 ? "candidate" : "candidates"}
-            </span>
-            <span
-              aria-hidden="true"
-              className="font-mono text-lg leading-none transition-transform duration-200 group-hover:translate-x-0.5"
-            >
-              →
-            </span>
+            Compare the {visibleCandidates.length}{" "}
+            {visibleCandidates.length === 1 ? "candidate" : "candidates"}
           </Link>
           {hiddenCount > 0 && (
             <p className="text-sm text-text-muted sm:text-right">

@@ -107,7 +107,7 @@ export function ZipCodeInput({ onSubmit, variant = "hero" }: ZipCodeInputProps) 
             type="submit"
             className="shrink-0 rounded-md bg-amber px-4 py-2 text-sm font-semibold text-navy transition-colors hover:bg-[var(--amber-hover)]"
           >
-            Find &rarr;
+            Find
           </button>
         </form>
         {error && (

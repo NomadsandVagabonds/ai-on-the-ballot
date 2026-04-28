@@ -91,7 +91,6 @@ export function FeedbackNotice() {
           onClick={dismiss}
         >
           Share feedback
-          <span aria-hidden="true">→</span>
         </a>
         <button
           type="button"
