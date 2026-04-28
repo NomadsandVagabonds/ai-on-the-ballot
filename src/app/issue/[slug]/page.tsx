@@ -14,8 +14,6 @@ interface IssuePageProps {
   params: Promise<{ slug: string }>;
 }
 
-const ROMAN = ["I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X"];
-
 export async function generateMetadata({
   params,
 }: IssuePageProps): Promise<Metadata> {
@@ -44,7 +42,6 @@ export default async function IssuePage({ params }: IssuePageProps) {
   if (!data) notFound();
 
   const index = allIssues.findIndex((i) => i.issue.slug === slug);
-  const numeral = index >= 0 ? ROMAN[index] ?? String(index + 1) : "·";
 
   // "On record" = definite stance (support/oppose/mixed).
   // Unclear and no_mention do not count.
@@ -58,74 +55,62 @@ export default async function IssuePage({ params }: IssuePageProps) {
       ? 0
       : Math.round((onRecord / data.total_candidates) * 100);
 
-  const sourced = onRecordRecords.filter((r) => !!r.source_url).length;
-  const sourcedPct = onRecord === 0 ? 0 : Math.round((sourced / onRecord) * 100);
-
   // Prev / next navigation within the issue set
   const prev = index > 0 ? allIssues[index - 1] : null;
   const next =
     index >= 0 && index < allIssues.length - 1 ? allIssues[index + 1] : null;
 
-  return (
-    <div className="mx-auto max-w-6xl px-4 pt-6 pb-20 md:pt-8 md:pb-24">
-      {/* ============================================================
-          Issue hero — compact editorial masthead
-          Desktop: [numeral][headline + kicker + dek] | [tally rail]
-          Mobile: stacks
-         ============================================================ */}
-      <header className="mb-6 md:mb-8">
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-x-8 gap-y-5 items-start">
-          <div className="md:col-span-8 min-w-0">
-            <div className="flex items-start gap-4 md:gap-5">
-              <div
-                aria-hidden="true"
-                className="shrink-0 w-14 h-14 md:w-16 md:h-16 flex items-center justify-center border border-border-strong rounded-sm bg-bg-surface"
-              >
-                <span className="font-display font-bold text-accent-primary text-[30px] md:text-[34px] leading-none">
-                  {numeral}
-                </span>
-              </div>
-              <div className="min-w-0 flex-1">
-                <h1 className="font-display text-display-md font-bold text-text-primary leading-[1.02] tracking-[-0.015em]">
-                  {data.issue.display_name}
-                </h1>
-              </div>
-            </div>
-            <p className="dek mt-3">{data.issue.description}</p>
-          </div>
+  const issueOrdinal = index >= 0 ? index + 1 : null;
+  const totalIssues = allIssues.length;
 
-          {/* Tally rail — inline on desktop, under on mobile */}
-          <aside className="md:col-span-4 md:pl-6 md:border-l md:border-border md:self-stretch md:flex md:flex-col md:justify-center">
-            <dl className="grid grid-cols-3 gap-3">
-              <div>
-                <dt className="marginalia-label">On Record</dt>
-                <dd className="font-mono text-xl md:text-[22px] font-bold text-text-primary tabular-nums leading-none mt-1">
-                  {onRecord}
-                </dd>
-              </div>
-              <div>
-                <dt className="marginalia-label">Coverage</dt>
-                <dd className="font-mono text-xl md:text-[22px] font-bold text-text-primary tabular-nums leading-none mt-1">
-                  {coveragePct}
-                  <span className="text-sm text-text-muted">%</span>
-                </dd>
-              </div>
-              <div>
-                <dt className="marginalia-label">Sourced</dt>
-                <dd className="font-mono text-xl md:text-[22px] font-bold text-text-primary tabular-nums leading-none mt-1">
-                  {sourcedPct}
-                  <span className="text-sm text-text-muted">%</span>
-                </dd>
-              </div>
-            </dl>
-          </aside>
-        </div>
+  return (
+    <div className="mx-auto max-w-5xl px-4 pt-10 pb-20 md:pt-12 md:pb-24">
+      {/* Back link */}
+      <Link
+        href="/"
+        className="inline-flex items-center gap-1.5 text-sm text-text-secondary hover:text-accent-primary transition-colors mb-6"
+      >
+        <span aria-hidden="true">←</span>
+        Home
+      </Link>
+
+      {/* ============================================================
+          Header — small kicker · headline · meta · description
+         ============================================================ */}
+      <header className="mb-8">
+        {issueOrdinal !== null && (
+          <p className="text-xs font-medium tracking-[0.08em] uppercase text-text-muted mb-3">
+            Issue {issueOrdinal} of {totalIssues}
+          </p>
+        )}
+
+        <h1 className="font-display text-[2.5rem] md:text-[3.25rem] font-bold text-text-primary leading-[1.05] tracking-[-0.015em]">
+          {data.issue.display_name}
+        </h1>
+
+        <p className="cand-meta mt-3">
+          <span className="font-mono tabular-nums text-text-primary">
+            {data.total_candidates}
+          </span>{" "}
+          candidate{data.total_candidates === 1 ? "" : "s"} ·{" "}
+          <span className="font-mono tabular-nums text-text-primary">
+            {onRecord}
+          </span>{" "}
+          on record ·{" "}
+          <span className="font-mono tabular-nums text-text-primary">
+            {coveragePct}%
+          </span>{" "}
+          coverage
+        </p>
+
+        {data.issue.description && (
+          <p className="mt-5 text-base leading-relaxed text-text-secondary max-w-2xl">
+            {data.issue.description}
+          </p>
+        )}
       </header>
 
-      {/* Issue switcher — dropdown between two hairlines so users can
-          jump between the ten tracked issues without bouncing back to
-          the index. */}
-      <div className="rule-hair" aria-hidden="true" />
+      {/* Issue switcher — dropdown so users can jump between tracked issues */}
       <IssueSwitcher
         issues={allIssues.map((i) => ({
           slug: i.issue.slug,
@@ -140,55 +125,54 @@ export default async function IssuePage({ params }: IssuePageProps) {
       {/* ============================================================
           Prev / next issue nav
          ============================================================ */}
-      <nav
-        aria-label="Adjacent issues"
-        className="mt-16 grid grid-cols-1 md:grid-cols-2 gap-6"
-      >
-        <div className="md:pr-6 md:border-r md:border-border">
-          {prev ? (
-            <Link
-              href={`/issue/${prev.issue.slug}`}
-              className="group block"
-            >
-              <p className="marginalia-label mb-1">
-                ← Previous Issue
-              </p>
-              <p className="font-display text-[19px] font-semibold leading-tight text-text-primary group-hover:text-accent-primary transition-colors">
-                {prev.issue.display_name}
-              </p>
-            </Link>
-          ) : (
-            <Link href="/" className="group block">
-              <p className="marginalia-label mb-1">← Return to Index</p>
-              <p className="font-display text-[19px] font-semibold leading-tight text-text-primary group-hover:text-accent-primary transition-colors">
-                A.I. on the Ballot
-              </p>
-            </Link>
-          )}
-        </div>
-        <div className="md:pl-6 md:text-right">
-          {next ? (
-            <Link
-              href={`/issue/${next.issue.slug}`}
-              className="group block"
-            >
-              <p className="marginalia-label mb-1">
-                Next Issue →
-              </p>
-              <p className="font-display text-[19px] font-semibold leading-tight text-text-primary group-hover:text-accent-primary transition-colors">
-                {next.issue.display_name}
-              </p>
-            </Link>
-          ) : (
-            <Link href="/" className="group block">
-              <p className="marginalia-label mb-1">Return to Index →</p>
-              <p className="font-display text-[19px] font-semibold leading-tight text-text-primary group-hover:text-accent-primary transition-colors">
-                A.I. on the Ballot
-              </p>
-            </Link>
-          )}
-        </div>
-      </nav>
+      {(prev || next) && (
+        <nav
+          aria-label="Adjacent issues"
+          className="mt-16 pt-8 border-t border-border grid grid-cols-1 md:grid-cols-2 gap-6"
+        >
+          <div>
+            {prev && (
+              <Link
+                href={`/issue/${prev.issue.slug}`}
+                className="group block"
+              >
+                <p className="text-xs uppercase tracking-[0.08em] text-text-muted mb-1">
+                  ← Previous
+                </p>
+                <p className="font-display text-lg font-semibold leading-tight text-text-primary group-hover:text-accent-primary transition-colors">
+                  {prev.issue.display_name}
+                </p>
+              </Link>
+            )}
+          </div>
+          <div className="md:text-right">
+            {next && (
+              <Link
+                href={`/issue/${next.issue.slug}`}
+                className="group block"
+              >
+                <p className="text-xs uppercase tracking-[0.08em] text-text-muted mb-1">
+                  Next →
+                </p>
+                <p className="font-display text-lg font-semibold leading-tight text-text-primary group-hover:text-accent-primary transition-colors">
+                  {next.issue.display_name}
+                </p>
+              </Link>
+            )}
+          </div>
+        </nav>
+      )}
+
+      {/* Footer — matches candidate / race pages */}
+      <div className="mt-12 pt-6 border-t border-border flex flex-wrap items-center justify-between gap-3 text-sm text-text-muted">
+        <p>{data.issue.display_name}</p>
+        <Link
+          href="/about#methodology"
+          className="hover:text-accent-primary transition-colors"
+        >
+          Methodology
+        </Link>
+      </div>
     </div>
   );
 }
