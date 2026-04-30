@@ -17,28 +17,6 @@ interface ComparisonGridProps {
    Helpers
    ============================================================ */
 
-const ROMAN = [
-  "I",
-  "II",
-  "III",
-  "IV",
-  "V",
-  "VI",
-  "VII",
-  "VIII",
-  "IX",
-  "X",
-  "XI",
-  "XII",
-  "XIII",
-  "XIV",
-  "XV",
-] as const;
-
-function roman(i: number): string {
-  return ROMAN[i] ?? String(i + 1);
-}
-
 /** Trim a summary to an editorial micro-phrase (≤ words). */
 function microSummary(summary: string | null, words = 7): string | null {
   if (!summary) return null;
@@ -177,23 +155,16 @@ function DesktopMatrix({
               } border-border hover:bg-bg-elevated/30 transition-colors`}
               style={gridTemplate}
             >
-              {/* Issue cell — folio + name + description (static) */}
+              {/* Issue cell — name + description (static) */}
               <div role="cell" className="px-4 py-5 pr-6">
-                <div className="flex items-baseline gap-3">
-                  <span className="folio text-xs shrink-0 pt-0.5">
-                    {roman(i)}.
-                  </span>
-                  <div className="min-w-0 flex-1">
-                    <h3 className="font-display text-[17px] leading-[1.3] font-semibold text-text-primary">
-                      {row.issue.display_name}
-                    </h3>
-                    {row.issue.description && (
-                      <p className="mt-1.5 text-[13px] leading-[1.5] text-text-secondary">
-                        {row.issue.description}
-                      </p>
-                    )}
-                  </div>
-                </div>
+                <h3 className="font-display text-[17px] leading-[1.3] font-semibold text-text-primary">
+                  {row.issue.display_name}
+                </h3>
+                {row.issue.description && (
+                  <p className="mt-1.5 text-[13px] leading-[1.5] text-text-secondary">
+                    {row.issue.description}
+                  </p>
+                )}
               </div>
 
               {/* Stance cells — stance mark + micro summary + primary source link */}
@@ -352,10 +323,7 @@ function MobileDispatches({
 
           return (
             <li key={row.issue.id} className="py-5">
-              <div className="flex items-baseline gap-3">
-                <span className="folio text-[11px] shrink-0 pt-0.5">
-                  {roman(i)}.
-                </span>
+              <div>
                 <div className="flex-1 min-w-0">
                   <h3 className="font-display text-base font-semibold leading-snug text-text-primary">
                     {row.issue.display_name}
