@@ -72,6 +72,12 @@ UUID_NAMESPACE = uuid.UUID("4a6f7572-6e61-6c2d-4f66-2d526563726f")
 ELECTION_YEAR = 2026
 FIXED_TIMESTAMP = "2026-04-17T00:00:00Z"
 
+# States to exclude from the public dataset until their data is ready.
+# Candidates, their races, and any positions referencing them are dropped
+# at build time. Remove a state from this set when its data is ready to
+# go live (see About > Coverage timeline for primary dates).
+EXCLUDED_STATES: set[str] = {"CA"}
+
 # ----------------------------------------------------------------------
 # Normalizers
 # ----------------------------------------------------------------------
@@ -527,6 +533,27 @@ def main() -> None:
     print(f"  issues        {len(issues):4d}")
 
     candidates, cand_by_source_id = build_candidates(df_cands)
+
+    # Drop candidates from excluded states; their positions and race
+    # junctions will fall away naturally because they key off the
+    # candidate's source_id / id.
+    if EXCLUDED_STATES:
+        excluded_source_ids = {
+            c["source_id"]
+            for c in candidates
+            if c["state"].upper() in EXCLUDED_STATES
+        }
+        before = len(candidates)
+        candidates = [
+            c for c in candidates if c["state"].upper() not in EXCLUDED_STATES
+        ]
+        for sid in excluded_source_ids:
+            cand_by_source_id.pop(sid, None)
+        if before != len(candidates):
+            print(
+                f"  excluded {before - len(candidates):4d} candidates "
+                f"from states: {', '.join(sorted(EXCLUDED_STATES))}"
+            )
     print(f"  candidates    {len(candidates):4d}")
 
     races, race_candidates = build_races_and_junction(candidates)
