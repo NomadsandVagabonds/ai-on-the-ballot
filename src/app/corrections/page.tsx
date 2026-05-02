@@ -59,12 +59,9 @@ export default async function CorrectionsPage() {
             updated as corrections are reviewed.
           </p>
         ) : (
-          <ol className="space-y-6">
+          <ol className="divide-y divide-border">
             {corrections.map((entry) => (
-              <li
-                key={entry.id}
-                className="border-l-2 border-border-strong pl-5 py-1"
-              >
+              <li key={entry.id} className="py-5 first:pt-0">
                 <p className="text-sm font-semibold text-text-primary mb-1.5">
                   {formatDate(entry.date)}
                 </p>
