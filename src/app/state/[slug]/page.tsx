@@ -33,8 +33,10 @@ export function generateStaticParams() {
   const launchStates = [
     "arkansas",
     "illinois",
+    "indiana",
     "mississippi",
     "north-carolina",
+    "ohio",
     "texas",
   ];
   return launchStates.map((slug) => ({ slug }));

@@ -39,6 +39,7 @@ ROOT = Path(__file__).resolve().parent.parent
 def _pick_xlsx() -> Path:
     """Prefer the latest tracker drop; fall back through earlier versions."""
     candidates = [
+        ROOT.parent / "new design" / "tracker_live.xlsx",
         ROOT.parent / "new design" / "trackerv2.5.xlsx",
         ROOT.parent / "new design" / "trackerv3.xlsx",
         ROOT.parent / "tracker_update.xlsx",
@@ -506,6 +507,52 @@ def build_positions(
 
 
 # ----------------------------------------------------------------------
+# Corrections log
+# ----------------------------------------------------------------------
+
+
+def build_corrections(xlsx_path: Path) -> list[dict[str, Any]]:
+    """Read the 'Corrections Log' sheet → list of {date, description} entries.
+
+    The sheet has two columns: 'Date of Correction' and 'Description'.
+    Rows with both fields blank are skipped (the sheet is padded with empties
+    in the source file).
+    """
+    import openpyxl  # type: ignore[import-not-found]
+
+    wb = openpyxl.load_workbook(xlsx_path, data_only=True, read_only=True)
+    if "Corrections Log" not in wb.sheetnames:
+        return []
+
+    ws = wb["Corrections Log"]
+    out: list[dict[str, Any]] = []
+    for date_cell, desc_cell in ws.iter_rows(min_row=2, values_only=True):
+        if date_cell is None and not desc_cell:
+            continue
+        if not desc_cell:
+            continue
+        # Normalize date to ISO (YYYY-MM-DD)
+        if hasattr(date_cell, "date"):
+            iso_date = date_cell.date().isoformat()
+        elif date_cell:
+            iso_date = str(date_cell).strip()
+        else:
+            iso_date = None
+
+        out.append(
+            {
+                "id": stable_uuid(f"correction:{iso_date}:{str(desc_cell)[:80]}"),
+                "date": iso_date,
+                "description": str(desc_cell).strip(),
+            }
+        )
+
+    # Newest first (lexicographic ISO-date sort works as chronological)
+    out.sort(key=lambda e: e["date"] or "", reverse=True)
+    return out
+
+
+# ----------------------------------------------------------------------
 # Main
 # ----------------------------------------------------------------------
 
@@ -597,11 +644,15 @@ def main() -> None:
             json.dump(data, f, indent=2, default=str)
         print(f"  wrote {path.relative_to(ROOT)}")
 
+    corrections = build_corrections(XLSX_PATH)
+    print(f"  corrections   {len(corrections):4d}")
+
     dump("issues.json", issues)
     dump("candidates.json", candidates_out)
     dump("races.json", races)
     dump("race_candidates.json", race_candidates)
     dump("positions.json", positions)
+    dump("corrections.json", corrections)
 
 
 if __name__ == "__main__":

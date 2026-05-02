@@ -1,0 +1,7 @@
+[
+  {
+    "id": "61b97e18-472f-5040-a6e1-57ab514d8e1d",
+    "date": "2026-05-01",
+    "description": "Corrected stance coding for five deepfakes-fraud entries (pos-0438, pos-2228, pos-2348, pos-2618, pos-0588) to align with the convention that Oppose = opposes deepfakes and Support = supports/minimizes concern. Updated pos-0354 (rouzer-david, data-centers) from Oppose to Mixed. Changed pos-2991 (bennett-chris, export-control) to No-Mention and N/A due to a mismatch between the topic and summary."
+  }
+]

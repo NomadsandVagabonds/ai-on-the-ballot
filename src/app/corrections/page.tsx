@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { createServerSupabaseClient, isSupabaseConfigured } from "@/lib/supabase/server";
+import { isSupabaseConfigured } from "@/lib/supabase/server";
+import { getMockCorrections } from "@/lib/mock-data";
 import type { PublicCorrection } from "@/types/domain";
 import { FeedbackTabs } from "./CorrectionForm";
 
@@ -11,21 +12,24 @@ export const metadata: Metadata = {
     "Submit corrections, candidate clarifications, or questions about AI on the Ballot's data and methodology.",
 };
 
+function formatDate(iso: string): string {
+  const d = new Date(iso + "T00:00:00Z");
+  if (Number.isNaN(d.getTime())) return iso;
+  return d.toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    timeZone: "UTC",
+  });
+}
+
 export default async function CorrectionsPage() {
-  let corrections: PublicCorrection[] = [];
-
-  if (isSupabaseConfigured()) {
-    const supabase = await createServerSupabaseClient();
-    const { data: rawCorrections } = await supabase
-      .from("corrections_log")
-      .select(
-        "id, candidate_name, issue, nature_of_change, previous_value, new_value, created_at"
-      )
-      .eq("is_public", true)
-      .order("created_at", { ascending: false });
-
-    corrections = (rawCorrections ?? []) as unknown as PublicCorrection[];
-  }
+  // Source: data/tracker/corrections.json (built from the spreadsheet's
+  // 'Corrections Log' sheet). Supabase isn't yet configured; once it is,
+  // swap to a server query keyed off the same shape.
+  const corrections: PublicCorrection[] = isSupabaseConfigured()
+    ? []
+    : getMockCorrections();
 
   return (
     <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 py-16 sm:py-20">
@@ -55,69 +59,21 @@ export default async function CorrectionsPage() {
             updated as corrections are reviewed.
           </p>
         ) : (
-          <div className="overflow-x-auto -mx-4 sm:mx-0">
-            <table className="w-full text-left">
-              <thead>
-                <tr className="border-b border-border-strong">
-                  <th className="pb-3 pr-4 text-sm font-semibold text-text-primary">
-                    Date
-                  </th>
-                  <th className="pb-3 pr-4 text-sm font-semibold text-text-primary">
-                    Candidate
-                  </th>
-                  <th className="pb-3 pr-4 text-sm font-semibold text-text-primary">
-                    Issue
-                  </th>
-                  <th className="pb-3 pr-4 text-sm font-semibold text-text-primary">
-                    Change
-                  </th>
-                  <th className="pb-3 text-sm font-semibold text-text-primary">
-                    Previous &rarr; New
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-border">
-                {corrections.map((correction) => (
-                  <tr key={correction.id} className="align-top">
-                    <td className="py-3 pr-4 font-mono text-sm text-text-muted whitespace-nowrap">
-                      {new Date(correction.created_at).toLocaleDateString(
-                        "en-US",
-                        {
-                          year: "numeric",
-                          month: "short",
-                          day: "numeric",
-                        }
-                      )}
-                    </td>
-                    <td className="py-3 pr-4 text-sm text-text-primary">
-                      {correction.candidate_name}
-                    </td>
-                    <td className="py-3 pr-4 text-sm text-text-secondary">
-                      {correction.issue}
-                    </td>
-                    <td className="py-3 pr-4 text-sm text-text-secondary">
-                      {correction.nature_of_change ?? "–"}
-                    </td>
-                    <td className="py-3 text-sm text-text-secondary">
-                      {correction.previous_value || correction.new_value ? (
-                        <>
-                          <span className="text-text-muted">
-                            {correction.previous_value ?? "–"}
-                          </span>
-                          <span className="mx-1.5">&rarr;</span>
-                          <span className="text-text-primary font-medium">
-                            {correction.new_value ?? "–"}
-                          </span>
-                        </>
-                      ) : (
-                        "–"
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <ol className="space-y-6">
+            {corrections.map((entry) => (
+              <li
+                key={entry.id}
+                className="border-l-2 border-border-strong pl-5 py-1"
+              >
+                <p className="text-sm font-semibold text-text-primary mb-1.5">
+                  {formatDate(entry.date)}
+                </p>
+                <p className="text-[15px] leading-relaxed text-text-secondary whitespace-pre-wrap">
+                  {entry.description}
+                </p>
+              </li>
+            ))}
+          </ol>
         )}
       </section>
     </div>

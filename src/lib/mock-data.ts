@@ -28,6 +28,7 @@ import type {
   RaceWithCandidates,
   ComparisonRow,
   PositionWithIssue,
+  PublicCorrection,
   SearchResult,
   IssueSummary,
   IssueWithRecords,
@@ -38,6 +39,7 @@ import candidatesJson from "../../data/tracker/candidates.json";
 import racesJson from "../../data/tracker/races.json";
 import raceCandidatesJson from "../../data/tracker/race_candidates.json";
 import positionsJson from "../../data/tracker/positions.json";
+import correctionsJson from "../../data/tracker/corrections.json";
 
 // ---------------------------------------------------------------------------
 // Raw imports shaped to our TS types
@@ -91,6 +93,13 @@ export const MOCK_POSITIONS: (PositionRow & {
  * structure in place so the UI renders its empty-state as designed.
  */
 export const MOCK_LEGISLATIVE_ACTIVITY: LegislativeActivityRow[] = [];
+
+export const MOCK_CORRECTIONS: PublicCorrection[] =
+  correctionsJson as PublicCorrection[];
+
+export function getMockCorrections(): PublicCorrection[] {
+  return MOCK_CORRECTIONS;
+}
 
 // ---------------------------------------------------------------------------
 // Helpers

@@ -119,11 +119,17 @@ export interface CorrectionSubmission {
   submitter_email?: string;
 }
 
-/** Public correction entry (what the corrections page displays) */
-export type PublicCorrection = Pick<
-  CorrectionRow,
-  "id" | "candidate_name" | "issue" | "nature_of_change" | "previous_value" | "new_value" | "created_at"
->;
+/** Public correction entry (what the corrections page displays).
+ *
+ * Free-form narrative log: each entry is a date + a description
+ * paragraph authored by the research team. Sourced from the
+ * 'Corrections Log' sheet in the tracker spreadsheet. */
+export interface PublicCorrection {
+  id: string;
+  /** ISO date (YYYY-MM-DD) */
+  date: string;
+  description: string;
+}
 
 /** Issue summary — for homepage issue index */
 export interface IssueSummary {
