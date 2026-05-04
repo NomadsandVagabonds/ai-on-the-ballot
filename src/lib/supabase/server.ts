@@ -2,7 +2,11 @@ import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import type { Database } from "@/types/database";
 
-/** Check if Supabase is configured with real credentials (not placeholders) */
+/** Check if Supabase is configured with real credentials (not placeholders).
+ *
+ * This is a *connectivity* check — true when we *could* talk to Supabase.
+ * It does NOT mean the site reads from Supabase. For that, gate on
+ * `supabaseReadsEnabled()` instead. */
 export function isSupabaseConfigured(): boolean {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
@@ -11,6 +15,21 @@ export function isSupabaseConfigured(): boolean {
     !url.includes("your-project") &&
     !key.includes("your-")
   );
+}
+
+/** Whether queries should read from Supabase (vs the JSON mock layer).
+ *
+ * Controlled by the `DATA_SOURCE` env var (`"supabase"` or `"json"`,
+ * defaulting to `"json"`). Returning Supabase reads requires credentials
+ * to also be configured — otherwise we silently fall back to JSON to
+ * keep the site up if env is misconfigured.
+ *
+ * Default is `"json"` so adding Supabase credentials never auto-flips
+ * the site's read path. The cutover is a deliberate env change. */
+export function supabaseReadsEnabled(): boolean {
+  const source = (process.env.DATA_SOURCE || "json").toLowerCase();
+  if (source !== "supabase") return false;
+  return isSupabaseConfigured();
 }
 
 export async function createServerSupabaseClient() {

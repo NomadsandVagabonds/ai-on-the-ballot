@@ -1,4 +1,4 @@
-import { createServerSupabaseClient, isSupabaseConfigured } from "@/lib/supabase/server";
+import { createServerSupabaseClient, supabaseReadsEnabled } from "@/lib/supabase/server";
 import { getMockRacesByState, getMockRaceBySlug } from "@/lib/mock-data";
 import { getCandidateSummaries } from "./candidates";
 import type { RaceWithCandidates } from "@/types/domain";
@@ -15,7 +15,7 @@ const CHAMBER_ORDER: Record<string, number> = {
 export async function getRacesByState(
   stateAbbr: string
 ): Promise<RaceWithCandidates[]> {
-  if (!isSupabaseConfigured()) return getMockRacesByState(stateAbbr);
+  if (!supabaseReadsEnabled()) return getMockRacesByState(stateAbbr);
 
   const supabase = await createServerSupabaseClient();
 
@@ -36,7 +36,7 @@ export async function getRacesByState(
 export async function getRaceBySlug(
   slug: string
 ): Promise<RaceWithCandidates | null> {
-  if (!isSupabaseConfigured()) return getMockRaceBySlug(slug);
+  if (!supabaseReadsEnabled()) return getMockRaceBySlug(slug);
 
   const supabase = await createServerSupabaseClient();
 

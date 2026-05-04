@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { STATE_MAP, stateAbbrToSlug } from "@/lib/utils/states";
 import {
   createServerSupabaseClient,
-  isSupabaseConfigured,
+  supabaseReadsEnabled,
 } from "@/lib/supabase/server";
 import { MOCK_RACES } from "@/lib/mock-data";
 import { getRacesByState } from "@/lib/queries/races";
@@ -132,7 +132,7 @@ async function resolveViaZippopotam(
 async function getRacesForState(
   stateAbbr: string
 ): Promise<Pick<RaceRow, "slug" | "chamber" | "district">[]> {
-  if (!isSupabaseConfigured()) {
+  if (!supabaseReadsEnabled()) {
     return MOCK_RACES.filter((r) => r.state === stateAbbr).map((r) => ({
       slug: r.slug,
       chamber: r.chamber,

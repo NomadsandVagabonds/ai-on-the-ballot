@@ -1,6 +1,6 @@
 import {
   createServerSupabaseClient,
-  isSupabaseConfigured,
+  supabaseReadsEnabled,
 } from "@/lib/supabase/server";
 import {
   getMockAllIssuesWithCounts,
@@ -27,7 +27,7 @@ const EMPTY_BREAKDOWN: Record<Stance, number> = {
  * One row per issue, sorted by `sort_order`.
  */
 export async function getAllIssuesWithCounts(): Promise<IssueSummary[]> {
-  if (!isSupabaseConfigured()) return getMockAllIssuesWithCounts();
+  if (!supabaseReadsEnabled()) return getMockAllIssuesWithCounts();
 
   const supabase = await createServerSupabaseClient();
 
@@ -75,7 +75,7 @@ export async function getAllIssuesWithCounts(): Promise<IssueSummary[]> {
 export async function getIssueBySlug(
   slug: string
 ): Promise<IssueWithRecords | null> {
-  if (!isSupabaseConfigured()) return getMockIssueBySlug(slug);
+  if (!supabaseReadsEnabled()) return getMockIssueBySlug(slug);
 
   const supabase = await createServerSupabaseClient();
 

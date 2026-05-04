@@ -1,4 +1,4 @@
-import { createServerSupabaseClient, isSupabaseConfigured } from "@/lib/supabase/server";
+import { createServerSupabaseClient, supabaseReadsEnabled } from "@/lib/supabase/server";
 import { searchMockData } from "@/lib/mock-data";
 import { STATE_MAP, stateAbbrToSlug } from "@/lib/utils/states";
 import type { SearchResult } from "@/types/domain";
@@ -31,7 +31,7 @@ export async function search(query: string): Promise<SearchResult[]> {
   }
 
   // If Supabase isn't configured, search mock data for candidates and races
-  if (!isSupabaseConfigured()) {
+  if (!supabaseReadsEnabled()) {
     const mockResults = searchMockData(trimmed);
     results.push(...mockResults);
 

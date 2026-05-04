@@ -1,4 +1,4 @@
-import { createServerSupabaseClient, isSupabaseConfigured } from "@/lib/supabase/server";
+import { createServerSupabaseClient, supabaseReadsEnabled } from "@/lib/supabase/server";
 import { getMockCandidateBySlug, getMockCandidateSummaries } from "@/lib/mock-data";
 import type { Candidate, CandidateSummary } from "@/types/domain";
 import type {
@@ -12,7 +12,7 @@ import type {
 export async function getCandidateBySlug(
   slug: string
 ): Promise<Candidate | null> {
-  if (!isSupabaseConfigured()) return getMockCandidateBySlug(slug);
+  if (!supabaseReadsEnabled()) return getMockCandidateBySlug(slug);
 
   const supabase = await createServerSupabaseClient();
 
@@ -64,7 +64,7 @@ export async function getCandidateSummaries(
   candidateIds: string[]
 ): Promise<CandidateSummary[]> {
   if (candidateIds.length === 0) return [];
-  if (!isSupabaseConfigured()) return getMockCandidateSummaries(candidateIds);
+  if (!supabaseReadsEnabled()) return getMockCandidateSummaries(candidateIds);
 
   const supabase = await createServerSupabaseClient();
 
@@ -147,7 +147,7 @@ export async function getCandidateSummaries(
 export async function getCandidatesByState(
   state: string
 ): Promise<CandidateSummary[]> {
-  if (!isSupabaseConfigured()) {
+  if (!supabaseReadsEnabled()) {
     const { MOCK_CANDIDATES } = await import("@/lib/mock-data");
     const ids = MOCK_CANDIDATES
       .filter((c) => c.state === state.toUpperCase())

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { isSupabaseConfigured } from "@/lib/supabase/server";
+import { supabaseReadsEnabled } from "@/lib/supabase/server";
 import { getMockCorrections } from "@/lib/mock-data";
 import type { PublicCorrection } from "@/types/domain";
 import { FeedbackTabs } from "./CorrectionForm";
@@ -27,7 +27,7 @@ export default async function CorrectionsPage() {
   // Source: data/tracker/corrections.json (built from the spreadsheet's
   // 'Corrections Log' sheet). Supabase isn't yet configured; once it is,
   // swap to a server query keyed off the same shape.
-  const corrections: PublicCorrection[] = isSupabaseConfigured()
+  const corrections: PublicCorrection[] = supabaseReadsEnabled()
     ? []
     : getMockCorrections();
 

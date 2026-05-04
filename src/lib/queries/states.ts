@@ -1,4 +1,4 @@
-import { createServerSupabaseClient, isSupabaseConfigured } from "@/lib/supabase/server";
+import { createServerSupabaseClient, supabaseReadsEnabled } from "@/lib/supabase/server";
 import { getRacesByState } from "./races";
 import { getMockRacesByState, MOCK_RACES } from "@/lib/mock-data";
 import {
@@ -18,7 +18,7 @@ export async function getStateData(
 
   if (!abbr || !name) return null;
 
-  if (!isSupabaseConfigured()) {
+  if (!supabaseReadsEnabled()) {
     const races = getMockRacesByState(abbr);
     const candidateCount = races.reduce(
       (sum, race) => sum + race.candidates.length,
@@ -51,7 +51,7 @@ export async function getStateData(
 
 /** Get map-level data for all states (minimal, for performance) */
 export async function getAllStatesForMap(): Promise<StateMapEntry[]> {
-  if (!isSupabaseConfigured()) {
+  if (!supabaseReadsEnabled()) {
     // Build a tally directly from the mock race set so counts reflect
     // whatever's currently in data/tracker/.
     const tally = new Map<string, number>();
