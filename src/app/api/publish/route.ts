@@ -1,11 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
-import { createClient } from "@supabase/supabase-js";
+import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import {
   normalize,
   type PublishPayload,
   type NormalizedBundle,
 } from "@/lib/publish/normalize";
+
+// Generic untyped client — we operate on tables that aren't yet in the
+// generated Database type. Loosen here rather than annotate every row.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type AnySupabaseClient = SupabaseClient<any, "public", "public", any, any>;
 
 /**
  * POST /api/publish
@@ -44,8 +49,8 @@ function unauth(msg: string) {
   return NextResponse.json({ ok: false, error: msg }, { status: 401 });
 }
 
-async function chunkUpsert<T extends Record<string, unknown>>(
-  supabase: ReturnType<typeof createClient>,
+async function chunkUpsert<T>(
+  supabase: AnySupabaseClient,
   table: string,
   rows: T[],
   conflict: string,
@@ -62,7 +67,7 @@ async function chunkUpsert<T extends Record<string, unknown>>(
 }
 
 async function countSentPersisted(
-  supabase: ReturnType<typeof createClient>,
+  supabase: AnySupabaseClient,
   table: string,
   sentIds: string[]
 ): Promise<number> {
@@ -84,7 +89,7 @@ async function countSentPersisted(
 }
 
 async function countSentRaceCandidates(
-  supabase: ReturnType<typeof createClient>,
+  supabase: AnySupabaseClient,
   pairs: { race_id: string; candidate_id: string }[]
 ): Promise<number> {
   if (pairs.length === 0) return 0;
