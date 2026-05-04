@@ -51,3 +51,7 @@ next-env.d.ts
 
 # Claude Code workspace (local agent state, worktrees)
 .claude/
+
+# Supabase CLI local cache (project ref, version files, etc.)
+/supabase/.temp/
+/supabase/.branches/

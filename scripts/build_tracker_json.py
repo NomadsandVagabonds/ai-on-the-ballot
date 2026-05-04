@@ -465,11 +465,18 @@ def build_positions(
             stance = normalize_stance(row.get("stance"))
             confidence = normalize_confidence(row.get("confidence"))
             summary = str(row["summary"]).strip() if pd.notna(row.get("summary")) else None
-        last_updated = (
-            row["lastUpdated"].date().isoformat()
-            if pd.notna(row.get("lastUpdated")) and hasattr(row["lastUpdated"], "date")
-            else (str(row["lastUpdated"])[:10] if pd.notna(row.get("lastUpdated")) else None)
-        )
+        # lastUpdated is a date in the sheet, but operators sometimes paste
+        # URLs or notes into the column. Accept only real date-like values;
+        # everything else becomes None so downstream consumers (Supabase
+        # date type) don't choke.
+        raw_lu = row.get("lastUpdated")
+        if pd.isna(raw_lu):
+            last_updated = None
+        elif hasattr(raw_lu, "date"):
+            last_updated = raw_lu.date().isoformat()
+        else:
+            s = str(raw_lu).strip()
+            last_updated = s[:10] if re.match(r"^\d{4}-\d{2}-\d{2}", s) else None
 
         sources = sources_by_pos.get(source_pos_id, [])
         first_source = sources[0] if sources else None
