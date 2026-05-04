@@ -663,5 +663,32 @@ def main() -> None:
     dump("corrections.json", corrections)
 
 
+def maybe_push_to_supabase(argv: list[str]) -> int:
+    """If --supabase or SUPABASE_PUSH=1, dual-write to Supabase and parity-check.
+
+    Returns the exit code: 0 on success or skip, 1 on parity mismatch.
+    """
+    flag = "--supabase" in argv or os.environ.get("SUPABASE_PUSH") == "1"
+    if not flag:
+        return 0
+    print("\n--- Supabase dual-write ---")
+    # Late import: only needed when flag set, keeps build_tracker_json runnable
+    # in environments without the seeder configured.
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
+    from seed_supabase_from_json import run as seed_run  # type: ignore
+
+    rc = seed_run(wipe=False)
+    if rc != 0:
+        print(
+            "  ❌ parity check failed — JSON and Supabase row counts diverge.",
+            file=sys.stderr,
+        )
+    return rc
+
+
 if __name__ == "__main__":
+    import os
+    import sys
+
     main()
+    sys.exit(maybe_push_to_supabase(sys.argv))

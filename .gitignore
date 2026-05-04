@@ -55,3 +55,7 @@ next-env.d.ts
 # Supabase CLI local cache (project ref, version files, etc.)
 /supabase/.temp/
 /supabase/.branches/
+
+# Python bytecode
+__pycache__/
+*.pyc

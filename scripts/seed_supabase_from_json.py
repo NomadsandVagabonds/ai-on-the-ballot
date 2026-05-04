@@ -129,18 +129,24 @@ def count_rows(base: str, secret: str, table: str) -> int:
     return -1
 
 
-def main() -> None:
-    ap = argparse.ArgumentParser()
-    ap.add_argument(
-        "--wipe",
-        action="store_true",
-        help="Delete existing rows before upsert (DEV ONLY).",
-    )
-    args = ap.parse_args()
-
+def run(wipe: bool = False) -> int:
+    """Push data/tracker/*.json to Supabase. Returns 0 on parity match, 1 on mismatch."""
     env = load_env()
+    if "NEXT_PUBLIC_SUPABASE_URL" not in env or "SUPABASE_SERVICE_ROLE_KEY" not in env:
+        print(
+            "  Supabase env not configured (NEXT_PUBLIC_SUPABASE_URL / "
+            "SUPABASE_SERVICE_ROLE_KEY missing) — skipping push.",
+            file=sys.stderr,
+        )
+        return 0
     base = env["NEXT_PUBLIC_SUPABASE_URL"].rstrip("/")
     secret = env["SUPABASE_SERVICE_ROLE_KEY"]
+    if "your-project" in base or "your-service-role" in secret:
+        print(
+            "  Supabase env still has placeholder values — skipping push.",
+            file=sys.stderr,
+        )
+        return 0
 
     print(f"Target: {base}")
 
@@ -157,7 +163,7 @@ def main() -> None:
         f"positions={len(positions)} corrections={len(corrections)}"
     )
 
-    if args.wipe:
+    if wipe:
         print("Wiping existing rows (positions → race_candidates → candidates → races → issues → corrections_log)…")
         # Order matters for FK-safe deletion
         for tbl in (
@@ -273,6 +279,7 @@ def main() -> None:
 
     # ---- Parity check ----
     print("\nParity check:")
+    parity_ok = True
     for tbl, expected in (
         ("issues", len(issues)),
         ("candidates", len(candidates)),
@@ -281,8 +288,24 @@ def main() -> None:
         ("positions", len(positions)),
     ):
         actual = count_rows(base, secret, tbl)
-        marker = "✅" if actual == expected else "❌"
+        match = actual == expected
+        marker = "✅" if match else "❌"
         print(f"  {marker} {tbl}: json={expected} supabase={actual}")
+        if not match:
+            parity_ok = False
+
+    return 0 if parity_ok else 1
+
+
+def main() -> None:
+    ap = argparse.ArgumentParser()
+    ap.add_argument(
+        "--wipe",
+        action="store_true",
+        help="Delete existing rows before upsert (DEV ONLY).",
+    )
+    args = ap.parse_args()
+    sys.exit(run(wipe=args.wipe))
 
 
 if __name__ == "__main__":

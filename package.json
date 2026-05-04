@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "data:build": "python3 scripts/build_tracker_json.py",
+    "data:publish": "python3 scripts/build_tracker_json.py --supabase"
   },
   "dependencies": {
     "@supabase/ssr": "^0.10.2",
