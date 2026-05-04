@@ -39,6 +39,7 @@ ROOT = Path(__file__).resolve().parent.parent
 def _pick_xlsx() -> Path:
     """Prefer the latest tracker drop; fall back through earlier versions."""
     candidates = [
+        ROOT.parent / "new design" / "tracker_v4.xlsx",
         ROOT.parent / "new design" / "tracker_live.xlsx",
         ROOT.parent / "new design" / "trackerv2.5.xlsx",
         ROOT.parent / "new design" / "trackerv3.xlsx",

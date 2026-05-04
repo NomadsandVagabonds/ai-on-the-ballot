@@ -122,7 +122,12 @@ def chamber_and_district(seat, district):
     if seat_norm == "senate":
         return "senate", None
     # House
-    d = (district or "").strip()
+    if district is None:
+        d = ""
+    elif isinstance(district, (int, float)):
+        d = str(int(district))
+    else:
+        d = str(district).strip()
     m = re.search(r"(\d+)", d)
     if m:
         return "house", m.group(1).zfill(2)
