@@ -1,5 +1,10 @@
-/** U.S. state abbreviation ↔ name mapping */
-
+/** U.S. jurisdiction abbreviation ↔ name mapping.
+ *
+ * Includes the 50 states plus DC and the five inhabited territories.
+ * The territories elect non-voting delegates to the House and aren't
+ * (yet) part of our coverage, but ZIP-code lookup needs them recognized
+ * so DC/territory residents land on a polite "no races tracked yet"
+ * page instead of an error. */
 export const STATE_MAP: Record<string, string> = {
   AL: "Alabama", AK: "Alaska", AZ: "Arizona", AR: "Arkansas",
   CA: "California", CO: "Colorado", CT: "Connecticut", DE: "Delaware",
@@ -14,6 +19,13 @@ export const STATE_MAP: Record<string, string> = {
   SD: "South Dakota", TN: "Tennessee", TX: "Texas", UT: "Utah",
   VT: "Vermont", VA: "Virginia", WA: "Washington", WV: "West Virginia",
   WI: "Wisconsin", WY: "Wyoming",
+  // Federal district + inhabited territories
+  DC: "District of Columbia",
+  PR: "Puerto Rico",
+  GU: "Guam",
+  AS: "American Samoa",
+  MP: "Northern Mariana Islands",
+  VI: "U.S. Virgin Islands",
 };
 
 /** Reverse lookup: full name → abbreviation */
