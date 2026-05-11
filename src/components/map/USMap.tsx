@@ -260,15 +260,14 @@ export function USMap({ states }: USMapProps) {
               </p>
               <p className="text-xs text-gray-300">
                 {(() => {
-                  // Covered + has races: show race count.
-                  if (hoveredStateData && hoveredStateData.race_count > 0) {
+                  // Covered + has races.
+                  if (hoveredStateData?.has_data) {
                     return `${hoveredStateData.race_count} tracked race${hoveredStateData.race_count === 1 ? "" : "s"}`;
                   }
-                  // Covered but no races (rare): show "no tracked races".
-                  if (hoveredStateData) return "No tracked races";
-                  // Un-covered: surface the primary date if we have it,
-                  // otherwise generic copy. The full-year format makes
-                  // it clear the date is forward-looking.
+                  // Anything else (no entry, or entry with has_data=false
+                  // because we haven't ingested races yet) is un-covered.
+                  // Surface the primary date if we know it, otherwise
+                  // a generic forward-looking message.
                   const primary = hoveredState
                     ? formatPrimaryDate(hoveredState, { withYear: true })
                     : null;
