@@ -232,7 +232,7 @@ function RecordCard({ record }: { record: IssuePositionRecord }) {
             </p>
           ) : (
             <p className="marginalia">
-              — no summary recorded for this position.
+              No summary recorded for this position.
             </p>
           )}
 
@@ -307,7 +307,7 @@ function RecordCard({ record }: { record: IssuePositionRecord }) {
                             </a>
                           ) : (
                             <span className="marginalia ml-1">
-                              — no link
+                              no link
                             </span>
                           )}
                           {s.title && (

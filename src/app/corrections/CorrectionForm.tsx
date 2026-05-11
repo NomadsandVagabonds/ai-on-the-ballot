@@ -129,7 +129,7 @@ export function CorrectionForm() {
     try {
       await sendSubmission({
         kind: "correction",
-        subject: `[Correction] ${candidateName.trim()} — ${issue.trim()}`,
+        subject: `[Correction] ${candidateName.trim()} · ${issue.trim()}`,
         bodyLines: [
           `Candidate: ${candidateName.trim()}`,
           `Issue: ${issue.trim()}`,
@@ -241,7 +241,7 @@ export function CorrectionForm() {
         <label htmlFor="submitter-email" className={labelClass}>
           Your email{" "}
           <span className="text-text-muted font-normal">
-            (optional — for follow-up only, not published)
+            (optional, for follow-up only, not published)
           </span>
         </label>
         <input
@@ -299,7 +299,7 @@ export function ClarificationForm() {
     try {
       await sendSubmission({
         kind: "clarification",
-        subject: `[Clarification] ${candidateName.trim()} — ${issue || "General"}`,
+        subject: `[Clarification] ${candidateName.trim()} · ${issue || "General"}`,
         bodyLines: [
           `Candidate: ${candidateName.trim()}`,
           role && `Submitted by: ${role}`,

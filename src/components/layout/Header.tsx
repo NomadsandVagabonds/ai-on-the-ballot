@@ -22,7 +22,7 @@ export function Header() {
           <Link
             href="/"
             className="shrink-0 group inline-flex items-center"
-            aria-label="AI on the Ballot — 2026 Congressional Tracker"
+            aria-label="AI on the Ballot · 2026 Congressional Tracker"
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img

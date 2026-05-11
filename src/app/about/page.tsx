@@ -231,7 +231,7 @@ export default function AboutPage() {
           As part of our methodology, we are reaching out to each candidate appearing in this tracker to share how their AI governance positions are being characterized on this site, with citations for the public sources used in each coding decision. This outreach is rolling: candidates are contacted as their state&rsquo;s data comes online, so not every candidate listed will have been contacted at the time of publication.
         </p>
         <p className="text-base leading-relaxed text-text-secondary mb-3">
-          The outreach is intended to flag any mischaracterization before or shortly after publication, and to invite the candidate or their campaign to clarify their stance — either by pointing us to additional public sources or by submitting a formal clarification through our{" "}
+          The outreach is intended to flag any mischaracterization before or shortly after publication, and to invite the candidate or their campaign to clarify their stance, either by pointing us to additional public sources or by submitting a formal clarification through our{" "}
           <Link
             href="/corrections#clarification"
             className="text-accent-primary hover:text-accent-primary-hover font-medium underline underline-offset-2"

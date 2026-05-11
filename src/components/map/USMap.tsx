@@ -273,7 +273,7 @@ export function USMap({ states }: USMapProps) {
                     : null;
                   return primary
                     ? `Coverage coming · Primary ${primary}`
-                    : "Coverage coming — rolling out state by state";
+                    : "Coverage coming, rolling out state by state";
                 })()}
               </p>
             </div>

@@ -65,7 +65,7 @@ function PrimarySource({
           className="hover:text-accent-primary transition-colors underline-offset-2 hover:underline"
         >
           {typeLabel}
-          {host ? ` — ${host}` : ""}
+          {host ? ` · ${host}` : ""}
         </a>
       ) : (
         <span>{typeLabel}</span>

@@ -25,7 +25,7 @@ export async function generateMetadata({
 
   return {
     title: candidate.name,
-    description: `${candidate.name}'s positions on AI policy issues — ${candidate.office_sought}.`,
+    description: `${candidate.name}'s positions on AI policy issues for the ${candidate.office_sought}.`,
   };
 }
 

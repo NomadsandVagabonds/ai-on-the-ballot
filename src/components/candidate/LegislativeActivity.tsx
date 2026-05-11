@@ -22,7 +22,7 @@ const ACTIVITY_GLYPHS: Record<LegislativeActivityType, string> = {
   vote: "●",
   hearing: "▲",
   letter: "❧",
-  statement: "—",
+  statement: "“",
 };
 
 const INITIAL_VISIBLE = 5;
