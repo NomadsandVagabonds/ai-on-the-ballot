@@ -8,6 +8,7 @@ import type { Topology, GeometryCollection } from "topojson-specification";
 import type { Feature, MultiPolygon, Polygon } from "geojson";
 import type { StateMapEntry } from "@/types/domain";
 import { STATE_MAP } from "@/lib/utils/states";
+import { formatPrimaryDate } from "@/lib/utils/primary-dates";
 import { useMapStore } from "@/stores/mapStore";
 import Link from "next/link";
 
@@ -258,11 +259,23 @@ export function USMap({ states }: USMapProps) {
                 {hoveredStateName}
               </p>
               <p className="text-xs text-gray-300">
-                {hoveredStateData
-                  ? hoveredStateData.race_count > 0
-                    ? `${hoveredStateData.race_count} tracked race${hoveredStateData.race_count === 1 ? "" : "s"}`
-                    : "No tracked races"
-                  : "Coming soon"}
+                {(() => {
+                  // Covered + has races: show race count.
+                  if (hoveredStateData && hoveredStateData.race_count > 0) {
+                    return `${hoveredStateData.race_count} tracked race${hoveredStateData.race_count === 1 ? "" : "s"}`;
+                  }
+                  // Covered but no races (rare): show "no tracked races".
+                  if (hoveredStateData) return "No tracked races";
+                  // Un-covered: surface the primary date if we have it,
+                  // otherwise generic copy. The full-year format makes
+                  // it clear the date is forward-looking.
+                  const primary = hoveredState
+                    ? formatPrimaryDate(hoveredState, { withYear: true })
+                    : null;
+                  return primary
+                    ? `Coverage coming · Primary ${primary}`
+                    : "Coverage coming — rolling out state by state";
+                })()}
               </p>
             </div>
           )}

@@ -3,6 +3,10 @@ import { getAllStatesForMap } from "@/lib/queries/states";
 import { getAllIssuesWithCounts } from "@/lib/queries/issues";
 import { AnimatedCounter } from "@/components/home/AnimatedCounter";
 import { HeroZipInput } from "./HeroZipInput";
+import {
+  primarySortKey,
+  formatPrimaryDate,
+} from "@/lib/utils/primary-dates";
 
 export const revalidate = 1800;
 
@@ -18,11 +22,16 @@ export default async function Home() {
   const totalRaces = states.reduce((sum, s) => sum + s.race_count, 0);
   const statesWithData = states.filter((s) => s.has_data).length;
 
-  // Auto-select the top states by tracked race count. Keeps the grid
-  // full + self-updates as new state coverage lands in the dataset.
+  // Sort states with data by upcoming primary date (soonest first), then
+  // alphabetical. States we cover but whose primary isn't in our calendar
+  // sort to the end via primarySortKey()'s Infinity fallback.
   const featuredRaces = [...states]
     .filter((s) => s.has_data)
-    .sort((a, b) => b.race_count - a.race_count || a.name.localeCompare(b.name))
+    .sort(
+      (a, b) =>
+        primarySortKey(a.abbreviation) - primarySortKey(b.abbreviation) ||
+        a.name.localeCompare(b.name)
+    )
     .slice(0, FEATURED_COUNT);
 
   return (
@@ -181,23 +190,32 @@ export default async function Home() {
             </div>
 
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 md:gap-4">
-              {featuredRaces.map((state) => (
-                <Link
-                  key={state.abbreviation}
-                  href={`/state/${state.slug}`}
-                  className="race-card"
-                >
-                  <div className="race-card-abbr">{state.abbreviation}</div>
-                  <div className="race-card-name">{state.name}</div>
-                  <div className="race-card-meta">
-                    {state.race_count}{" "}
-                    {state.race_count === 1 ? "race" : "races"}
-                  </div>
-                  <div className="race-card-arrow" aria-hidden="true">
-                    →
-                  </div>
-                </Link>
-              ))}
+              {featuredRaces.map((state) => {
+                const primary = formatPrimaryDate(state.abbreviation);
+                return (
+                  <Link
+                    key={state.abbreviation}
+                    href={`/state/${state.slug}`}
+                    className="race-card"
+                  >
+                    <div className="race-card-abbr">{state.abbreviation}</div>
+                    <div className="race-card-name">{state.name}</div>
+                    <div className="race-card-meta">
+                      {primary ? (
+                        <>Primary {primary}</>
+                      ) : (
+                        <>
+                          {state.race_count}{" "}
+                          {state.race_count === 1 ? "race" : "races"}
+                        </>
+                      )}
+                    </div>
+                    <div className="race-card-arrow" aria-hidden="true">
+                      →
+                    </div>
+                  </Link>
+                );
+              })}
             </div>
           </div>
         </section>
