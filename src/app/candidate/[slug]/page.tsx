@@ -79,16 +79,6 @@ export default async function CandidatePage({ params }: CandidatePageProps) {
 
         <p className="cand-meta mt-3">
           {office} · {stateName}
-          {candidate.total_raised != null && candidate.total_raised > 0 && (
-            <>
-              {" "}
-              ·{" "}
-              <span className="font-mono tabular-nums text-text-primary">
-                ${(candidate.total_raised / 1_000_000).toFixed(1)}M
-              </span>{" "}
-              raised
-            </>
-          )}
         </p>
       </header>
 

@@ -39,6 +39,7 @@ interface PublishResult {
     races: number;
     race_candidates: number;
     positions: number;
+    corrections: number;
   };
   warnings: string[];
   parity: Record<string, { sent: number; persisted: number; ok: boolean }>;
@@ -132,6 +133,13 @@ async function persist(bundle: NormalizedBundle) {
   );
   if (e) errs.push(e);
   e = await chunkUpsert(supabase, "positions", bundle.positions, "id");
+  if (e) errs.push(e);
+  e = await chunkUpsert(
+    supabase,
+    "published_corrections",
+    bundle.corrections,
+    "id"
+  );
   if (e) errs.push(e);
 
   return { errs, supabase };
@@ -231,6 +239,15 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
         bundle.positions.map((x) => x.id)
       ),
     ],
+    [
+      "published_corrections",
+      bundle.corrections.length,
+      countSentPersisted(
+        supabase,
+        "published_corrections",
+        bundle.corrections.map((x) => x.id)
+      ),
+    ],
   ];
   for (const [tbl, sent, p] of checks) {
     const persisted = await p;
@@ -251,6 +268,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       races: bundle.races.length,
       race_candidates: bundle.race_candidates.length,
       positions: bundle.positions.length,
+      corrections: bundle.corrections.length,
     },
     warnings: bundle.warnings,
     parity,

@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
-import { supabaseReadsEnabled } from "@/lib/supabase/server";
-import { getMockCorrections } from "@/lib/mock-data";
+import { getPublishedCorrections } from "@/lib/queries/corrections";
 import type { PublicCorrection } from "@/types/domain";
 import { FeedbackTabs } from "./CorrectionForm";
 
@@ -24,12 +23,10 @@ function formatDate(iso: string): string {
 }
 
 export default async function CorrectionsPage() {
-  // Source: data/tracker/corrections.json (built from the spreadsheet's
-  // 'Corrections Log' sheet). Supabase isn't yet configured; once it is,
-  // swap to a server query keyed off the same shape.
-  const corrections: PublicCorrection[] = supabaseReadsEnabled()
-    ? []
-    : getMockCorrections();
+  // Sourced from the published_corrections table in Supabase (fed by the
+  // sheet's "Corrections Log" tab via /api/publish), falling back to the
+  // JSON snapshot when DATA_SOURCE=json.
+  const corrections: PublicCorrection[] = await getPublishedCorrections();
 
   return (
     <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 py-16 sm:py-20">

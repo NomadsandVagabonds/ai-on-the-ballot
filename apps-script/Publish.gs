@@ -35,6 +35,7 @@ const SHEET_HEADERS = {
   "Positions v2": ["id", "candidateId", "topicId", "stance", "confidence", "summary", "lastUpdated", "coder", "notes"],
   Topics: ["id", "name", "shortName", "description", "includes", "excludes"],
   Sources: ["positionId", "type", "title", "url", "date", "excerpt"],
+  "Corrections Log": ["Date of Correction", "Description"],
 };
 
 function onOpen() {
@@ -89,6 +90,7 @@ function buildPayload() {
     candidates: readSheet("Candidates"),
     positions: readSheet("Positions v2"),
     sources: readSheet("Sources"),
+    corrections: readSheet("Corrections Log"),
   };
 }
 
@@ -97,10 +99,11 @@ function showCountSummary() {
     const p = buildPayload();
     SpreadsheetApp.getUi().alert(
       "Sheet contents (no publish)",
-      `Topics:     ${p.topics.length}\n` +
-      `Candidates: ${p.candidates.length}\n` +
-      `Positions:  ${p.positions.length}\n` +
-      `Sources:    ${p.sources.length}`,
+      `Topics:      ${p.topics.length}\n` +
+      `Candidates:  ${p.candidates.length}\n` +
+      `Positions:   ${p.positions.length}\n` +
+      `Sources:     ${p.sources.length}\n` +
+      `Corrections: ${p.corrections.length}`,
       SpreadsheetApp.getUi().ButtonSet.OK
     );
   } catch (e) {
@@ -159,10 +162,11 @@ function publishToSite() {
     ui.alert(
       "Published",
       `Site updated in ${elapsed}s.\n\n` +
-      `Issues:     ${c.issues}\n` +
-      `Candidates: ${c.candidates}\n` +
-      `Races:      ${c.races}\n` +
-      `Positions:  ${c.positions}\n` +
+      `Issues:      ${c.issues}\n` +
+      `Candidates:  ${c.candidates}\n` +
+      `Races:       ${c.races}\n` +
+      `Positions:   ${c.positions}\n` +
+      `Corrections: ${c.corrections}\n` +
       (body.warnings && body.warnings.length
         ? `\nWarnings (${body.warnings.length}):\n` + body.warnings.slice(0, 10).join("\n")
         : ""),

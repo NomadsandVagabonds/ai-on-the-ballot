@@ -144,7 +144,7 @@ export default async function RacePage({ params }: RacePageProps) {
           Methodology
         </p>
         <p className="text-sm leading-relaxed text-text-secondary">
-          Each candidate&rsquo;s positions are drawn from public statements, votes, bills, and interviews — every stance cited.{" "}
+          Each candidate&rsquo;s positions are drawn from public statements, votes, bills, and interviews. Every stance cited.{" "}
           <Link
             href="/about#methodology"
             className="text-accent-primary hover:text-accent-primary-hover font-medium underline underline-offset-2"
@@ -173,10 +173,6 @@ export default async function RacePage({ params }: RacePageProps) {
         </Link>
       </div>
 
-      {/* Footer hairline — quiet metadata */}
-      <div className="mt-10 pt-6 border-t border-border text-center text-sm text-text-muted">
-        {stateName} · {race.election_year}
-      </div>
     </div>
   );
 }

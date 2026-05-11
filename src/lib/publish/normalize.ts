@@ -51,11 +51,17 @@ export type RawSourceRow = {
   excerpt?: string | null;
 };
 
+export type RawCorrectionRow = {
+  "Date of Correction"?: string | null;
+  Description?: string | null;
+};
+
 export interface PublishPayload {
   candidates: RawCandidateRow[];
   topics: RawTopicRow[];
   positions: RawPositionRow[];
   sources?: RawSourceRow[];
+  corrections?: RawCorrectionRow[];
 }
 
 // ---------------------------------------------------------------------------
@@ -227,12 +233,19 @@ export interface PositionOut {
   date_recorded: string | null;
 }
 
+export interface CorrectionOut {
+  id: string;
+  correction_date: string;
+  description: string;
+}
+
 export interface NormalizedBundle {
   issues: IssueOut[];
   candidates: CandidateOut[];
   races: RaceOut[];
   race_candidates: RaceCandidateOut[];
   positions: PositionOut[];
+  corrections: CorrectionOut[];
   warnings: string[];
 }
 
@@ -386,12 +399,28 @@ export function normalize(payload: PublishPayload): NormalizedBundle {
     });
   }
 
+  // Corrections (published log — distinct from corrections_log intake form)
+  const corrections: CorrectionOut[] = [];
+  for (const r of payload.corrections ?? []) {
+    const date = safeDate(clean(r["Date of Correction"]));
+    const description = clean(r.Description);
+    if (!date || !description) continue;
+    corrections.push({
+      // Stable UUID from date + first 80 chars of description so re-publish
+      // is idempotent and never duplicates entries.
+      id: uuid5(`correction:${date}:${description.slice(0, 80)}`),
+      correction_date: date,
+      description,
+    });
+  }
+
   return {
     issues,
     candidates,
     races,
     race_candidates: raceCandidates,
     positions,
+    corrections,
     warnings,
   };
 }
