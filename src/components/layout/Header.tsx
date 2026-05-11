@@ -12,6 +12,7 @@ const NAV_LINKS = [
 export function Header() {
   const isMobileNavOpen = useAppStore((s) => s.isMobileNavOpen);
   const toggleMobileNav = useAppStore((s) => s.toggleMobileNav);
+  const closeMobileNav = useAppStore((s) => s.closeMobileNav);
 
   return (
     <header className="sticky top-0 z-40 bg-bg-surface/95 backdrop-blur-sm border-b border-border">
@@ -47,13 +48,14 @@ export function Header() {
             ))}
           </nav>
 
-          {/* Mobile hamburger */}
+          {/* Mobile hamburger — toggles the panel below */}
           <button
             type="button"
             className="md:hidden inline-flex items-center justify-center rounded-md p-2 text-text-secondary hover:text-text-primary hover:bg-bg-elevated transition-colors"
             onClick={toggleMobileNav}
-            aria-label="Open navigation menu"
+            aria-label={isMobileNavOpen ? "Close navigation menu" : "Open navigation menu"}
             aria-expanded={isMobileNavOpen}
+            aria-controls="mobile-nav-panel"
           >
             <svg
               className="h-6 w-6"
@@ -63,15 +65,47 @@ export function Header() {
               stroke="currentColor"
               aria-hidden="true"
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"
-              />
+              {isMobileNavOpen ? (
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              ) : (
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"
+                />
+              )}
             </svg>
           </button>
         </div>
       </div>
+
+      {/* Mobile nav panel — slides down under the header bar.
+          Drops away (display:none via Tailwind hidden) on md+. */}
+      <nav
+        id="mobile-nav-panel"
+        aria-label="Mobile navigation"
+        className={`md:hidden border-t border-border bg-bg-surface overflow-hidden transition-[max-height] duration-200 ease-out ${
+          isMobileNavOpen ? "max-h-[400px]" : "max-h-0"
+        }`}
+      >
+        <ul className="px-4 sm:px-6 py-2 divide-y divide-border">
+          {NAV_LINKS.map((link) => (
+            <li key={link.href}>
+              <Link
+                href={link.href}
+                onClick={closeMobileNav}
+                className="block py-3 text-base text-text-primary hover:text-accent-primary transition-colors"
+              >
+                {link.label}
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </nav>
     </header>
   );
 }

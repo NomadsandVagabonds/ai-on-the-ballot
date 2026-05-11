@@ -1,16 +1,34 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import type { CandidateSummary, ComparisonRow } from "@/types/domain";
 import { PartyBadge } from "@/components/shared/PartyBadge";
 import { ToggleSwitch } from "@/components/shared/ToggleSwitch";
 import { useAppStore } from "@/stores/appStore";
 import { resolveCandidatePhoto } from "@/lib/utils/portrait";
 import { STANCE_DISPLAY } from "@/lib/utils/stance";
+import {
+  StatementDrawer,
+  type DrawerContent,
+} from "@/components/race/StatementDrawer";
 
 interface ComparisonGridProps {
   candidates: CandidateSummary[];
   comparisonData: ComparisonRow[];
+}
+
+type PositionLike = ComparisonRow["positions"][number];
+
+/** Whether a position has anything worth showing in the drawer.
+ * ComparisonRow positions don't include full_quote (that's only on
+ * candidate-page positions); the drawer body will still surface a
+ * quote if the source has an excerpt. */
+function hasDrawerContent(p: PositionLike): boolean {
+  return Boolean(
+    p.summary ||
+      p.source_url ||
+      (p.sources && p.sources.length > 0)
+  );
 }
 
 /* ============================================================
@@ -106,9 +124,11 @@ function CandidateHeader({ candidate }: { candidate: CandidateSummary }) {
 function DesktopMatrix({
   candidates,
   rows,
+  onExpand,
 }: {
   candidates: CandidateSummary[];
   rows: ComparisonRow[];
+  onExpand: (candidate: CandidateSummary, row: ComparisonRow, pos: PositionLike) => void;
 }) {
   const n = candidates.length;
 
@@ -167,8 +187,12 @@ function DesktopMatrix({
                 )}
               </div>
 
-              {/* Stance cells — stance mark + micro summary + primary source link */}
+              {/* Stance cells — stance mark + micro summary + primary source link.
+                  Cell is a button when the position has anything to expand. */}
               {row.positions.map((pos) => {
+                const candidate = candidates.find(
+                  (c) => c.id === pos.candidate_id
+                );
                 const primarySource =
                   pos.sources && pos.sources.length > 0
                     ? pos.sources[0]
@@ -186,12 +210,15 @@ function DesktopMatrix({
                   ? SOURCE_TYPE_LABELS[primarySource.type] ?? primarySource.type
                   : null;
 
-                return (
-                  <div
-                    key={pos.candidate_id}
-                    role="cell"
-                    className="px-4 py-5 border-l border-border flex flex-col items-center gap-1.5 text-center"
-                  >
+                const expandable = hasDrawerContent(pos);
+                const cellClass =
+                  "px-4 py-5 border-l border-border flex flex-col items-center gap-1.5 text-center w-full" +
+                  (expandable
+                    ? " cursor-pointer hover:bg-bg-elevated/60 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-primary"
+                    : "");
+
+                const inner = (
+                  <>
                     <span className="stance-mark" data-stance={pos.stance}>
                       {STANCE_DISPLAY[pos.stance].label}
                     </span>
@@ -203,21 +230,39 @@ function DesktopMatrix({
                     {primarySource && (
                       <p className="mt-1 text-[11px] leading-[1.4] text-text-muted">
                         <span className="font-semibold">Source:</span>{" "}
-                        {primarySource.url && host ? (
-                          <a
-                            href={primarySource.url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="hover:text-accent-primary transition-colors underline-offset-2 hover:underline"
-                          >
-                            {typeLabel}
-                          </a>
-                        ) : (
-                          <span>{typeLabel}</span>
-                        )}
+                        {typeLabel}
                       </p>
                     )}
-                  </div>
+                    {expandable && (
+                      <span className="mt-1 text-[10.5px] uppercase tracking-[0.08em] text-accent-primary opacity-0 group-hover:opacity-100 transition-opacity">
+                        View details →
+                      </span>
+                    )}
+                  </>
+                );
+
+                if (!expandable || !candidate) {
+                  return (
+                    <div
+                      key={pos.candidate_id}
+                      role="cell"
+                      className={cellClass}
+                    >
+                      {inner}
+                    </div>
+                  );
+                }
+                return (
+                  <button
+                    key={pos.candidate_id}
+                    type="button"
+                    role="cell"
+                    onClick={() => onExpand(candidate, row, pos)}
+                    aria-label={`Expand details for ${candidate.name} on ${row.issue.display_name}`}
+                    className={`group ${cellClass}`}
+                  >
+                    {inner}
+                  </button>
                 );
               })}
             </div>
@@ -235,9 +280,11 @@ function DesktopMatrix({
 function MobileDispatches({
   candidates,
   rows,
+  onExpand,
 }: {
   candidates: CandidateSummary[];
   rows: ComparisonRow[];
+  onExpand: (candidate: CandidateSummary, row: ComparisonRow, pos: PositionLike) => void;
 }) {
   const [activeIndex, setActiveIndex] = useState(0);
   const active = candidates[activeIndex];
@@ -321,42 +368,50 @@ function MobileDispatches({
             ? SOURCE_TYPE_LABELS[primarySource.type] ?? primarySource.type
             : null;
 
-          return (
-            <li key={row.issue.id} className="py-5">
-              <div>
-                <div className="flex-1 min-w-0">
-                  <h3 className="font-display text-base font-semibold leading-snug text-text-primary">
-                    {row.issue.display_name}
-                  </h3>
-                  <div className="mt-2">
-                    <span className="stance-mark" data-stance={pos.stance}>
-                      {STANCE_DISPLAY[pos.stance].label}
-                    </span>
-                  </div>
-                  {microSummary(pos.summary) && (
-                    <p className="mt-2 text-[13px] leading-[1.5] text-text-secondary">
-                      {microSummary(pos.summary)}
-                    </p>
-                  )}
-                  {primarySource && (
-                    <p className="mt-2 text-[12px] leading-[1.4] text-text-muted">
-                      <span className="font-semibold">Source:</span>{" "}
-                      {primarySource.url && host ? (
-                        <a
-                          href={primarySource.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="hover:text-accent-primary transition-colors underline-offset-2 hover:underline"
-                        >
-                          {typeLabel}
-                        </a>
-                      ) : (
-                        <span>{typeLabel}</span>
-                      )}
-                    </p>
-                  )}
-                </div>
+          const expandable = hasDrawerContent(pos);
+
+          const body = (
+            <>
+              <h3 className="font-display text-base font-semibold leading-snug text-text-primary">
+                {row.issue.display_name}
+              </h3>
+              <div className="mt-2">
+                <span className="stance-mark" data-stance={pos.stance}>
+                  {STANCE_DISPLAY[pos.stance].label}
+                </span>
               </div>
+              {microSummary(pos.summary) && (
+                <p className="mt-2 text-[13px] leading-[1.5] text-text-secondary">
+                  {microSummary(pos.summary)}
+                </p>
+              )}
+              {primarySource && (
+                <p className="mt-2 text-[12px] leading-[1.4] text-text-muted">
+                  <span className="font-semibold">Source:</span> {typeLabel}
+                </p>
+              )}
+              {expandable && (
+                <p className="mt-2 text-[11px] uppercase tracking-[0.08em] text-accent-primary">
+                  Tap to view details →
+                </p>
+              )}
+            </>
+          );
+
+          return (
+            <li key={row.issue.id}>
+              {expandable ? (
+                <button
+                  type="button"
+                  onClick={() => onExpand(active, row, pos)}
+                  aria-label={`Expand details on ${row.issue.display_name}`}
+                  className="w-full text-left py-5 hover:bg-bg-elevated/40 transition-colors focus:outline-none focus-visible:bg-bg-elevated/40"
+                >
+                  {body}
+                </button>
+              ) : (
+                <div className="py-5">{body}</div>
+              )}
             </li>
           );
         })}
@@ -376,11 +431,20 @@ export function ComparisonGrid({
   const hideNoMention = useAppStore((s) => s.hideNoMention);
   const toggleHideNoMention = useAppStore((s) => s.toggleHideNoMention);
 
+  const [drawer, setDrawer] = useState<DrawerContent | null>(null);
+
   const filteredRows = hideNoMention
     ? comparisonData.filter((row) =>
         row.positions.some((p) => p.stance !== "no_mention")
       )
     : comparisonData;
+
+  const handleExpand = useCallback(
+    (candidate: CandidateSummary, row: ComparisonRow, pos: PositionLike) => {
+      setDrawer({ candidate, issue: row.issue, position: pos });
+    },
+    []
+  );
 
   return (
     <section aria-label="Comparison matrix">
@@ -407,13 +471,23 @@ export function ComparisonGrid({
       ) : (
         <>
           <div className="hidden md:block">
-            <DesktopMatrix candidates={candidates} rows={filteredRows} />
+            <DesktopMatrix
+              candidates={candidates}
+              rows={filteredRows}
+              onExpand={handleExpand}
+            />
           </div>
           <div className="md:hidden">
-            <MobileDispatches candidates={candidates} rows={filteredRows} />
+            <MobileDispatches
+              candidates={candidates}
+              rows={filteredRows}
+              onExpand={handleExpand}
+            />
           </div>
         </>
       )}
+
+      <StatementDrawer content={drawer} onClose={() => setDrawer(null)} />
     </section>
   );
 }
