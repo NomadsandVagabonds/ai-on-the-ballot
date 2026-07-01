@@ -373,6 +373,29 @@ export function normalize(payload: PublishPayload): NormalizedBundle {
     const { first, last } = splitName(name);
     const slug = `${slugify(first)}-${slugify(last)}-${state.toLowerCase()}`;
 
+    // Dedupe candidates by sheetId — same id twice produces the same
+    // UUID and cascades into duplicate race_candidates and positions
+    // that Postgres rejects with "ON CONFLICT DO UPDATE cannot affect
+    // row a second time". Slug dedup below only catches same-slug
+    // duplicates; a duplicate id with a different name/state slips
+    // through and hits the DB.
+    const existingBySheetId = candBySheetId.get(sheetId);
+    if (existingBySheetId) {
+      let dup = problems.duplicateCandidateSlugs.find(
+        (d) => d.slug === "(same id)"
+      );
+      if (!dup) {
+        dup = {
+          slug: "(same id)",
+          kept_sheet_id: sheetId,
+          dropped_sheet_ids: [],
+        };
+        problems.duplicateCandidateSlugs.push(dup);
+      }
+      dup.dropped_sheet_ids.push(`${sheetId} (row ${rowNum})`);
+      continue;
+    }
+
     // Dedupe candidates by slug — DB has UNIQUE (slug); an unhandled
     // duplicate here would abort the whole candidates upsert and cascade
     // into orphaned positions + FK failures.
@@ -622,12 +645,39 @@ export function normalize(payload: PublishPayload): NormalizedBundle {
     });
   }
 
+  // Final safety dedup pass — the previous logic should already prevent
+  // these, but any surviving duplicate primary keys make Postgres reject
+  // the entire chunk. Silent is fine here; the categorized dupes above
+  // are what Vinaya needs to see in the sheet.
+  const seenCandidateIds = new Set<string>();
+  const candidatesUnique = candidates.filter((c) => {
+    if (seenCandidateIds.has(c.id)) return false;
+    seenCandidateIds.add(c.id);
+    return true;
+  });
+  const seenRaceCandidateKeys = new Set<string>();
+  const raceCandidatesUnique = raceCandidates.filter((rc) => {
+    const k = `${rc.race_id}::${rc.candidate_id}`;
+    if (seenRaceCandidateKeys.has(k)) return false;
+    seenRaceCandidateKeys.add(k);
+    return true;
+  });
+  const seenPositionIds = new Set<string>();
+  const seenPositionPairs = new Set<string>();
+  const positionsUnique = positions.filter((p) => {
+    const pair = `${p.candidate_id}::${p.issue_id}`;
+    if (seenPositionIds.has(p.id) || seenPositionPairs.has(pair)) return false;
+    seenPositionIds.add(p.id);
+    seenPositionPairs.add(pair);
+    return true;
+  });
+
   return {
     issues,
-    candidates,
+    candidates: candidatesUnique,
     races,
-    race_candidates: raceCandidates,
-    positions,
+    race_candidates: raceCandidatesUnique,
+    positions: positionsUnique,
     corrections,
     warnings,
     problems,
