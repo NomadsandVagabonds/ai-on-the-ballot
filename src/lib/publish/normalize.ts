@@ -247,6 +247,46 @@ export interface NormalizedBundle {
   positions: PositionOut[];
   corrections: CorrectionOut[];
   warnings: string[];
+  problems: PublishProblems;
+}
+
+/**
+ * Structured diagnostics for the Apps Script dialog. Every category is
+ * grouped by root cause so Vinaya sees "6 candidateIds missing" rather
+ * than 60 individual warnings pointing at the same 6 IDs.
+ */
+export interface PublishProblems {
+  droppedCandidates: Array<{
+    row_index: number;
+    sheet_id: string | null;
+    name: string | null;
+    reason: string;
+  }>;
+  unknownCandidateRefs: Array<{
+    candidateId: string;
+    positions_affected: number;
+    sample_position_ids: string[];
+  }>;
+  unknownTopicRefs: Array<{
+    topicId: string;
+    positions_affected: number;
+    sample_position_ids: string[];
+  }>;
+  duplicateCandidateSlugs: Array<{
+    slug: string;
+    kept_sheet_id: string;
+    dropped_sheet_ids: string[];
+  }>;
+  duplicatePositions: Array<{
+    candidateId: string;
+    topicId: string;
+    position_ids: string[];
+  }>;
+  droppedPositions: Array<{
+    row_index: number;
+    position_id: string | null;
+    reason: string;
+  }>;
 }
 
 // ---------------------------------------------------------------------------
@@ -261,6 +301,14 @@ const EXCLUDED_STATES = new Set(["CA"]);
 
 export function normalize(payload: PublishPayload): NormalizedBundle {
   const warnings: string[] = [];
+  const problems: PublishProblems = {
+    droppedCandidates: [],
+    unknownCandidateRefs: [],
+    unknownTopicRefs: [],
+    duplicateCandidateSlugs: [],
+    duplicatePositions: [],
+    droppedPositions: [],
+  };
   const ELECTION_YEAR = 2026;
 
   // Issues
@@ -280,19 +328,71 @@ export function normalize(payload: PublishPayload): NormalizedBundle {
   }
   const issueBySlug = new Map(issues.map((x) => [x.slug, x]));
 
-  // Candidates (apply state exclusion)
+  // Candidates (apply state exclusion, dedupe on slug)
   const candidates: CandidateOut[] = [];
   const candBySheetId = new Map<string, CandidateOut>();
-  for (const r of payload.candidates) {
+  const candBySlug = new Map<string, { sheetId: string }>();
+  for (let i = 0; i < payload.candidates.length; i++) {
+    const r = payload.candidates[i];
+    const rowNum = i + 2; // sheet row (header = 1)
     const sheetId = clean(r.id);
     const name = clean(r.name);
-    if (!sheetId || !name) continue;
+    if (!sheetId) {
+      problems.droppedCandidates.push({
+        row_index: rowNum,
+        sheet_id: null,
+        name,
+        reason: "missing id column",
+      });
+      continue;
+    }
+    if (!name) {
+      problems.droppedCandidates.push({
+        row_index: rowNum,
+        sheet_id: sheetId,
+        name: null,
+        reason: "missing name column",
+      });
+      continue;
+    }
     const state = (clean(r.state) ?? "").toUpperCase();
-    if (EXCLUDED_STATES.has(state)) continue;
+    if (EXCLUDED_STATES.has(state)) continue; // intentional silent skip
+    if (!state) {
+      problems.droppedCandidates.push({
+        row_index: rowNum,
+        sheet_id: sheetId,
+        name,
+        reason: "missing state column",
+      });
+      continue;
+    }
 
     const { chamber, district } = chamberAndDistrict(clean(r.seat), r.district);
     const { first, last } = splitName(name);
     const slug = `${slugify(first)}-${slugify(last)}-${state.toLowerCase()}`;
+
+    // Dedupe candidates by slug — DB has UNIQUE (slug); an unhandled
+    // duplicate here would abort the whole candidates upsert and cascade
+    // into orphaned positions + FK failures.
+    const existing = candBySlug.get(slug);
+    if (existing) {
+      let dup = problems.duplicateCandidateSlugs.find((d) => d.slug === slug);
+      if (!dup) {
+        dup = {
+          slug,
+          kept_sheet_id: existing.sheetId,
+          dropped_sheet_ids: [],
+        };
+        problems.duplicateCandidateSlugs.push(dup);
+      }
+      dup.dropped_sheet_ids.push(sheetId);
+      // Alias the dupe's sheetId to the kept candidate so positions
+      // referencing either row still resolve. Avoids surprise data loss.
+      const kept = candBySheetId.get(existing.sheetId);
+      if (kept) candBySheetId.set(sheetId, kept);
+      continue;
+    }
+
     const officeLabel =
       chamber === "senate"
         ? "U.S. Senate"
@@ -332,6 +432,7 @@ export function normalize(payload: PublishPayload): NormalizedBundle {
     };
     candidates.push(out);
     candBySheetId.set(sheetId, out);
+    candBySlug.set(slug, { sheetId });
   }
 
   // Races (derived from unique state×chamber×district)
@@ -368,25 +469,76 @@ export function normalize(payload: PublishPayload): NormalizedBundle {
     if (!firstSourceByPosId.has(pid)) firstSourceByPosId.set(pid, s);
   }
 
-  // Positions
+  // Positions — with grouped ref errors and (candidate, issue) dedupe
   const positions: PositionOut[] = [];
-  for (const r of payload.positions) {
+  const positionsByPair = new Map<string, PositionOut>();
+  const unknownCandCounts = new Map<
+    string,
+    { count: number; samples: string[] }
+  >();
+  const unknownTopicCounts = new Map<
+    string,
+    { count: number; samples: string[] }
+  >();
+  const dupePositionMap = new Map<string, string[]>(); // sheet pos-IDs, not UUIDs
+  const pairKeyToSheetIds = new Map<string, string>(); // first sheet pid per pair
+
+  for (let i = 0; i < payload.positions.length; i++) {
+    const r = payload.positions[i];
+    const rowNum = i + 2;
     const pid = clean(r.id);
     const candSheetId = clean(r.candidateId);
     const topicSlug = clean(r.topicId);
-    if (!pid || !candSheetId || !topicSlug) continue;
+    if (!pid) {
+      problems.droppedPositions.push({
+        row_index: rowNum,
+        position_id: null,
+        reason: "missing id column",
+      });
+      continue;
+    }
+    if (!candSheetId) {
+      problems.droppedPositions.push({
+        row_index: rowNum,
+        position_id: pid,
+        reason: "missing candidateId column",
+      });
+      continue;
+    }
+    if (!topicSlug) {
+      problems.droppedPositions.push({
+        row_index: rowNum,
+        position_id: pid,
+        reason: "missing topicId column",
+      });
+      continue;
+    }
     const cand = candBySheetId.get(candSheetId);
     const issue = issueBySlug.get(topicSlug);
     if (!cand) {
+      const rec = unknownCandCounts.get(candSheetId) ?? {
+        count: 0,
+        samples: [],
+      };
+      rec.count++;
+      if (rec.samples.length < 5) rec.samples.push(pid);
+      unknownCandCounts.set(candSheetId, rec);
       warnings.push(`position ${pid}: unknown candidateId ${candSheetId}`);
       continue;
     }
     if (!issue) {
+      const rec = unknownTopicCounts.get(topicSlug) ?? {
+        count: 0,
+        samples: [],
+      };
+      rec.count++;
+      if (rec.samples.length < 5) rec.samples.push(pid);
+      unknownTopicCounts.set(topicSlug, rec);
       warnings.push(`position ${pid}: unknown topicId ${topicSlug}`);
       continue;
     }
     const src = firstSourceByPosId.get(pid);
-    positions.push({
+    const positionOut: PositionOut = {
       id: uuid5(`position:${pid}`),
       candidate_id: cand.id,
       issue_id: issue.id,
@@ -396,6 +548,60 @@ export function normalize(payload: PublishPayload): NormalizedBundle {
       full_quote: src?.excerpt ? clean(src.excerpt) : null,
       source_url: src?.url ? clean(src.url) : null,
       date_recorded: safeDate(clean(r.lastUpdated)),
+    };
+
+    // Enforce positions UNIQUE (candidate_id, issue_id) — Postgres will
+    // reject the whole chunk if two payload rows collide. Keep the last
+    // (assumes downstream sheet order = chronological update order) and
+    // warn so Vinaya knows which position row wins.
+    const pairKey = `${cand.id}::${issue.id}`;
+    const existing = positionsByPair.get(pairKey);
+    if (existing) {
+      const firstPid = pairKeyToSheetIds.get(pairKey) ?? pid;
+      const list = dupePositionMap.get(pairKey) ?? [firstPid];
+      list.push(pid);
+      dupePositionMap.set(pairKey, list);
+      // Replace with newer row
+      const idx = positions.findIndex((p) => p.id === existing.id);
+      if (idx >= 0) positions[idx] = positionOut;
+      positionsByPair.set(pairKey, positionOut);
+    } else {
+      positions.push(positionOut);
+      positionsByPair.set(pairKey, positionOut);
+      pairKeyToSheetIds.set(pairKey, pid);
+    }
+  }
+
+  // Roll grouped refs up into the structured problems object
+  for (const [candidateId, rec] of unknownCandCounts) {
+    problems.unknownCandidateRefs.push({
+      candidateId,
+      positions_affected: rec.count,
+      sample_position_ids: rec.samples,
+    });
+  }
+  for (const [topicId, rec] of unknownTopicCounts) {
+    problems.unknownTopicRefs.push({
+      topicId,
+      positions_affected: rec.count,
+      sample_position_ids: rec.samples,
+    });
+  }
+  for (const [pairKey, position_ids] of dupePositionMap) {
+    // Recover the sheet-facing candidate + topic slugs from the pair key
+    const [candUuid, issueUuid] = pairKey.split("::");
+    const candSheetId =
+      Array.from(candBySheetId.entries()).find(
+        ([, v]) => v.id === candUuid
+      )?.[0] ?? candUuid;
+    const topicSlug =
+      Array.from(issueBySlug.entries()).find(
+        ([, v]) => v.id === issueUuid
+      )?.[0] ?? issueUuid;
+    problems.duplicatePositions.push({
+      candidateId: candSheetId,
+      topicId: topicSlug,
+      position_ids,
     });
   }
 
@@ -422,5 +628,108 @@ export function normalize(payload: PublishPayload): NormalizedBundle {
     positions,
     corrections,
     warnings,
+    problems,
   };
+}
+
+/**
+ * Human-readable summary lines for the top data-integrity issues,
+ * targeting the Apps Script alert. Grouped and truncated so Vinaya sees
+ * the fixes she needs to make in the sheet, not a flood of duplicates.
+ */
+export function summarizeProblems(p: PublishProblems): string[] {
+  const lines: string[] = [];
+
+  if (p.droppedCandidates.length) {
+    lines.push(
+      `${p.droppedCandidates.length} candidate row(s) skipped — missing required column:`
+    );
+    for (const d of p.droppedCandidates.slice(0, 6)) {
+      const label = d.name ?? d.sheet_id ?? "(blank row)";
+      lines.push(`  · Candidates row ${d.row_index}: ${d.reason} (${label})`);
+    }
+    if (p.droppedCandidates.length > 6)
+      lines.push(`  · …and ${p.droppedCandidates.length - 6} more`);
+  }
+
+  if (p.unknownCandidateRefs.length) {
+    const totalOrphans = p.unknownCandidateRefs.reduce(
+      (n, r) => n + r.positions_affected,
+      0
+    );
+    lines.push(
+      `${totalOrphans} position(s) reference ${p.unknownCandidateRefs.length} candidate id(s) not in Candidates sheet:`
+    );
+    const sorted = [...p.unknownCandidateRefs].sort(
+      (a, b) => b.positions_affected - a.positions_affected
+    );
+    for (const r of sorted.slice(0, 8)) {
+      lines.push(
+        `  · candidateId="${r.candidateId}" — ${r.positions_affected} position(s) [e.g. ${r.sample_position_ids.slice(0, 2).join(", ")}]`
+      );
+    }
+    if (sorted.length > 8)
+      lines.push(`  · …and ${sorted.length - 8} more candidate id(s)`);
+    lines.push(
+      `  Fix: add these rows to the Candidates sheet, or correct the candidateId in Positions v2.`
+    );
+  }
+
+  if (p.unknownTopicRefs.length) {
+    lines.push(
+      `${p.unknownTopicRefs.length} unknown topicId(s) referenced by positions:`
+    );
+    for (const r of p.unknownTopicRefs.slice(0, 6)) {
+      lines.push(
+        `  · topicId="${r.topicId}" — ${r.positions_affected} position(s)`
+      );
+    }
+  }
+
+  if (p.duplicateCandidateSlugs.length) {
+    lines.push(
+      `${p.duplicateCandidateSlugs.length} candidate(s) share the same URL slug (first-last-state) — later rows are ignored:`
+    );
+    for (const d of p.duplicateCandidateSlugs.slice(0, 6)) {
+      lines.push(
+        `  · slug="${d.slug}" kept=${d.kept_sheet_id} dropped=${d.dropped_sheet_ids.join(", ")}`
+      );
+    }
+  }
+
+  if (p.duplicatePositions.length) {
+    lines.push(
+      `${p.duplicatePositions.length} candidate+topic pair(s) had multiple position rows — only the latest is kept:`
+    );
+    for (const d of p.duplicatePositions.slice(0, 6)) {
+      lines.push(
+        `  · candidate="${d.candidateId}" topic="${d.topicId}" (${d.position_ids.length} rows)`
+      );
+    }
+  }
+
+  if (p.droppedPositions.length) {
+    lines.push(
+      `${p.droppedPositions.length} position row(s) skipped — missing required column:`
+    );
+    for (const d of p.droppedPositions.slice(0, 4)) {
+      lines.push(
+        `  · Positions v2 row ${d.row_index}: ${d.reason} (id=${d.position_id ?? "(blank)"})`
+      );
+    }
+  }
+
+  return lines;
+}
+
+/** Total count of every dropped/orphaned/deduped row across categories. */
+export function countProblemRows(p: PublishProblems): number {
+  return (
+    p.droppedCandidates.length +
+    p.droppedPositions.length +
+    p.duplicateCandidateSlugs.reduce((n, d) => n + d.dropped_sheet_ids.length, 0) +
+    p.duplicatePositions.reduce((n, d) => n + (d.position_ids.length - 1), 0) +
+    p.unknownCandidateRefs.reduce((n, r) => n + r.positions_affected, 0) +
+    p.unknownTopicRefs.reduce((n, r) => n + r.positions_affected, 0)
+  );
 }

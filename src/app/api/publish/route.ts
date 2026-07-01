@@ -3,8 +3,11 @@ import { revalidatePath } from "next/cache";
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import {
   normalize,
+  summarizeProblems,
+  countProblemRows,
   type PublishPayload,
   type NormalizedBundle,
+  type PublishProblems,
 } from "@/lib/publish/normalize";
 
 // Generic untyped client — we operate on tables that aren't yet in the
@@ -33,6 +36,7 @@ export const maxDuration = 60;
 
 interface PublishResult {
   ok: boolean;
+  mode?: "publish" | "validate";
   counts: {
     issues: number;
     candidates: number;
@@ -42,7 +46,10 @@ interface PublishResult {
     corrections: number;
   };
   warnings: string[];
-  parity: Record<string, { sent: number; persisted: number; ok: boolean }>;
+  problems: PublishProblems;
+  summary: string[];
+  parity?: Record<string, { sent: number; persisted: number; ok: boolean }>;
+  details?: string[];
   error?: string;
 }
 
@@ -185,15 +192,50 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
   // ---- Normalize ----
   const bundle = normalize(payload);
+  const summary = summarizeProblems(bundle.problems);
+  const problemCount = countProblemRows(bundle.problems);
+
+  const counts = {
+    issues: bundle.issues.length,
+    candidates: bundle.candidates.length,
+    races: bundle.races.length,
+    race_candidates: bundle.race_candidates.length,
+    positions: bundle.positions.length,
+    corrections: bundle.corrections.length,
+  };
+
+  // ---- Validate-only mode (dry run) ----
+  const validate = request.nextUrl.searchParams.get("validate") === "1";
+  if (validate) {
+    const body: PublishResult = {
+      ok: problemCount === 0,
+      mode: "validate",
+      counts,
+      warnings: bundle.warnings,
+      problems: bundle.problems,
+      summary,
+    };
+    return NextResponse.json(body, { status: 200 });
+  }
 
   // ---- Persist ----
   const { errs, supabase } = await persist(bundle);
   if (errs.length > 0) {
+    console.error("[publish] upsert errors:", errs);
     return NextResponse.json(
       {
         ok: false,
-        error: "One or more upserts failed",
+        mode: "publish",
+        error: "Database rejected one or more rows. See details.",
+        counts,
         warnings: bundle.warnings,
+        problems: bundle.problems,
+        summary: [
+          ...summary,
+          "",
+          "Database errors (server rejected the write):",
+          ...errs.map((e) => `  · ${e}`),
+        ],
         details: errs,
       },
       { status: 500 }
@@ -203,7 +245,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
   // ---- Parity check ----
   // Verify every row we sent is now visible in the DB by id, rather than
   // comparing total table counts (which break on partial publishes).
-  const parity: PublishResult["parity"] = {};
+  const parity: NonNullable<PublishResult["parity"]> = {};
   let parityOk = true;
   const checks: Array<[string, number, Promise<number>]> = [
     [
@@ -262,15 +304,11 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
   const body: PublishResult = {
     ok: parityOk,
-    counts: {
-      issues: bundle.issues.length,
-      candidates: bundle.candidates.length,
-      races: bundle.races.length,
-      race_candidates: bundle.race_candidates.length,
-      positions: bundle.positions.length,
-      corrections: bundle.corrections.length,
-    },
+    mode: "publish",
+    counts,
     warnings: bundle.warnings,
+    problems: bundle.problems,
+    summary,
     parity,
   };
   return NextResponse.json(body, { status: parityOk ? 200 : 500 });

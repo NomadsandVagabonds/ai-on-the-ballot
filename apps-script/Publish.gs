@@ -42,6 +42,7 @@ function onOpen() {
   SpreadsheetApp.getUi()
     .createMenu("AI on the Ballot")
     .addItem("Publish to site", "publishToSite")
+    .addItem("Validate sheet (no publish)", "validateSheet")
     .addSeparator()
     .addItem("Show count summary (no publish)", "showCountSummary")
     .addToUi();
@@ -112,18 +113,36 @@ function showCountSummary() {
 }
 
 function publishToSite() {
+  runPublishFlow_(false);
+}
+
+function validateSheet() {
+  runPublishFlow_(true);
+}
+
+/**
+ * Shared publish/validate driver. When validateOnly is true, hits
+ * /api/publish?validate=1 and the server skips all DB writes.
+ */
+function runPublishFlow_(validateOnly) {
   const ui = SpreadsheetApp.getUi();
   if (PUBLISH_TOKEN.indexOf("REPLACE") !== -1) {
-    ui.alert("Setup needed", "PUBLISH_TOKEN is still the placeholder. Open Extensions → Apps Script and set the real token at the top of the file.", ui.ButtonSet.OK);
+    ui.alert(
+      "Setup needed",
+      "PUBLISH_TOKEN is still the placeholder. Open Extensions → Apps Script and set the real token at the top of the file.",
+      ui.ButtonSet.OK
+    );
     return;
   }
 
-  const confirm = ui.alert(
-    "Publish to AI on the Ballot",
-    "This will push the current sheet contents to the live site. Continue?",
-    ui.ButtonSet.YES_NO
-  );
-  if (confirm !== ui.Button.YES) return;
+  if (!validateOnly) {
+    const confirm = ui.alert(
+      "Publish to AI on the Ballot",
+      "This will push the current sheet contents to the live site. Continue?",
+      ui.ButtonSet.YES_NO
+    );
+    if (confirm !== ui.Button.YES) return;
+  }
 
   let payload;
   try {
@@ -133,10 +152,11 @@ function publishToSite() {
     return;
   }
 
+  const url = `${SITE_URL}/api/publish${validateOnly ? "?validate=1" : ""}`;
   const startedAt = new Date();
   let response;
   try {
-    response = UrlFetchApp.fetch(`${SITE_URL}/api/publish`, {
+    response = UrlFetchApp.fetch(url, {
       method: "post",
       contentType: "application/json",
       headers: { Authorization: `Bearer ${PUBLISH_TOKEN}` },
@@ -156,27 +176,66 @@ function publishToSite() {
     body = { raw: response.getContentText() };
   }
 
+  const elapsed = ((new Date().getTime() - startedAt.getTime()) / 1000).toFixed(1);
+
+  // ---- Success path ----
   if (code >= 200 && code < 300 && body.ok) {
     const c = body.counts || {};
-    const elapsed = ((new Date().getTime() - startedAt.getTime()) / 1000).toFixed(1);
+    const warnCount = (body.warnings || []).length;
+    const heading = validateOnly
+      ? `Validation passed (${elapsed}s)`
+      : `Published (${elapsed}s)`;
+    const followup = validateOnly
+      ? "No blocking issues found. Ready to publish."
+      : "Site cache refreshed — new data live in ~30s.";
     ui.alert(
-      "Published",
-      `Site updated in ${elapsed}s.\n\n` +
-      `Issues:      ${c.issues}\n` +
-      `Candidates:  ${c.candidates}\n` +
-      `Races:       ${c.races}\n` +
-      `Positions:   ${c.positions}\n` +
-      `Corrections: ${c.corrections}\n` +
-      (body.warnings && body.warnings.length
-        ? `\nWarnings (${body.warnings.length}):\n` + body.warnings.slice(0, 10).join("\n")
-        : ""),
+      heading,
+      `${followup}\n\n` +
+        `Issues:      ${c.issues}\n` +
+        `Candidates:  ${c.candidates}\n` +
+        `Races:       ${c.races}\n` +
+        `Positions:   ${c.positions}\n` +
+        `Corrections: ${c.corrections}\n` +
+        (warnCount ? `\n${warnCount} soft warning(s) — see below:\n` + (body.summary || []).slice(0, 12).join("\n") : ""),
       ui.ButtonSet.OK
     );
-  } else {
-    ui.alert(
-      "Publish failed (HTTP " + code + ")",
-      JSON.stringify(body, null, 2).substring(0, 1500),
-      ui.ButtonSet.OK
-    );
+    return;
   }
+
+  // ---- Failure path ----
+  const summary = body.summary || [];
+  const details = body.details || [];
+  const errorLine = body.error || `HTTP ${code}`;
+  const c = body.counts || {};
+  const parts = [];
+  parts.push(errorLine);
+  parts.push("");
+  if (c.candidates != null) {
+    parts.push(
+      `Would upsert: ${c.candidates} candidates · ${c.positions} positions · ${c.races} races`
+    );
+    parts.push("");
+  }
+  if (summary.length) {
+    parts.push("What to fix in the sheet:");
+    for (let i = 0; i < summary.length && i < 40; i++) {
+      parts.push(summary[i]);
+    }
+    if (summary.length > 40) parts.push(`…and ${summary.length - 40} more lines`);
+    parts.push("");
+  }
+  if (details.length) {
+    parts.push("Server details:");
+    for (let i = 0; i < details.length && i < 6; i++) {
+      parts.push(`  · ${details[i]}`);
+    }
+    parts.push("");
+  }
+  parts.push('Tip: run "Validate sheet (no publish)" to check fixes without hitting the DB.');
+
+  ui.alert(
+    validateOnly ? "Validation issues found" : `Publish failed (HTTP ${code})`,
+    parts.join("\n").substring(0, 3500),
+    ui.ButtonSet.OK
+  );
 }
