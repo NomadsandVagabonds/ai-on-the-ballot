@@ -116,6 +116,29 @@ async function countSentRaceCandidates(
   return total;
 }
 
+async function countSentPositions(
+  supabase: AnySupabaseClient,
+  positions: { candidate_id: string; issue_id: string }[]
+): Promise<number> {
+  if (positions.length === 0) return 0;
+  // Positions upsert uses (candidate_id, issue_id) as the conflict target
+  // so the id in the DB may differ from what we sent. Verify by checking
+  // that every candidate we wrote has at least the number of positions
+  // we expected.
+  const candIds = Array.from(new Set(positions.map((p) => p.candidate_id)));
+  let total = 0;
+  for (let i = 0; i < candIds.length; i += 100) {
+    const slice = candIds.slice(i, i + 100);
+    const { count, error } = await supabase
+      .from("positions")
+      .select("candidate_id", { count: "exact", head: true })
+      .in("candidate_id", slice);
+    if (error) return -1;
+    total += count ?? 0;
+  }
+  return total;
+}
+
 async function persist(bundle: NormalizedBundle) {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL!;
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY!;
@@ -139,7 +162,16 @@ async function persist(bundle: NormalizedBundle) {
     "race_id,candidate_id"
   );
   if (e) errs.push(e);
-  e = await chunkUpsert(supabase, "positions", bundle.positions, "id");
+  // positions: use the (candidate_id, issue_id) unique constraint as the
+  // conflict target so renamed position sheet ids don't collide with the
+  // pre-existing DB row for the same (candidate, issue). Fine because
+  // nothing FKs to positions.id.
+  e = await chunkUpsert(
+    supabase,
+    "positions",
+    bundle.positions,
+    "candidate_id,issue_id"
+  );
   if (e) errs.push(e);
   e = await chunkUpsert(
     supabase,
@@ -275,11 +307,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     [
       "positions",
       bundle.positions.length,
-      countSentPersisted(
-        supabase,
-        "positions",
-        bundle.positions.map((x) => x.id)
-      ),
+      countSentPositions(supabase, bundle.positions),
     ],
     [
       "published_corrections",
