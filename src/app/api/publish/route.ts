@@ -164,12 +164,15 @@ async function persist(bundle: NormalizedBundle) {
   if (e) errs.push(e);
   // positions: use the (candidate_id, issue_id) unique constraint as the
   // conflict target so renamed position sheet ids don't collide with the
-  // pre-existing DB row for the same (candidate, issue). Fine because
-  // nothing FKs to positions.id.
+  // pre-existing DB row for the same (candidate, issue). And strip id
+  // from the payload so the DB's DEFAULT gen_random_uuid() fires on
+  // INSERT and the existing id is preserved on UPDATE — otherwise
+  // repeated position pids across different rows collide on positions_pkey.
+  const positionsPayload = bundle.positions.map(({ id: _id, ...rest }) => rest);
   e = await chunkUpsert(
     supabase,
     "positions",
-    bundle.positions,
+    positionsPayload,
     "candidate_id,issue_id"
   );
   if (e) errs.push(e);
