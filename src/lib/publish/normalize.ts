@@ -642,7 +642,7 @@ export function summarizeProblems(p: PublishProblems): string[] {
 
   if (p.droppedCandidates.length) {
     lines.push(
-      `${p.droppedCandidates.length} candidate row(s) skipped — missing required column:`
+      `${p.droppedCandidates.length} candidate row(s) skipped, missing required column:`
     );
     for (const d of p.droppedCandidates.slice(0, 6)) {
       const label = d.name ?? d.sheet_id ?? "(blank row)";
@@ -665,7 +665,7 @@ export function summarizeProblems(p: PublishProblems): string[] {
     );
     for (const r of sorted.slice(0, 8)) {
       lines.push(
-        `  · candidateId="${r.candidateId}" — ${r.positions_affected} position(s) [e.g. ${r.sample_position_ids.slice(0, 2).join(", ")}]`
+        `  · candidateId="${r.candidateId}": ${r.positions_affected} position(s) [e.g. ${r.sample_position_ids.slice(0, 2).join(", ")}]`
       );
     }
     if (sorted.length > 8)
@@ -681,14 +681,14 @@ export function summarizeProblems(p: PublishProblems): string[] {
     );
     for (const r of p.unknownTopicRefs.slice(0, 6)) {
       lines.push(
-        `  · topicId="${r.topicId}" — ${r.positions_affected} position(s)`
+        `  · topicId="${r.topicId}": ${r.positions_affected} position(s)`
       );
     }
   }
 
   if (p.duplicateCandidateSlugs.length) {
     lines.push(
-      `${p.duplicateCandidateSlugs.length} candidate(s) share the same URL slug (first-last-state) — later rows are ignored:`
+      `${p.duplicateCandidateSlugs.length} candidate(s) share the same URL slug (first-last-state); later rows are ignored:`
     );
     for (const d of p.duplicateCandidateSlugs.slice(0, 6)) {
       lines.push(
@@ -699,7 +699,7 @@ export function summarizeProblems(p: PublishProblems): string[] {
 
   if (p.duplicatePositions.length) {
     lines.push(
-      `${p.duplicatePositions.length} candidate+topic pair(s) had multiple position rows — only the latest is kept:`
+      `${p.duplicatePositions.length} candidate+topic pair(s) had multiple position rows; only the latest is kept:`
     );
     for (const d of p.duplicatePositions.slice(0, 6)) {
       lines.push(
@@ -710,7 +710,7 @@ export function summarizeProblems(p: PublishProblems): string[] {
 
   if (p.droppedPositions.length) {
     lines.push(
-      `${p.droppedPositions.length} position row(s) skipped — missing required column:`
+      `${p.droppedPositions.length} position row(s) skipped, missing required column:`
     );
     for (const d of p.droppedPositions.slice(0, 4)) {
       lines.push(

@@ -187,7 +187,7 @@ function runPublishFlow_(validateOnly) {
       : `Published (${elapsed}s)`;
     const followup = validateOnly
       ? "No blocking issues found. Ready to publish."
-      : "Site cache refreshed — new data live in ~30s.";
+      : "Site cache refreshed. New data live in ~30s.";
     ui.alert(
       heading,
       `${followup}\n\n` +
@@ -196,7 +196,7 @@ function runPublishFlow_(validateOnly) {
         `Races:       ${c.races}\n` +
         `Positions:   ${c.positions}\n` +
         `Corrections: ${c.corrections}\n` +
-        (warnCount ? `\n${warnCount} soft warning(s) — see below:\n` + (body.summary || []).slice(0, 12).join("\n") : ""),
+        (warnCount ? `\n${warnCount} soft warning(s), see below:\n` + (body.summary || []).slice(0, 12).join("\n") : ""),
       ui.ButtonSet.OK
     );
     return;
