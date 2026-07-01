@@ -293,7 +293,9 @@ export interface PublishProblems {
 // Excluded states (mirrors EXCLUDED_STATES in build_tracker_json.py)
 // ---------------------------------------------------------------------------
 
-const EXCLUDED_STATES = new Set(["CA"]);
+// California un-excluded 2026-07-01 after Vinaya coded positions for
+// ~155 CA candidates. Add abbreviations here to reinstate an exclusion.
+const EXCLUDED_STATES = new Set<string>();
 
 // ---------------------------------------------------------------------------
 // Main

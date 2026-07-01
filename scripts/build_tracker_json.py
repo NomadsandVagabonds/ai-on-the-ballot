@@ -78,7 +78,7 @@ FIXED_TIMESTAMP = "2026-04-17T00:00:00Z"
 # Candidates, their races, and any positions referencing them are dropped
 # at build time. Remove a state from this set when its data is ready to
 # go live (see About > Coverage timeline for primary dates).
-EXCLUDED_STATES: set[str] = {"CA"}
+EXCLUDED_STATES: set[str] = set()  # CA un-excluded 2026-07-01
 
 # ----------------------------------------------------------------------
 # Normalizers
