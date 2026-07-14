@@ -149,6 +149,66 @@ async function persist(bundle: NormalizedBundle) {
   const errs: string[] = [];
   let e: string | null;
 
+  // Reconcile candidate ids against the DB's existing slug → id map.
+  // The candidates table has UNIQUE (slug); an INSERT that produces a
+  // new id for an existing slug (Vinaya renamed a sheet id, or a new
+  // row happens to collide on first-last-state) aborts the whole chunk.
+  // Rewrite the payload id + every FK reference to the DB's canonical
+  // id so the upsert becomes a clean UPDATE.
+  const slugs = bundle.candidates.map((c) => c.slug);
+  const dbIdBySlug = new Map<string, string>();
+  for (let i = 0; i < slugs.length; i += 100) {
+    const slice = slugs.slice(i, i + 100);
+    const { data, error } = await supabase
+      .from("candidates")
+      .select("id, slug")
+      .in("slug", slice);
+    if (error) {
+      errs.push(`candidates slug prefetch: ${error.message}`);
+      break;
+    }
+    for (const row of data ?? []) {
+      dbIdBySlug.set(row.slug as string, row.id as string);
+    }
+  }
+  const idRemap = new Map<string, string>();
+  for (const c of bundle.candidates) {
+    const dbId = dbIdBySlug.get(c.slug);
+    if (dbId && dbId !== c.id) {
+      idRemap.set(c.id, dbId);
+      c.id = dbId;
+    }
+  }
+  if (idRemap.size > 0) {
+    for (const rc of bundle.race_candidates) {
+      const mapped = idRemap.get(rc.candidate_id);
+      if (mapped) rc.candidate_id = mapped;
+    }
+    for (const p of bundle.positions) {
+      const mapped = idRemap.get(p.candidate_id);
+      if (mapped) p.candidate_id = mapped;
+    }
+    // Remap may have introduced duplicate (race_id, candidate_id) or
+    // (candidate_id, issue_id) pairs against non-remapped rows. Dedupe.
+    const seenRc = new Set<string>();
+    bundle.race_candidates = bundle.race_candidates.filter((rc) => {
+      const k = `${rc.race_id}::${rc.candidate_id}`;
+      if (seenRc.has(k)) return false;
+      seenRc.add(k);
+      return true;
+    });
+    const seenPos = new Set<string>();
+    bundle.positions = bundle.positions.filter((p) => {
+      const k = `${p.candidate_id}::${p.issue_id}`;
+      if (seenPos.has(k)) return false;
+      seenPos.add(k);
+      return true;
+    });
+    bundle.warnings.push(
+      `Remapped ${idRemap.size} candidate id(s) to existing DB rows with the same slug (first-last-state). Sheet ids differed from what's stored; the DB row was updated in place. If any of these are actually different people who share a name, differentiate the display name in the sheet.`
+    );
+  }
+
   e = await chunkUpsert(supabase, "issues", bundle.issues, "id");
   if (e) errs.push(e);
   e = await chunkUpsert(supabase, "candidates", bundle.candidates, "id", 200);
