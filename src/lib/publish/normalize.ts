@@ -18,7 +18,13 @@ export type RawCandidateRow = {
   district?: string | number | null;
   incumbency?: string | null;
   "amount raised"?: number | string | null;
-  /** "Y" once the candidate advanced to the November general-election ballot. */
+  /**
+   * Sheet's "general ballot" column: "Y" once the candidate advanced to
+   * the November ballot. Other observed values (RUNOFF, GENERAL TBD,
+   * PRIMARY/GENERAL TBD, N, WRITE-IN) all normalize to false.
+   */
+  "general ballot"?: string | null;
+  /** Legacy alias for "general ballot" — kept so either header works. */
   general?: string | null;
   notes?: string | null;
 };
@@ -457,7 +463,9 @@ export function normalize(payload: PublishPayload): NormalizedBundle {
       photo_url: null,
       is_incumbent: (clean(r.incumbency) ?? "").toUpperCase() === "Y",
       total_raised: totalRaised,
-      in_general_election: (clean(r.general) ?? "").toUpperCase() === "Y",
+      in_general_election:
+        (clean(r["general ballot"]) ?? clean(r.general) ?? "").toUpperCase() ===
+        "Y",
     };
     candidates.push(out);
     candBySheetId.set(sheetId, out);
