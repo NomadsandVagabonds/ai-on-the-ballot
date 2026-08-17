@@ -10,6 +10,7 @@
  */
 
 import type { CandidateSummary } from "@/types/domain";
+import { GENERAL_ELECTION_SEED } from "./general-election-seed";
 
 export const CANDIDATE_DISPLAY_LIMIT = 5;
 
@@ -52,15 +53,19 @@ export type RaceDisplayMode = "general" | "primary";
  *
  * When at least one candidate is marked `in_general_election`, show
  * exactly those (alphabetical by name — nonpartisan default, no cap;
- * general fields are small). Otherwise the primary results haven't been
- * entered for this race yet, so fall back to the fundraising-capped
- * primary view unchanged.
+ * general fields are small). Races the sheet hasn't marked yet fall
+ * back to the temporary demo seed (see general-election-seed.ts —
+ * delete at go-live). Only when neither source names anyone does the
+ * race keep the fundraising-capped primary view unchanged.
  */
 export function selectRaceCandidates<T extends CandidateSummary>(
   candidates: T[],
   limit: number = CANDIDATE_DISPLAY_LIMIT
 ): { shown: T[]; hidden: number; mode: RaceDisplayMode } {
-  const general = candidates.filter((c) => c.in_general_election);
+  let general = candidates.filter((c) => c.in_general_election);
+  if (general.length === 0) {
+    general = candidates.filter((c) => GENERAL_ELECTION_SEED.has(c.slug));
+  }
   if (general.length > 0) {
     const shown = [...general].sort((a, b) => a.name.localeCompare(b.name));
     return {
