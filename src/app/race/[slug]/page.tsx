@@ -6,8 +6,9 @@ import { getComparisonData } from "@/lib/queries/positions";
 import { chamberLabel } from "@/lib/utils/stance";
 import { parseRaceSlug } from "@/lib/utils/slugs";
 import { STATE_MAP, stateAbbrToSlug } from "@/lib/utils/states";
-import { capByFundraising } from "@/lib/utils/ranking";
+import { capByFundraising, selectRaceCandidates } from "@/lib/utils/ranking";
 import { ComparisonGrid } from "@/components/race/ComparisonGrid";
+import { RaceCandidatesView } from "@/components/race/RaceCandidatesView";
 
 export const revalidate = 1800;
 
@@ -45,10 +46,20 @@ export default async function RacePage({ params }: RacePageProps) {
     notFound();
   }
 
-  const { shown: displayedCandidates, hidden: hiddenCandidateCount } =
-    capByFundraising(race.candidates);
+  const selection = selectRaceCandidates(race.candidates);
+  const hasGeneralData = selection.mode === "general";
+  const { shown: primaryShown, hidden: primaryHidden } = capByFundraising(
+    race.candidates
+  );
+  const displayedCandidates = hasGeneralData ? selection.shown : primaryShown;
+  const hiddenCandidateCount = hasGeneralData ? 0 : primaryHidden;
+
+  // Fetch comparison data for the union of both views so the client-side
+  // "show all primary candidates" toggle never needs a round trip.
+  const candidateIds = [
+    ...new Set([...displayedCandidates, ...primaryShown].map((c) => c.id)),
+  ];
   const displayedIds = new Set(displayedCandidates.map((c) => c.id));
-  const candidateIds = displayedCandidates.map((c) => c.id);
   const fullComparisonData = await getComparisonData(candidateIds);
   const comparisonData = fullComparisonData.map((row) => ({
     ...row,
@@ -105,17 +116,21 @@ export default async function RacePage({ params }: RacePageProps) {
               <span className="font-mono tabular-nums text-text-primary">
                 {candCount}
               </span>{" "}
-              candidate{candCount === 1 ? "" : "s"}
-              {hiddenCandidateCount > 0 && (
+              {hasGeneralData
+                ? `on the November ballot`
+                : `candidate${candCount === 1 ? "" : "s"}`}
+              {(hasGeneralData
+                ? race.candidates.length > candCount
+                : hiddenCandidateCount > 0) && (
                 <span className="text-text-muted">
-                  {" "}of {race.candidates.length}
+                  {" "}of {race.candidates.length} tracked
                 </span>
               )}
             </>
           )}
         </p>
 
-        {hiddenCandidateCount > 0 && (
+        {!hasGeneralData && hiddenCandidateCount > 0 && (
           <p className="mt-2 text-sm text-text-muted">
             Top five shown, ranked by reported fundraising.
           </p>
@@ -131,6 +146,13 @@ export default async function RacePage({ params }: RacePageProps) {
             No candidates tracked in this race yet.
           </p>
         </div>
+      ) : hasGeneralData ? (
+        <RaceCandidatesView
+          general={displayedCandidates}
+          allPrimary={primaryShown}
+          primaryHidden={primaryHidden}
+          comparisonData={fullComparisonData}
+        />
       ) : (
         <ComparisonGrid
           candidates={displayedCandidates}

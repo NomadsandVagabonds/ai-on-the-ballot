@@ -43,3 +43,31 @@ export function capByFundraising<T extends CandidateSummary>(
   const hidden = Math.max(0, ranked.length - shown.length);
   return { shown, hidden };
 }
+
+/** Which lens a race's candidate list is being shown through. */
+export type RaceDisplayMode = "general" | "primary";
+
+/**
+ * Pick the default candidate list for a race, post-primary.
+ *
+ * When at least one candidate is marked `in_general_election`, show
+ * exactly those (alphabetical by name — nonpartisan default, no cap;
+ * general fields are small). Otherwise the primary results haven't been
+ * entered for this race yet, so fall back to the fundraising-capped
+ * primary view unchanged.
+ */
+export function selectRaceCandidates<T extends CandidateSummary>(
+  candidates: T[],
+  limit: number = CANDIDATE_DISPLAY_LIMIT
+): { shown: T[]; hidden: number; mode: RaceDisplayMode } {
+  const general = candidates.filter((c) => c.in_general_election);
+  if (general.length > 0) {
+    const shown = [...general].sort((a, b) => a.name.localeCompare(b.name));
+    return {
+      shown,
+      hidden: candidates.length - shown.length,
+      mode: "general",
+    };
+  }
+  return { ...capByFundraising(candidates, limit), mode: "primary" };
+}

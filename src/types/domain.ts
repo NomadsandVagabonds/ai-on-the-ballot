@@ -48,6 +48,8 @@ export interface CandidateSummary {
   is_incumbent: boolean;
   /** Campaign funds raised in whole dollars. Used to rank-cap a race's comparison view at 5. */
   total_raised: number | null;
+  /** True once the candidate is on the November general-election ballot. Absent means false. */
+  in_general_election?: boolean;
   position_count: number;
   coverage_percentage: number;
   /** Ordered stance values for the stance minibar (one per issue, in issue sort order) */

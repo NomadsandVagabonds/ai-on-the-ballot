@@ -18,6 +18,8 @@ export type RawCandidateRow = {
   district?: string | number | null;
   incumbency?: string | null;
   "amount raised"?: number | string | null;
+  /** "Y" once the candidate advanced to the November general-election ballot. */
+  general?: string | null;
   notes?: string | null;
 };
 
@@ -204,6 +206,7 @@ export interface CandidateOut {
   photo_url: string | null;
   is_incumbent: boolean;
   total_raised: number | null;
+  in_general_election: boolean;
 }
 
 export interface RaceOut {
@@ -454,6 +457,7 @@ export function normalize(payload: PublishPayload): NormalizedBundle {
       photo_url: null,
       is_incumbent: (clean(r.incumbency) ?? "").toUpperCase() === "Y",
       total_raised: totalRaised,
+      in_general_election: (clean(r.general) ?? "").toUpperCase() === "Y",
     };
     candidates.push(out);
     candBySheetId.set(sheetId, out);

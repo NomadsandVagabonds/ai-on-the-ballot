@@ -131,6 +131,7 @@ function buildSummary(c: CandidateRow): CandidateSummary {
     office_sought: c.office_sought,
     is_incumbent: c.is_incumbent,
     total_raised: c.total_raised,
+    in_general_election: c.in_general_election ?? false,
     position_count: posCount,
     coverage_percentage:
       issueCount > 0 ? Math.round((posCount / issueCount) * 100) : 0,

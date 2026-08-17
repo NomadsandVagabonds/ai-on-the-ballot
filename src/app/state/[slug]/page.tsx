@@ -4,7 +4,7 @@ import Link from "next/link";
 import { getStateData } from "@/lib/queries/states";
 import { stateSlugToName } from "@/lib/utils/states";
 import { chamberLabel } from "@/lib/utils/stance";
-import { capByFundraising } from "@/lib/utils/ranking";
+import { selectRaceCandidates } from "@/lib/utils/ranking";
 import { CandidateCard } from "@/components/race/CandidateCard";
 import { StateOutline } from "@/components/state/StateOutline";
 
@@ -143,8 +143,8 @@ export default async function StatePage({ params }: StatePageProps) {
           )}
 
           {restRaces.map((race) => {
-            const { shown: visibleCandidates, hidden: hiddenCount } =
-              capByFundraising(race.candidates);
+            const { shown: visibleCandidates, hidden: hiddenCount, mode } =
+              selectRaceCandidates(race.candidates);
 
             return (
               <section key={race.id}>
@@ -193,10 +193,22 @@ export default async function StatePage({ params }: StatePageProps) {
                         </Link>
                         {hiddenCount > 0 && (
                           <p className="text-sm text-text-muted sm:text-right">
-                            {hiddenCount} more{" "}
-                            {hiddenCount === 1 ? "candidate" : "candidates"} not shown.
-                            <br className="hidden sm:inline" />
-                            Top five ranked by reported fundraising.
+                            {mode === "general" ? (
+                              <>
+                                November matchup shown.
+                                <br className="hidden sm:inline" />
+                                {hiddenCount} primary{" "}
+                                {hiddenCount === 1 ? "candidate" : "candidates"}{" "}
+                                not on the ballot.
+                              </>
+                            ) : (
+                              <>
+                                {hiddenCount} more{" "}
+                                {hiddenCount === 1 ? "candidate" : "candidates"} not shown.
+                                <br className="hidden sm:inline" />
+                                Top five ranked by reported fundraising.
+                              </>
+                            )}
                           </p>
                         )}
                       </div>
@@ -234,9 +246,8 @@ function FirstRaceCards({
     : never;
 }) {
   if (!race) return null;
-  const { shown: visibleCandidates, hidden: hiddenCount } = capByFundraising(
-    race.candidates
-  );
+  const { shown: visibleCandidates, hidden: hiddenCount, mode } =
+    selectRaceCandidates(race.candidates);
 
   if (race.candidates.length === 0) {
     return (
@@ -265,10 +276,22 @@ function FirstRaceCards({
           </Link>
           {hiddenCount > 0 && (
             <p className="text-sm text-text-muted sm:text-right">
-              {hiddenCount} more{" "}
-              {hiddenCount === 1 ? "candidate" : "candidates"} not shown.
-              <br className="hidden sm:inline" />
-              Top five ranked by reported fundraising.
+              {mode === "general" ? (
+                <>
+                  November matchup shown.
+                  <br className="hidden sm:inline" />
+                  {hiddenCount} primary{" "}
+                  {hiddenCount === 1 ? "candidate" : "candidates"} not on the
+                  ballot.
+                </>
+              ) : (
+                <>
+                  {hiddenCount} more{" "}
+                  {hiddenCount === 1 ? "candidate" : "candidates"} not shown.
+                  <br className="hidden sm:inline" />
+                  Top five ranked by reported fundraising.
+                </>
+              )}
             </p>
           )}
         </div>
