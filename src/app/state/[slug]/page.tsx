@@ -195,11 +195,9 @@ export default async function StatePage({ params }: StatePageProps) {
                           <p className="text-sm text-text-muted sm:text-right">
                             {mode === "general" ? (
                               <>
-                                November matchup shown.
-                                <br className="hidden sm:inline" />
-                                {hiddenCount} primary{" "}
+                                {hiddenCount} more primary{" "}
                                 {hiddenCount === 1 ? "candidate" : "candidates"}{" "}
-                                not on the ballot.
+                                not shown.
                               </>
                             ) : (
                               <>
@@ -278,11 +276,8 @@ function FirstRaceCards({
             <p className="text-sm text-text-muted sm:text-right">
               {mode === "general" ? (
                 <>
-                  November matchup shown.
-                  <br className="hidden sm:inline" />
-                  {hiddenCount} primary{" "}
-                  {hiddenCount === 1 ? "candidate" : "candidates"} not on the
-                  ballot.
+                  {hiddenCount} more primary{" "}
+                  {hiddenCount === 1 ? "candidate" : "candidates"} not shown.
                 </>
               ) : (
                 <>

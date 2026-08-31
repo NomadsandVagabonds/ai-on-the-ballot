@@ -12,8 +12,11 @@ import {
   type DrawerContent,
 } from "@/components/race/StatementDrawer";
 
+/** Candidates may carry the roster annotation from selectRaceCandidates. */
+type GridCandidate = CandidateSummary & { lost_primary?: boolean };
+
 interface ComparisonGridProps {
-  candidates: CandidateSummary[];
+  candidates: GridCandidate[];
   comparisonData: ComparisonRow[];
 }
 
@@ -45,6 +48,15 @@ function microSummary(summary: string | null, words = 7): string | null {
   return tokens.slice(0, words).join(" ") + "…";
 }
 
+/** Last name for the mobile pager — skips generational suffixes like "Jr." */
+function pagerLabel(name: string): string {
+  const tokens = name
+    .replace(/,/g, "")
+    .split(/\s+/)
+    .filter((t) => !/^(jr|sr|i{2,3}|iv|v)\.?$/i.test(t));
+  return tokens[tokens.length - 1] ?? name;
+}
+
 function initials(name: string): string {
   return name
     .split(/\s+/)
@@ -72,12 +84,23 @@ const SOURCE_TYPE_LABELS: Record<string, string> = {
   news: "News",
 };
 
+/** Small neutral tag marking a candidate eliminated in the primary. */
+function LostPrimaryTag({ className = "" }: { className?: string }) {
+  return (
+    <span
+      className={`inline-flex items-center px-1.5 py-0.5 rounded-sm border border-border-strong bg-bg-elevated text-[10px] font-semibold uppercase tracking-[0.08em] text-text-muted ${className}`}
+    >
+      Lost primary
+    </span>
+  );
+}
+
 /* ============================================================
    Candidate column header — square portrait, Crimson name,
    party + mono sub-line
    ============================================================ */
 
-function CandidateHeader({ candidate }: { candidate: CandidateSummary }) {
+function CandidateHeader({ candidate }: { candidate: GridCandidate }) {
   const subLine = [
     candidate.district ? `DIST ${candidate.district}` : null,
     candidate.is_incumbent ? "INCUMBENT" : null,
@@ -85,10 +108,13 @@ function CandidateHeader({ candidate }: { candidate: CandidateSummary }) {
     .filter(Boolean)
     .join(" · ");
 
+  const lost = candidate.lost_primary === true;
   const portraitSrc = resolveCandidatePhoto(candidate);
   return (
     <div className="flex flex-col items-center gap-3 px-2 pb-4 text-center">
-      <div className="portrait-frame w-16 h-16">
+      <div
+        className={`portrait-frame w-16 h-16 ${lost ? "grayscale opacity-50" : ""}`}
+      >
         {portraitSrc ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
@@ -101,10 +127,19 @@ function CandidateHeader({ candidate }: { candidate: CandidateSummary }) {
         )}
       </div>
       <div className="min-w-0">
-        <p className="font-display text-[17px] font-semibold leading-[1.1] text-text-primary">
+        <p
+          className={`font-display text-[17px] font-semibold leading-[1.1] ${
+            lost
+              ? "text-text-muted line-through decoration-[1.5px]"
+              : "text-text-primary"
+          }`}
+        >
           {candidate.name}
         </p>
-        <div className="mt-2 flex items-center justify-center gap-2">
+        {lost && <LostPrimaryTag className="mt-2" />}
+        <div
+          className={`mt-2 flex items-center justify-center gap-2 ${lost ? "opacity-50 grayscale" : ""}`}
+        >
           <PartyBadge party={candidate.party} size="sm" />
           {subLine && (
             <span className="marginalia-label" style={{ margin: 0 }}>
@@ -126,7 +161,7 @@ function DesktopMatrix({
   rows,
   onExpand,
 }: {
-  candidates: CandidateSummary[];
+  candidates: GridCandidate[];
   rows: ComparisonRow[];
   onExpand: (candidate: CandidateSummary, row: ComparisonRow, pos: PositionLike) => void;
 }) {
@@ -211,8 +246,10 @@ function DesktopMatrix({
                   : null;
 
                 const expandable = hasDrawerContent(pos);
+                const lost = candidate?.lost_primary === true;
                 const cellClass =
                   "px-4 py-5 border-l border-border flex flex-col items-center gap-1.5 text-center w-full" +
+                  (lost ? " opacity-45 grayscale" : "") +
                   (expandable
                     ? " cursor-pointer hover:bg-bg-elevated/60 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-primary"
                     : "");
@@ -282,12 +319,13 @@ function MobileDispatches({
   rows,
   onExpand,
 }: {
-  candidates: CandidateSummary[];
+  candidates: GridCandidate[];
   rows: ComparisonRow[];
   onExpand: (candidate: CandidateSummary, row: ComparisonRow, pos: PositionLike) => void;
 }) {
   const [activeIndex, setActiveIndex] = useState(0);
   const active = candidates[activeIndex];
+  const activeLost = active.lost_primary === true;
 
   return (
     <div>
@@ -302,11 +340,17 @@ function MobileDispatches({
             className={`flex-1 min-w-0 px-3 py-2.5 text-center truncate transition-colors border-l first:border-l-0 border-border ${
               i === activeIndex
                 ? "bg-accent-primary text-white"
-                : "bg-bg-surface text-text-secondary hover:bg-bg-elevated"
+                : c.lost_primary
+                  ? "bg-bg-elevated text-text-muted hover:bg-bg-elevated"
+                  : "bg-bg-surface text-text-secondary hover:bg-bg-elevated"
             }`}
           >
-            <span className="font-display text-sm font-semibold">
-              {c.name.split(" ").slice(-1)[0]}
+            <span
+              className={`font-display text-sm font-semibold ${
+                c.lost_primary ? "line-through" : ""
+              }`}
+            >
+              {pagerLabel(c.name)}
             </span>
           </button>
         ))}
@@ -314,7 +358,11 @@ function MobileDispatches({
 
       {/* Active candidate masthead */}
       <div className="flex items-center gap-4 pb-5 border-b border-border-strong">
-        <div className="portrait-frame w-14 h-14 shrink-0">
+        <div
+          className={`portrait-frame w-14 h-14 shrink-0 ${
+            activeLost ? "grayscale opacity-50" : ""
+          }`}
+        >
           {(() => {
             const src = resolveCandidatePhoto(active);
             return src ? (
@@ -336,11 +384,20 @@ function MobileDispatches({
             {active.district ? `Dist. ${active.district}` : active.office_sought}
             {active.is_incumbent && " · Incumbent"}
           </p>
-          <p className="font-display text-lg font-semibold leading-tight text-text-primary">
+          <p
+            className={`font-display text-lg font-semibold leading-tight ${
+              activeLost
+                ? "text-text-muted line-through decoration-[1.5px]"
+                : "text-text-primary"
+            }`}
+          >
             {active.name}
           </p>
-          <div className="mt-1.5">
-            <PartyBadge party={active.party} size="sm" />
+          <div className="mt-1.5 flex items-center gap-2">
+            <span className={activeLost ? "opacity-50 grayscale" : undefined}>
+              <PartyBadge party={active.party} size="sm" />
+            </span>
+            {activeLost && <LostPrimaryTag />}
           </div>
         </div>
       </div>

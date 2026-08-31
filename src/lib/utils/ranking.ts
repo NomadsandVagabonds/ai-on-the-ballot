@@ -48,31 +48,53 @@ export function capByFundraising<T extends CandidateSummary>(
 /** Which lens a race's candidate list is being shown through. */
 export type RaceDisplayMode = "general" | "primary";
 
+/** A candidate annotated with their post-primary status for display. */
+export type RosterCandidate<T extends CandidateSummary> = T & {
+  /** True when the race has general-election results and this candidate is not on the November ballot. */
+  lost_primary: boolean;
+};
+
 /**
- * Pick the default candidate list for a race, post-primary.
+ * Build the display roster for a race, post-primary.
  *
- * When at least one candidate is marked `in_general_election`, show
- * exactly those (alphabetical by name — nonpartisan default, no cap;
- * general fields are small). Races the sheet hasn't marked yet fall
- * back to the temporary demo seed (see general-election-seed.ts —
- * delete at go-live). Only when neither source names anyone does the
- * race keep the fundraising-capped primary view unchanged.
+ * When at least one candidate is on the November ballot (via the
+ * `in_general_election` flag, or the temporary demo seed for races the
+ * sheet hasn't marked yet — see general-election-seed.ts, delete at
+ * go-live), every candidate stays visible: general-ballot candidates
+ * lead (alphabetical — nonpartisan default), followed by the
+ * fundraising-ranked primary field marked `lost_primary` so the UI can
+ * grey and cross them out. The fundraising cap still bounds the losers
+ * shown, so fringe filers don't bury the matchup.
+ *
+ * Races without primary results keep the capped primary view unchanged.
  */
 export function selectRaceCandidates<T extends CandidateSummary>(
   candidates: T[],
   limit: number = CANDIDATE_DISPLAY_LIMIT
-): { shown: T[]; hidden: number; mode: RaceDisplayMode } {
+): { shown: RosterCandidate<T>[]; hidden: number; mode: RaceDisplayMode } {
   let general = candidates.filter((c) => c.in_general_election);
   if (general.length === 0) {
     general = candidates.filter((c) => GENERAL_ELECTION_SEED.has(c.slug));
   }
   if (general.length > 0) {
-    const shown = [...general].sort((a, b) => a.name.localeCompare(b.name));
+    const generalIds = new Set(general.map((c) => c.id));
+    const onBallot = [...general]
+      .sort((a, b) => a.name.localeCompare(b.name))
+      .map((c) => ({ ...c, lost_primary: false }));
+    const eliminated = capByFundraising(candidates, limit)
+      .shown.filter((c) => !generalIds.has(c.id))
+      .map((c) => ({ ...c, lost_primary: true }));
+    const shown = [...onBallot, ...eliminated];
     return {
       shown,
       hidden: candidates.length - shown.length,
       mode: "general",
     };
   }
-  return { ...capByFundraising(candidates, limit), mode: "primary" };
+  const { shown, hidden } = capByFundraising(candidates, limit);
+  return {
+    shown: shown.map((c) => ({ ...c, lost_primary: false })),
+    hidden,
+    mode: "primary",
+  };
 }

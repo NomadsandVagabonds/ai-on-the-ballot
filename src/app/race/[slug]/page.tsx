@@ -6,9 +6,8 @@ import { getComparisonData } from "@/lib/queries/positions";
 import { chamberLabel } from "@/lib/utils/stance";
 import { parseRaceSlug } from "@/lib/utils/slugs";
 import { STATE_MAP, stateAbbrToSlug } from "@/lib/utils/states";
-import { capByFundraising, selectRaceCandidates } from "@/lib/utils/ranking";
+import { selectRaceCandidates } from "@/lib/utils/ranking";
 import { ComparisonGrid } from "@/components/race/ComparisonGrid";
-import { RaceCandidatesView } from "@/components/race/RaceCandidatesView";
 
 export const revalidate = 1800;
 
@@ -48,23 +47,19 @@ export default async function RacePage({ params }: RacePageProps) {
 
   const selection = selectRaceCandidates(race.candidates);
   const hasGeneralData = selection.mode === "general";
-  const { shown: primaryShown, hidden: primaryHidden } = capByFundraising(
-    race.candidates
-  );
-  const displayedCandidates = hasGeneralData ? selection.shown : primaryShown;
-  const hiddenCandidateCount = hasGeneralData ? 0 : primaryHidden;
+  const displayedCandidates = selection.shown;
+  const hiddenCandidateCount = selection.hidden;
+  const onBallotCount = displayedCandidates.filter(
+    (c) => !c.lost_primary
+  ).length;
+  const lostPrimaryCount = displayedCandidates.length - onBallotCount;
 
-  // Fetch comparison data for the union of both views so the client-side
-  // "show all primary candidates" toggle never needs a round trip.
-  const candidateIds = [
-    ...new Set([...displayedCandidates, ...primaryShown].map((c) => c.id)),
-  ];
-  const displayedIds = new Set(displayedCandidates.map((c) => c.id));
-  const fullComparisonData = await getComparisonData(candidateIds);
-  const comparisonData = fullComparisonData.map((row) => ({
-    ...row,
-    positions: row.positions.filter((p) => displayedIds.has(p.candidate_id)),
-  }));
+  // Comparison rows come back in candidate-id order, which keeps grid
+  // columns aligned with the roster: general-ballot candidates first,
+  // then the crossed-out primary field.
+  const comparisonData = await getComparisonData(
+    displayedCandidates.map((c) => c.id)
+  );
 
   const stateName = STATE_MAP[race.state] ?? race.state;
   const stateSlug = stateAbbrToSlug(race.state);
@@ -110,25 +105,43 @@ export default async function RacePage({ params }: RacePageProps) {
 
         <p className="cand-meta mt-3">
           {stateName} · {race.election_year}
-          {candCount > 0 && (
-            <>
-              {" · "}
-              <span className="font-mono tabular-nums text-text-primary">
-                {candCount}
-              </span>{" "}
-              {hasGeneralData
-                ? `on the November ballot`
-                : `candidate${candCount === 1 ? "" : "s"}`}
-              {(hasGeneralData
-                ? race.candidates.length > candCount
-                : hiddenCandidateCount > 0) && (
-                <span className="text-text-muted">
-                  {" "}of {race.candidates.length} tracked
-                </span>
-              )}
-            </>
-          )}
+          {candCount > 0 &&
+            (hasGeneralData ? (
+              <>
+                {" · "}
+                <span className="font-mono tabular-nums text-text-primary">
+                  {onBallotCount}
+                </span>{" "}
+                on the November ballot
+                {lostPrimaryCount > 0 && (
+                  <span className="text-text-muted">
+                    {" · "}
+                    {lostPrimaryCount} lost the primary
+                  </span>
+                )}
+              </>
+            ) : (
+              <>
+                {" · "}
+                <span className="font-mono tabular-nums text-text-primary">
+                  {candCount}
+                </span>{" "}
+                candidate{candCount === 1 ? "" : "s"}
+                {hiddenCandidateCount > 0 && (
+                  <span className="text-text-muted">
+                    {" "}of {race.candidates.length} tracked
+                  </span>
+                )}
+              </>
+            ))}
         </p>
+
+        {hasGeneralData && lostPrimaryCount > 0 && (
+          <p className="mt-2 text-sm text-text-muted">
+            Candidates who did not advance to the general election stay
+            listed, crossed out.
+          </p>
+        )}
 
         {!hasGeneralData && hiddenCandidateCount > 0 && (
           <p className="mt-2 text-sm text-text-muted">
@@ -146,13 +159,6 @@ export default async function RacePage({ params }: RacePageProps) {
             No candidates tracked in this race yet.
           </p>
         </div>
-      ) : hasGeneralData ? (
-        <RaceCandidatesView
-          general={displayedCandidates}
-          allPrimary={primaryShown}
-          primaryHidden={primaryHidden}
-          comparisonData={fullComparisonData}
-        />
       ) : (
         <ComparisonGrid
           candidates={displayedCandidates}
