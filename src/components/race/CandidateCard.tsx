@@ -7,6 +7,8 @@ import { resolveCandidatePhoto } from "@/lib/utils/portrait";
 interface CandidateCardProps {
   /** May carry the roster annotation from selectRaceCandidates. */
   candidate: CandidateSummary & { lost_primary?: boolean };
+  /** True when the race has primary losers and this candidate advanced to the November ballot. */
+  advancing?: boolean;
 }
 
 function initials(name: string): string {
@@ -19,7 +21,7 @@ function initials(name: string): string {
     .toUpperCase();
 }
 
-export function CandidateCard({ candidate }: CandidateCardProps) {
+export function CandidateCard({ candidate, advancing }: CandidateCardProps) {
   const partyName = partyLabel(candidate.party);
   const portraitSrc = resolveCandidatePhoto(candidate);
   const lost = candidate.lost_primary === true;
@@ -27,8 +29,12 @@ export function CandidateCard({ candidate }: CandidateCardProps) {
   return (
     <Link
       href={`/candidate/${candidate.slug}`}
-      className={`group block border border-border rounded-sm p-5 transition-all duration-200 hover:border-border-strong hover:shadow-[var(--shadow-md)] focus-visible:outline-2 focus-visible:outline-accent-primary focus-visible:outline-offset-2 ${
-        lost ? "bg-bg-elevated/60" : "bg-bg-surface"
+      className={`group block border rounded-sm p-5 transition-all duration-200 hover:shadow-[var(--shadow-md)] focus-visible:outline-2 focus-visible:outline-accent-primary focus-visible:outline-offset-2 ${
+        lost
+          ? "bg-bg-elevated/60 border-border hover:border-border-strong"
+          : advancing
+            ? "bg-advancing-bg border-advancing-border hover:border-accent-secondary"
+            : "bg-bg-surface border-border hover:border-border-strong"
       }`}
     >
       <div className="flex items-start gap-4">
@@ -70,9 +76,7 @@ export function CandidateCard({ candidate }: CandidateCardProps) {
 
           <h3
             className={`font-display text-lg font-semibold leading-tight transition-colors group-hover:text-accent-primary ${
-              lost
-                ? "text-text-muted line-through decoration-[1.5px]"
-                : "text-text-primary"
+              lost ? "text-text-muted" : "text-text-primary"
             }`}
           >
             {candidate.name}

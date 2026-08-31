@@ -176,6 +176,9 @@ export default async function StatePage({ params }: StatePageProps) {
                         <CandidateCard
                           key={candidate.id}
                           candidate={candidate}
+                          advancing={
+                            mode === "general" && !candidate.lost_primary
+                          }
                         />
                       ))}
                     </div>
@@ -259,7 +262,11 @@ function FirstRaceCards({
     <section>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {visibleCandidates.map((candidate) => (
-          <CandidateCard key={candidate.id} candidate={candidate} />
+          <CandidateCard
+            key={candidate.id}
+            candidate={candidate}
+            advancing={mode === "general" && !candidate.lost_primary}
+          />
         ))}
       </div>
 

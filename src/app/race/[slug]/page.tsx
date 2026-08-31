@@ -139,7 +139,7 @@ export default async function RacePage({ params }: RacePageProps) {
         {hasGeneralData && lostPrimaryCount > 0 && (
           <p className="mt-2 text-sm text-text-muted">
             Candidates who did not advance to the general election stay
-            listed, crossed out.
+            listed, greyed out.
           </p>
         )}
 

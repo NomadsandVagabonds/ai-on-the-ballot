@@ -100,7 +100,14 @@ function LostPrimaryTag({ className = "" }: { className?: string }) {
    party + mono sub-line
    ============================================================ */
 
-function CandidateHeader({ candidate }: { candidate: GridCandidate }) {
+function CandidateHeader({
+  candidate,
+  advancing,
+}: {
+  candidate: GridCandidate;
+  /** True when the race has primary losers and this candidate is on the November ballot. */
+  advancing?: boolean;
+}) {
   const subLine = [
     candidate.district ? `DIST ${candidate.district}` : null,
     candidate.is_incumbent ? "INCUMBENT" : null,
@@ -111,7 +118,11 @@ function CandidateHeader({ candidate }: { candidate: GridCandidate }) {
   const lost = candidate.lost_primary === true;
   const portraitSrc = resolveCandidatePhoto(candidate);
   return (
-    <div className="flex flex-col items-center gap-3 px-2 pb-4 text-center">
+    <div
+      className={`flex flex-col items-center gap-3 px-2 pb-4 text-center ${
+        advancing ? "pt-3" : ""
+      }`}
+    >
       <div
         className={`portrait-frame w-16 h-16 ${lost ? "grayscale opacity-50" : ""}`}
       >
@@ -129,9 +140,7 @@ function CandidateHeader({ candidate }: { candidate: GridCandidate }) {
       <div className="min-w-0">
         <p
           className={`font-display text-[17px] font-semibold leading-[1.1] ${
-            lost
-              ? "text-text-muted line-through decoration-[1.5px]"
-              : "text-text-primary"
+            lost ? "text-text-muted" : "text-text-primary"
           }`}
         >
           {candidate.name}
@@ -166,6 +175,7 @@ function DesktopMatrix({
   onExpand: (candidate: CandidateSummary, row: ComparisonRow, pos: PositionLike) => void;
 }) {
   const n = candidates.length;
+  const hasLosers = candidates.some((c) => c.lost_primary);
 
   const gridTemplate = {
     gridTemplateColumns: `minmax(15rem, 1.3fr) repeat(${n}, minmax(9rem, 1fr))`,
@@ -184,15 +194,20 @@ function DesktopMatrix({
         <div role="columnheader" className="px-4 pt-1">
           <span className="marginalia-label">Issue</span>
         </div>
-        {candidates.map((c) => (
-          <div
-            key={c.id}
-            role="columnheader"
-            className="border-l border-border"
-          >
-            <CandidateHeader candidate={c} />
-          </div>
-        ))}
+        {candidates.map((c) => {
+          const advancing = hasLosers && !c.lost_primary;
+          return (
+            <div
+              key={c.id}
+              role="columnheader"
+              className={`border-l border-border ${
+                advancing ? "bg-advancing-bg rounded-t-sm" : ""
+              }`}
+            >
+              <CandidateHeader candidate={c} advancing={advancing} />
+            </div>
+          );
+        })}
       </div>
 
       {/* Body rows */}
@@ -326,6 +341,7 @@ function MobileDispatches({
   const [activeIndex, setActiveIndex] = useState(0);
   const active = candidates[activeIndex];
   const activeLost = active.lost_primary === true;
+  const hasLosers = candidates.some((c) => c.lost_primary);
 
   return (
     <div>
@@ -342,14 +358,12 @@ function MobileDispatches({
                 ? "bg-accent-primary text-white"
                 : c.lost_primary
                   ? "bg-bg-elevated text-text-muted hover:bg-bg-elevated"
-                  : "bg-bg-surface text-text-secondary hover:bg-bg-elevated"
+                  : hasLosers
+                    ? "bg-advancing-bg text-text-secondary hover:bg-bg-elevated"
+                    : "bg-bg-surface text-text-secondary hover:bg-bg-elevated"
             }`}
           >
-            <span
-              className={`font-display text-sm font-semibold ${
-                c.lost_primary ? "line-through" : ""
-              }`}
-            >
+            <span className="font-display text-sm font-semibold">
               {pagerLabel(c.name)}
             </span>
           </button>
@@ -386,9 +400,7 @@ function MobileDispatches({
           </p>
           <p
             className={`font-display text-lg font-semibold leading-tight ${
-              activeLost
-                ? "text-text-muted line-through decoration-[1.5px]"
-                : "text-text-primary"
+              activeLost ? "text-text-muted" : "text-text-primary"
             }`}
           >
             {active.name}
