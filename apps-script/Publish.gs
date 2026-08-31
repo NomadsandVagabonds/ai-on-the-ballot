@@ -31,7 +31,7 @@ const PUBLISH_TOKEN = "REPLACE-WITH-PUBLISH_TOKEN-VALUE-FROM-VERCEL";
 // -------------------------------
 
 const SHEET_HEADERS = {
-  Candidates: ["id", "name", "state", "party", "seat", "district", "incumbency", "amount raised", "notes"],
+  Candidates: ["id", "name", "state", "party", "seat", "district", "incumbency", "amount raised", "general ballot", "notes"],
   "Positions v2": ["id", "candidateId", "topicId", "stance", "confidence", "summary", "lastUpdated", "coder", "notes"],
   Topics: ["id", "name", "shortName", "description", "includes", "excludes"],
   Sources: ["positionId", "type", "title", "url", "date", "excerpt"],
@@ -58,9 +58,13 @@ function readSheet(name) {
   const data = sheet.getDataRange().getValues();
   if (data.length < 2) return [];
   const header = data[0].map((h) => String(h || "").trim());
+  // Compare case-insensitively: the server reads columns the same way, so
+  // "General Ballot" and "general ballot" are both fine. A genuinely
+  // missing column still fails here, loudly, instead of publishing blanks.
+  const headerKeys = header.map((h) => h.toLowerCase());
   const expected = SHEET_HEADERS[name] || [];
   for (const col of expected) {
-    if (header.indexOf(col) === -1) {
+    if (headerKeys.indexOf(col.toLowerCase()) === -1) {
       throw new Error(`Sheet "${name}" missing required column: ${col}`);
     }
   }

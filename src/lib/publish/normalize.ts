@@ -22,6 +22,7 @@ export type RawCandidateRow = {
    * Sheet's "general ballot" column: "Y" once the candidate advanced to
    * the November ballot. Other observed values (RUNOFF, GENERAL TBD,
    * PRIMARY/GENERAL TBD, N, WRITE-IN) all normalize to false.
+   * Read via cell(), so the header's capitalization does not matter.
    */
   "general ballot"?: string | null;
   /** Legacy alias for "general ballot" — kept so either header works. */
@@ -114,6 +115,27 @@ function clean(v: unknown): string | null {
   if (v === null || v === undefined) return null;
   const s = String(v).trim();
   return s === "" ? null : s;
+}
+
+/**
+ * Read a sheet column by header name, case- and whitespace-insensitively.
+ *
+ * Row keys come straight from the sheet's header row, so a well-meaning
+ * retitle to "General Ballot" would otherwise read as an empty column and
+ * silently blank the field for every candidate. Names are tried in order;
+ * the first one present and non-empty wins.
+ */
+function cell(row: object, ...names: string[]): string | null {
+  const entries = Object.entries(row as Record<string, unknown>);
+  for (const name of names) {
+    const want = name.trim().toLowerCase();
+    for (const [key, value] of entries) {
+      if (key.trim().toLowerCase() !== want) continue;
+      const found = clean(value);
+      if (found !== null) return found;
+    }
+  }
+  return null;
 }
 
 function normStance(s: string | null | undefined): string {
@@ -464,8 +486,7 @@ export function normalize(payload: PublishPayload): NormalizedBundle {
       is_incumbent: (clean(r.incumbency) ?? "").toUpperCase() === "Y",
       total_raised: totalRaised,
       in_general_election:
-        (clean(r["general ballot"]) ?? clean(r.general) ?? "").toUpperCase() ===
-        "Y",
+        (cell(r, "general ballot", "general") ?? "").toUpperCase() === "Y",
     };
     candidates.push(out);
     candBySheetId.set(sheetId, out);
