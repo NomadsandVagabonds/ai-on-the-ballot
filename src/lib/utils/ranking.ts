@@ -51,7 +51,7 @@ export type RaceDisplayMode = "general" | "primary";
 /** A candidate annotated with their post-primary status for display. */
 export type RosterCandidate<T extends CandidateSummary> = T & {
   /** True when the race has general-election results and this candidate is not on the November ballot. */
-  lost_primary: boolean;
+  not_advancing: boolean;
 };
 
 /**
@@ -62,9 +62,9 @@ export type RosterCandidate<T extends CandidateSummary> = T & {
  * sheet hasn't marked yet — see general-election-seed.ts, delete at
  * go-live), every candidate stays visible: general-ballot candidates
  * lead (alphabetical — nonpartisan default), followed by the
- * fundraising-ranked primary field marked `lost_primary` so the UI can
- * grey and cross them out. The fundraising cap still bounds the losers
- * shown, so fringe filers don't bury the matchup.
+ * fundraising-ranked rest of the primary field marked `not_advancing`
+ * so the UI can grey them out. The fundraising cap still bounds that
+ * tail, so fringe filers don't bury the matchup.
  *
  * Races without primary results keep the capped primary view unchanged.
  */
@@ -80,10 +80,10 @@ export function selectRaceCandidates<T extends CandidateSummary>(
     const generalIds = new Set(general.map((c) => c.id));
     const onBallot = [...general]
       .sort((a, b) => a.name.localeCompare(b.name))
-      .map((c) => ({ ...c, lost_primary: false }));
+      .map((c) => ({ ...c, not_advancing: false }));
     const eliminated = capByFundraising(candidates, limit)
       .shown.filter((c) => !generalIds.has(c.id))
-      .map((c) => ({ ...c, lost_primary: true }));
+      .map((c) => ({ ...c, not_advancing: true }));
     const shown = [...onBallot, ...eliminated];
     return {
       shown,
@@ -93,7 +93,7 @@ export function selectRaceCandidates<T extends CandidateSummary>(
   }
   const { shown, hidden } = capByFundraising(candidates, limit);
   return {
-    shown: shown.map((c) => ({ ...c, lost_primary: false })),
+    shown: shown.map((c) => ({ ...c, not_advancing: false })),
     hidden,
     mode: "primary",
   };

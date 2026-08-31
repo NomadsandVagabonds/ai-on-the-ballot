@@ -177,7 +177,7 @@ export default async function StatePage({ params }: StatePageProps) {
                           key={candidate.id}
                           candidate={candidate}
                           advancing={
-                            mode === "general" && !candidate.lost_primary
+                            mode === "general" && !candidate.not_advancing
                           }
                         />
                       ))}
@@ -265,7 +265,7 @@ function FirstRaceCards({
           <CandidateCard
             key={candidate.id}
             candidate={candidate}
-            advancing={mode === "general" && !candidate.lost_primary}
+            advancing={mode === "general" && !candidate.not_advancing}
           />
         ))}
       </div>

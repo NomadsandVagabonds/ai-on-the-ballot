@@ -13,7 +13,7 @@ import {
 } from "@/components/race/StatementDrawer";
 
 /** Candidates may carry the roster annotation from selectRaceCandidates. */
-type GridCandidate = CandidateSummary & { lost_primary?: boolean };
+type GridCandidate = CandidateSummary & { not_advancing?: boolean };
 
 interface ComparisonGridProps {
   candidates: GridCandidate[];
@@ -84,13 +84,15 @@ const SOURCE_TYPE_LABELS: Record<string, string> = {
   news: "News",
 };
 
-/** Small neutral tag marking a candidate eliminated in the primary. */
-function LostPrimaryTag({ className = "" }: { className?: string }) {
+/** Small neutral tag for a candidate who is not on the November ballot.
+ * States the fact rather than the cause: the data only records whether a
+ * candidate advanced, not whether they lost, withdrew, or never filed. */
+function NotAdvancingTag({ className = "" }: { className?: string }) {
   return (
     <span
       className={`inline-flex items-center px-1.5 py-0.5 rounded-sm border border-border-strong bg-bg-elevated text-[10px] font-semibold uppercase tracking-[0.08em] text-text-muted ${className}`}
     >
-      Lost primary
+      Not advancing
     </span>
   );
 }
@@ -105,7 +107,7 @@ function CandidateHeader({
   advancing,
 }: {
   candidate: GridCandidate;
-  /** True when the race has primary losers and this candidate is on the November ballot. */
+  /** True when some candidate in the race is not advancing and this one is on the November ballot. */
   advancing?: boolean;
 }) {
   const subLine = [
@@ -115,7 +117,7 @@ function CandidateHeader({
     .filter(Boolean)
     .join(" · ");
 
-  const lost = candidate.lost_primary === true;
+  const lost = candidate.not_advancing === true;
   const portraitSrc = resolveCandidatePhoto(candidate);
   return (
     <div
@@ -145,7 +147,7 @@ function CandidateHeader({
         >
           {candidate.name}
         </p>
-        {lost && <LostPrimaryTag className="mt-2" />}
+        {lost && <NotAdvancingTag className="mt-2" />}
         <div
           className={`mt-2 flex items-center justify-center gap-2 ${lost ? "opacity-50 grayscale" : ""}`}
         >
@@ -175,7 +177,7 @@ function DesktopMatrix({
   onExpand: (candidate: CandidateSummary, row: ComparisonRow, pos: PositionLike) => void;
 }) {
   const n = candidates.length;
-  const hasLosers = candidates.some((c) => c.lost_primary);
+  const hasLosers = candidates.some((c) => c.not_advancing);
 
   const gridTemplate = {
     gridTemplateColumns: `minmax(15rem, 1.3fr) repeat(${n}, minmax(9rem, 1fr))`,
@@ -195,7 +197,7 @@ function DesktopMatrix({
           <span className="marginalia-label">Issue</span>
         </div>
         {candidates.map((c) => {
-          const advancing = hasLosers && !c.lost_primary;
+          const advancing = hasLosers && !c.not_advancing;
           return (
             <div
               key={c.id}
@@ -261,7 +263,7 @@ function DesktopMatrix({
                   : null;
 
                 const expandable = hasDrawerContent(pos);
-                const lost = candidate?.lost_primary === true;
+                const lost = candidate?.not_advancing === true;
                 const cellClass =
                   "px-4 py-5 border-l border-border flex flex-col items-center gap-1.5 text-center w-full" +
                   (lost ? " opacity-45 grayscale" : "") +
@@ -340,8 +342,8 @@ function MobileDispatches({
 }) {
   const [activeIndex, setActiveIndex] = useState(0);
   const active = candidates[activeIndex];
-  const activeLost = active.lost_primary === true;
-  const hasLosers = candidates.some((c) => c.lost_primary);
+  const activeLost = active.not_advancing === true;
+  const hasLosers = candidates.some((c) => c.not_advancing);
 
   return (
     <div>
@@ -356,7 +358,7 @@ function MobileDispatches({
             className={`flex-1 min-w-0 px-3 py-2.5 text-center truncate transition-colors border-l first:border-l-0 border-border ${
               i === activeIndex
                 ? "bg-accent-primary text-white"
-                : c.lost_primary
+                : c.not_advancing
                   ? "bg-bg-elevated text-text-muted hover:bg-bg-elevated"
                   : hasLosers
                     ? "bg-advancing-bg text-text-secondary hover:bg-bg-elevated"
@@ -409,7 +411,7 @@ function MobileDispatches({
             <span className={activeLost ? "opacity-50 grayscale" : undefined}>
               <PartyBadge party={active.party} size="sm" />
             </span>
-            {activeLost && <LostPrimaryTag />}
+            {activeLost && <NotAdvancingTag />}
           </div>
         </div>
       </div>

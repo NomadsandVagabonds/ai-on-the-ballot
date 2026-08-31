@@ -6,8 +6,8 @@ import { resolveCandidatePhoto } from "@/lib/utils/portrait";
 
 interface CandidateCardProps {
   /** May carry the roster annotation from selectRaceCandidates. */
-  candidate: CandidateSummary & { lost_primary?: boolean };
-  /** True when the race has primary losers and this candidate advanced to the November ballot. */
+  candidate: CandidateSummary & { not_advancing?: boolean };
+  /** True when some candidate in the race is not advancing and this one is on the November ballot. */
   advancing?: boolean;
 }
 
@@ -24,7 +24,7 @@ function initials(name: string): string {
 export function CandidateCard({ candidate, advancing }: CandidateCardProps) {
   const partyName = partyLabel(candidate.party);
   const portraitSrc = resolveCandidatePhoto(candidate);
-  const lost = candidate.lost_primary === true;
+  const lost = candidate.not_advancing === true;
 
   return (
     <Link
@@ -62,7 +62,7 @@ export function CandidateCard({ candidate, advancing }: CandidateCardProps) {
             </span>
             {lost ? (
               <span className="inline-flex items-center px-1.5 py-0.5 rounded-sm border border-border-strong bg-bg-elevated text-[10px] font-semibold uppercase tracking-[0.08em] text-text-muted">
-                Lost primary
+                Not advancing
               </span>
             ) : (
               <span

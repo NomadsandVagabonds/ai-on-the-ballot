@@ -50,9 +50,9 @@ export default async function RacePage({ params }: RacePageProps) {
   const displayedCandidates = selection.shown;
   const hiddenCandidateCount = selection.hidden;
   const onBallotCount = displayedCandidates.filter(
-    (c) => !c.lost_primary
+    (c) => !c.not_advancing
   ).length;
-  const lostPrimaryCount = displayedCandidates.length - onBallotCount;
+  const notAdvancingCount = displayedCandidates.length - onBallotCount;
 
   // Comparison rows come back in candidate-id order, which keeps grid
   // columns aligned with the roster: general-ballot candidates first,
@@ -113,10 +113,10 @@ export default async function RacePage({ params }: RacePageProps) {
                   {onBallotCount}
                 </span>{" "}
                 on the November ballot
-                {lostPrimaryCount > 0 && (
+                {notAdvancingCount > 0 && (
                   <span className="text-text-muted">
                     {" · "}
-                    {lostPrimaryCount} lost the primary
+                    {notAdvancingCount} not advancing
                   </span>
                 )}
               </>
@@ -136,10 +136,10 @@ export default async function RacePage({ params }: RacePageProps) {
             ))}
         </p>
 
-        {hasGeneralData && lostPrimaryCount > 0 && (
+        {hasGeneralData && notAdvancingCount > 0 && (
           <p className="mt-2 text-sm text-text-muted">
-            Candidates who did not advance to the general election stay
-            listed, greyed out.
+            Candidates who are not on the November ballot stay listed,
+            greyed out.
           </p>
         )}
 
