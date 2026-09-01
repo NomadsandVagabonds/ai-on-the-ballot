@@ -6,7 +6,7 @@ import { getComparisonData } from "@/lib/queries/positions";
 import { chamberLabel } from "@/lib/utils/stance";
 import { parseRaceSlug } from "@/lib/utils/slugs";
 import { STATE_MAP, stateAbbrToSlug } from "@/lib/utils/states";
-import { capByFundraising } from "@/lib/utils/ranking";
+import { selectRaceCandidates } from "@/lib/utils/ranking";
 import { ComparisonGrid } from "@/components/race/ComparisonGrid";
 
 export const revalidate = 1800;
@@ -45,15 +45,21 @@ export default async function RacePage({ params }: RacePageProps) {
     notFound();
   }
 
-  const { shown: displayedCandidates, hidden: hiddenCandidateCount } =
-    capByFundraising(race.candidates);
-  const displayedIds = new Set(displayedCandidates.map((c) => c.id));
-  const candidateIds = displayedCandidates.map((c) => c.id);
-  const fullComparisonData = await getComparisonData(candidateIds);
-  const comparisonData = fullComparisonData.map((row) => ({
-    ...row,
-    positions: row.positions.filter((p) => displayedIds.has(p.candidate_id)),
-  }));
+  const selection = selectRaceCandidates(race.candidates);
+  const hasGeneralData = selection.mode === "general";
+  const displayedCandidates = selection.shown;
+  const hiddenCandidateCount = selection.hidden;
+  const onBallotCount = displayedCandidates.filter(
+    (c) => !c.not_advancing
+  ).length;
+  const notAdvancingCount = displayedCandidates.length - onBallotCount;
+
+  // Comparison rows come back in candidate-id order, which keeps grid
+  // columns aligned with the roster: general-ballot candidates first,
+  // then the crossed-out primary field.
+  const comparisonData = await getComparisonData(
+    displayedCandidates.map((c) => c.id)
+  );
 
   const stateName = STATE_MAP[race.state] ?? race.state;
   const stateSlug = stateAbbrToSlug(race.state);
@@ -99,23 +105,45 @@ export default async function RacePage({ params }: RacePageProps) {
 
         <p className="cand-meta mt-3">
           {stateName} · {race.election_year}
-          {candCount > 0 && (
-            <>
-              {" · "}
-              <span className="font-mono tabular-nums text-text-primary">
-                {candCount}
-              </span>{" "}
-              candidate{candCount === 1 ? "" : "s"}
-              {hiddenCandidateCount > 0 && (
-                <span className="text-text-muted">
-                  {" "}of {race.candidates.length}
-                </span>
-              )}
-            </>
-          )}
+          {candCount > 0 &&
+            (hasGeneralData ? (
+              <>
+                {" · "}
+                <span className="font-mono tabular-nums text-text-primary">
+                  {onBallotCount}
+                </span>{" "}
+                on the November ballot
+                {notAdvancingCount > 0 && (
+                  <span className="text-text-muted">
+                    {" · "}
+                    {notAdvancingCount} not advancing
+                  </span>
+                )}
+              </>
+            ) : (
+              <>
+                {" · "}
+                <span className="font-mono tabular-nums text-text-primary">
+                  {candCount}
+                </span>{" "}
+                candidate{candCount === 1 ? "" : "s"}
+                {hiddenCandidateCount > 0 && (
+                  <span className="text-text-muted">
+                    {" "}of {race.candidates.length} tracked
+                  </span>
+                )}
+              </>
+            ))}
         </p>
 
-        {hiddenCandidateCount > 0 && (
+        {hasGeneralData && notAdvancingCount > 0 && (
+          <p className="mt-2 text-sm text-text-muted">
+            Candidates who are not on the November ballot stay listed,
+            greyed out.
+          </p>
+        )}
+
+        {!hasGeneralData && hiddenCandidateCount > 0 && (
           <p className="mt-2 text-sm text-text-muted">
             Top five shown, ranked by reported fundraising.
           </p>

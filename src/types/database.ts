@@ -37,6 +37,13 @@ export interface CandidateRow {
   is_incumbent: boolean;
   /** Campaign funds raised, in whole dollars. Source: FEC filings. */
   total_raised: number | null;
+  /**
+   * True once the candidate has advanced to the November general-election
+   * ballot. Sourced from the "general" (Y/N) column on the Candidates
+   * sheet. Optional because rows published before migration 008 (and the
+   * mock-data JSON) don't carry it — absent means false.
+   */
+  in_general_election?: boolean;
   created_at: string;
   updated_at: string;
 }

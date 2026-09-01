@@ -43,3 +43,55 @@ export function capByFundraising<T extends CandidateSummary>(
   const hidden = Math.max(0, ranked.length - shown.length);
   return { shown, hidden };
 }
+
+/** Which lens a race's candidate list is being shown through. */
+export type RaceDisplayMode = "general" | "primary";
+
+/** A candidate annotated with their post-primary status for display. */
+export type RosterCandidate<T extends CandidateSummary> = T & {
+  /** True when the race has general-election results and this candidate is not on the November ballot. */
+  not_advancing: boolean;
+};
+
+/**
+ * Build the display roster for a race, post-primary.
+ *
+ * When at least one candidate carries the sheet-driven
+ * `in_general_election` flag, every candidate stays visible:
+ * general-ballot candidates lead (alphabetical — nonpartisan default),
+ * followed by the fundraising-ranked rest of the primary field marked
+ * `not_advancing` so the UI can grey them out. The fundraising cap
+ * still bounds that tail, so fringe filers don't bury the matchup.
+ *
+ * A race is only ever shown this way on the strength of the sheet's
+ * "general ballot" column. Nothing is inferred: a race the sheet has
+ * not marked keeps the capped primary view unchanged, so the site never
+ * asserts that a real candidate lost.
+ */
+export function selectRaceCandidates<T extends CandidateSummary>(
+  candidates: T[],
+  limit: number = CANDIDATE_DISPLAY_LIMIT
+): { shown: RosterCandidate<T>[]; hidden: number; mode: RaceDisplayMode } {
+  const general = candidates.filter((c) => c.in_general_election);
+  if (general.length > 0) {
+    const generalIds = new Set(general.map((c) => c.id));
+    const onBallot = [...general]
+      .sort((a, b) => a.name.localeCompare(b.name))
+      .map((c) => ({ ...c, not_advancing: false }));
+    const eliminated = capByFundraising(candidates, limit)
+      .shown.filter((c) => !generalIds.has(c.id))
+      .map((c) => ({ ...c, not_advancing: true }));
+    const shown = [...onBallot, ...eliminated];
+    return {
+      shown,
+      hidden: candidates.length - shown.length,
+      mode: "general",
+    };
+  }
+  const { shown, hidden } = capByFundraising(candidates, limit);
+  return {
+    shown: shown.map((c) => ({ ...c, not_advancing: false })),
+    hidden,
+    mode: "primary",
+  };
+}

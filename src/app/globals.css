@@ -16,6 +16,11 @@
   --accent-primary-hover: #1D2D3F;
   --accent-secondary: #5B7B6A;
   --accent-gold: #A67C37;
+  /* Advancing-to-general highlight — light sage, deliberately greener than
+     accent-secondary tints so it doesn't collapse into grey, but distinct
+     from --stance-support so it never reads as an endorsement. */
+  --advancing-bg: #E4EFE3;
+  --advancing-border: #A8C4AB;
 
   /* Landing palette — navy hero + amber CTA */
   --navy: #12192c;
@@ -64,6 +69,8 @@
   --color-accent-primary-hover: var(--accent-primary-hover);
   --color-accent-secondary: var(--accent-secondary);
   --color-accent-gold: var(--accent-gold);
+  --color-advancing-bg: var(--advancing-bg);
+  --color-advancing-border: var(--advancing-border);
   --color-border: var(--border);
   --color-border-strong: var(--border-strong);
   --color-stance-support: var(--stance-support);

@@ -135,6 +135,7 @@ export async function getCandidateSummaries(
       office_sought: c.office_sought,
       is_incumbent: c.is_incumbent,
       total_raised: c.total_raised,
+      in_general_election: c.in_general_election ?? false,
       position_count: count,
       coverage_percentage:
         issueCount > 0 ? Math.round((count / issueCount) * 100) : 0,
