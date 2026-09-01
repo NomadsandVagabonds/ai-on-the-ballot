@@ -10,7 +10,6 @@
  */
 
 import type { CandidateSummary } from "@/types/domain";
-import { GENERAL_ELECTION_SEED } from "./general-election-seed";
 
 export const CANDIDATE_DISPLAY_LIMIT = 5;
 
@@ -57,25 +56,23 @@ export type RosterCandidate<T extends CandidateSummary> = T & {
 /**
  * Build the display roster for a race, post-primary.
  *
- * When at least one candidate is on the November ballot (via the
- * `in_general_election` flag, or the temporary demo seed for races the
- * sheet hasn't marked yet — see general-election-seed.ts, delete at
- * go-live), every candidate stays visible: general-ballot candidates
- * lead (alphabetical — nonpartisan default), followed by the
- * fundraising-ranked rest of the primary field marked `not_advancing`
- * so the UI can grey them out. The fundraising cap still bounds that
- * tail, so fringe filers don't bury the matchup.
+ * When at least one candidate carries the sheet-driven
+ * `in_general_election` flag, every candidate stays visible:
+ * general-ballot candidates lead (alphabetical — nonpartisan default),
+ * followed by the fundraising-ranked rest of the primary field marked
+ * `not_advancing` so the UI can grey them out. The fundraising cap
+ * still bounds that tail, so fringe filers don't bury the matchup.
  *
- * Races without primary results keep the capped primary view unchanged.
+ * A race is only ever shown this way on the strength of the sheet's
+ * "general ballot" column. Nothing is inferred: a race the sheet has
+ * not marked keeps the capped primary view unchanged, so the site never
+ * asserts that a real candidate lost.
  */
 export function selectRaceCandidates<T extends CandidateSummary>(
   candidates: T[],
   limit: number = CANDIDATE_DISPLAY_LIMIT
 ): { shown: RosterCandidate<T>[]; hidden: number; mode: RaceDisplayMode } {
-  let general = candidates.filter((c) => c.in_general_election);
-  if (general.length === 0) {
-    general = candidates.filter((c) => GENERAL_ELECTION_SEED.has(c.slug));
-  }
+  const general = candidates.filter((c) => c.in_general_election);
   if (general.length > 0) {
     const generalIds = new Set(general.map((c) => c.id));
     const onBallot = [...general]
