@@ -6,11 +6,16 @@ import { usePathname } from "next/navigation";
 import { useAppStore } from "@/stores/appStore";
 import { ZipCodeInput } from "@/components/shared/ZipCodeInput";
 
-const NAV_LINKS = [
+const NAV_LINKS: ReadonlyArray<{
+  href: string;
+  label: string;
+  external?: boolean;
+}> = [
   { href: "/map", label: "Map" },
+  { href: "https://aiontheballot.substack.com/", label: "Blog", external: true },
   { href: "/about", label: "About" },
   { href: "/corrections", label: "Submit Correction" },
-] as const;
+];
 
 export function MobileNav() {
   const isMobileNavOpen = useAppStore((s) => s.isMobileNavOpen);
@@ -129,15 +134,28 @@ export function MobileNav() {
 
           {/* Navigation links */}
           <nav className="flex-1 px-4 py-6 space-y-1" aria-label="Mobile navigation">
-            {NAV_LINKS.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className="block rounded-lg px-3 py-3 text-base font-medium text-text-secondary hover:bg-bg-elevated hover:text-accent-primary transition-colors"
-              >
-                {link.label}
-              </Link>
-            ))}
+            {NAV_LINKS.map((link) =>
+              link.external ? (
+                <a
+                  key={link.href}
+                  href={link.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={closeMobileNav}
+                  className="block rounded-lg px-3 py-3 text-base font-medium text-text-secondary hover:bg-bg-elevated hover:text-accent-primary transition-colors"
+                >
+                  {link.label}
+                </a>
+              ) : (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className="block rounded-lg px-3 py-3 text-base font-medium text-text-secondary hover:bg-bg-elevated hover:text-accent-primary transition-colors"
+                >
+                  {link.label}
+                </Link>
+              )
+            )}
           </nav>
 
           {/* Zip code input */}

@@ -3,11 +3,16 @@
 import Link from "next/link";
 import { useAppStore } from "@/stores/appStore";
 
-const NAV_LINKS = [
+const NAV_LINKS: ReadonlyArray<{
+  href: string;
+  label: string;
+  external?: boolean;
+}> = [
   { href: "/map", label: "Map" },
+  { href: "https://aiontheballot.substack.com/", label: "Blog", external: true },
   { href: "/about", label: "About" },
   { href: "/corrections", label: "Submit Correction" },
-] as const;
+];
 
 export function Header() {
   const isMobileNavOpen = useAppStore((s) => s.isMobileNavOpen);
@@ -37,15 +42,27 @@ export function Header() {
             className="hidden md:flex items-center gap-7"
             aria-label="Main navigation"
           >
-            {NAV_LINKS.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className="text-sm text-text-secondary hover:text-accent-primary transition-colors"
-              >
-                {link.label}
-              </Link>
-            ))}
+            {NAV_LINKS.map((link) =>
+              link.external ? (
+                <a
+                  key={link.href}
+                  href={link.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-sm text-text-secondary hover:text-accent-primary transition-colors"
+                >
+                  {link.label}
+                </a>
+              ) : (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className="text-sm text-text-secondary hover:text-accent-primary transition-colors"
+                >
+                  {link.label}
+                </Link>
+              )
+            )}
           </nav>
 
           {/* Mobile hamburger — toggles the panel below */}
@@ -95,13 +112,25 @@ export function Header() {
         <ul className="px-4 sm:px-6 py-2 divide-y divide-border">
           {NAV_LINKS.map((link) => (
             <li key={link.href}>
-              <Link
-                href={link.href}
-                onClick={closeMobileNav}
-                className="block py-3 text-base text-text-primary hover:text-accent-primary transition-colors"
-              >
-                {link.label}
-              </Link>
+              {link.external ? (
+                <a
+                  href={link.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={closeMobileNav}
+                  className="block py-3 text-base text-text-primary hover:text-accent-primary transition-colors"
+                >
+                  {link.label}
+                </a>
+              ) : (
+                <Link
+                  href={link.href}
+                  onClick={closeMobileNav}
+                  className="block py-3 text-base text-text-primary hover:text-accent-primary transition-colors"
+                >
+                  {link.label}
+                </Link>
+              )}
             </li>
           ))}
         </ul>
